@@ -3,6 +3,7 @@ import { z } from 'zod'
 
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
+import { Word } from './definitions'
 
 const SignupFormSchema = z.object({
     username: z.string(),
@@ -43,4 +44,8 @@ export async function login(formData: FormData) {
 
     redirect('/topics')
 
+}
+
+export async function createWord(topicID: string, formData: FormData) {
+    console.log(formData, topicID)
 }

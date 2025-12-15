@@ -6,7 +6,9 @@ type FetchTopicsQuery = {
     language?: string,
 }
 
-export async function fetchTopics(query: FetchTopicsQuery = {}) {
+import { Topic, Word } from '@/lib/definitions'
+
+export async function fetchTopics(query: FetchTopicsQuery = {}): Promise<{ topics: Topic[] }> {
     try {
         const queryParams = new URLSearchParams(query).toString()
         const response = await fetch(`http://localhost:3500/api/v1/topics?${queryParams}`, {
@@ -23,7 +25,7 @@ export async function fetchTopics(query: FetchTopicsQuery = {}) {
     }
 }
 
-export async function fetchTopicByID(id: string) {
+export async function fetchTopicByID(id: string): Promise<{ topic: Topic }> {
     try {
         const response = await fetch(`http://localhost:3500/api/v1/topics/${id}`, {
             method: 'GET',
@@ -38,3 +40,20 @@ export async function fetchTopicByID(id: string) {
         throw new Error('Error fetching The topic')
     }
 }
+
+export async function fetchWords(topicID: string): Promise<{ words: Word[]}> {
+    try {
+        const { topic } = await fetchTopicByID(topicID)
+        const response = await fetch(`http://localhost:3500/api/v1/words?words=${topic.words}`, {
+            method: 'GET',
+            headers: { 
+                'content-type': 'application/json',
+            },
+        })
+        return response.json()
+    } catch (error) {
+        console.error(error)
+        throw new Error('Error fetching words')
+    }
+}
+

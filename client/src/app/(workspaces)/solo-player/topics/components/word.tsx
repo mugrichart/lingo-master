@@ -1,38 +1,39 @@
 import ContentView from './ContentView'
 
 import { Card, CardContent } from "@/components/ui/card"
+import { Word } from '@/lib/definitions'
 
-export const WordCard = () => {
+export const WordCard = ({ word }: { word: Word}) => {
   return (
     <Card className="p-3 aspect-square justify-between w-90">
         <div className="w-full flex justify-between">
-            <label>Word</label>
+            <label>{word.word}</label>
             <div className="flex flex-col">
-                <label>Noun</label>
-                <label>-Jargon</label>
+                <label>{word.type}</label>
+                <label>-{word['language style']}</label>
             </div>
         </div>
         <CardContent className="flex flex-col items-center gap-4">
             <p>
-                def: The definition of the greatest word to ever exist in this realm and the next. So please don't play with me
+                def: {word.meaning}
             </p>
             <p>
-                eg. There are things you joke about and things you don't joke about, and the hardest thing is to know which type you are dealing with
+                eg. {word.example}
             </p>
         </CardContent>
         <div className="">
-            <p>Synonym: The synonym</p>
-            <p>Antonym: The antonym</p>
+            <p>Synonym: {word.synonym}</p>
+            <p>Antonym: {word.antonym}</p>
         </div>
     </Card>
   )
 }
 
-export const WordList = () => {
+export const WordList = ({ words }: { words: Word[]}) => {
   return (
     <ContentView>
       {
-        [0, 1, 2,0, 1, 2,0, 1, 2,0, 1, 2,0, 1, 2,0, 1, 2,].map((_, i) => <WordCard key={i}/>)
+        words.map(word => <WordCard key={word._id} word={word}/>)
       }
     </ContentView>
   )

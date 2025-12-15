@@ -25,7 +25,6 @@ const topicsLayout = async (
     const chain = (await params).slug ?? []
     const topics = await Promise.all(chain.map(fetchTopicByID))
     const breadcrumbs = topics.map(data => ({ slug: data.topic._id, name: data.topic.name }))
-    console.log(chain, breadcrumbs)
 
   return (
     <>
