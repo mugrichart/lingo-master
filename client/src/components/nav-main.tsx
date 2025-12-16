@@ -18,20 +18,82 @@ import {
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar"
 
-export function NavMain({
-  items,
-}: {
-  items: {
-    title: string
-    url: string
-    icon?: LucideIcon
-    isActive?: boolean
-    items?: {
-      title: string
-      url: string
-    }[]
-  }[]
-}) {
+import {
+  UserRound,
+  Trophy,
+  BookOpen,
+  Settings2,
+} from "lucide-react"
+
+const items = [
+    {
+      title: "Solo-player",
+      url: "#",
+      icon: UserRound,
+      isActive: true,
+      items: [
+        {
+          title: "Topics",
+          url: "/solo-player/topics",
+        },
+        {
+          title: "ForYou",
+          url: "#",
+        },
+        {
+          title: "My Learning",
+          url: "#",
+        },
+        {
+          title: "Stories",
+          url: "#",
+        },
+        {
+          title: "Settings",
+          url: "#",
+        },
+      ],
+    },
+    {
+      title: "Multi-player",
+      url: "#",
+      icon: Trophy,
+      items: [
+        {
+          title: "Learning",
+          url: "#",
+        },
+        {
+          title: "Stories",
+          url: "#",
+        },
+      ],
+    },
+    {
+      title: "Imports",
+      url: "#",
+      icon: BookOpen,
+      items: [
+        {
+          title: "From PDF reading",
+          url: "#",
+        },
+        {
+          title: "From Website reading",
+          url: "#",
+        }
+      ],
+    },
+    {
+      title: "Settings",
+      url: "#",
+      icon: Settings2,
+      items: [
+      ],
+    },
+]
+
+export function NavMain() {
   return (
     <SidebarGroup>
       <SidebarGroupLabel>Platform</SidebarGroupLabel>

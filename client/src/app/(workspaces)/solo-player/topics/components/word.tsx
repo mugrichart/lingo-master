@@ -3,6 +3,15 @@ import ContentView from './ContentView'
 import { Card, CardContent } from "@/components/ui/card"
 import { Word } from '@/lib/definitions'
 
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@/components/ui/input-group"
+import { Plus, Search } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import Link from 'next/link'
+
 export const WordCard = ({ word }: { word: Word}) => {
   return (
     <Card className="p-3 aspect-square justify-between w-90">
@@ -29,12 +38,31 @@ export const WordCard = ({ word }: { word: Word}) => {
   )
 }
 
-export const WordList = ({ words }: { words: Word[]}) => {
+export const WordList = ({ words, topicID }: { words: Word[], topicID: string}) => {
   return (
-    <ContentView>
-      {
-        words.map(word => <WordCard key={word._id} word={word}/>)
-      }
-    </ContentView>
+    <div className='w-full h-220 pl-4'>
+      <div className='w-full flex justify-between py-4'>
+        <InputGroup className='max-w-200'>
+          <InputGroupInput placeholder="Search..." />
+          <InputGroupAddon>
+            <Search />
+          </InputGroupAddon>
+          <InputGroupAddon align="inline-end">12 results</InputGroupAddon>
+        </InputGroup>
+        <div>
+          <Link href={topicID ? `/solo-player/topics/create-word?topic=${topicID}` : `/solo-player/topics/create-word`}>
+            <Button>
+              <Plus />
+              Add new word
+            </Button>
+          </Link>
+        </div>
+      </div>
+      <ContentView>
+        {
+          words.map(word => <WordCard key={word._id} word={word}/>)
+        }
+      </ContentView>
+    </div>
   )
 }

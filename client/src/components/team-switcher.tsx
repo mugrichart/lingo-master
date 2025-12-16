@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { ChevronsUpDown, Plus } from "lucide-react"
+import { ChevronsUpDown, Plus, Trophy, UserRound } from "lucide-react"
 
 import {
   DropdownMenu,
@@ -19,14 +19,18 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 
-export function TeamSwitcher({
-  modes,
-}: {
-  modes: {
-    logo: React.ElementType,
-    name: string
-  }[]
-}) {
+const modes = [
+    {
+      logo: UserRound,
+      name: "Solo",
+    },
+    {
+      logo: Trophy,
+      name: "Multiplayer",
+    },
+]
+
+export function TeamSwitcher() {
   const { isMobile } = useSidebar()
   const [activeMode, setActiveMode] = React.useState(modes[0])
 

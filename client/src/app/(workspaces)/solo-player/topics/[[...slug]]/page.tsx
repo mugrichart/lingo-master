@@ -14,6 +14,7 @@ const page = async ({
   const topicID = topicChain?.[topicChain.length - 1]
 
   const { topics } = await fetchTopics(topicID ? { parent : topicID }: {})
+  console.log(topicID)
   const { words } = topicID ? await fetchWords(topicID) : { words: [] }
   
   return (
@@ -26,11 +27,14 @@ const page = async ({
         )
       }
       <TabsContent value="topics">
-        <TopicList topics={topics}/>
+        <TopicList topics={topics} topicID={topicID}/>
       </TabsContent>
-      <TabsContent value="words">
-        <WordList words={words}/>
-      </TabsContent>
+      {
+        topicID && 
+        <TabsContent value="words">
+          <WordList words={words} topicID={topicID}/>
+        </TabsContent>
+      }
   </Tabs>
   )
 }

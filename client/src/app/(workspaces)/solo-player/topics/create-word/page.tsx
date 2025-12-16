@@ -20,20 +20,24 @@ import {
 import { Button } from "@/components/ui/button"
 
 import { createWord } from "@/lib/actions"
+import { fetchTopicByID } from "@/lib/data"
 
 const page = async ({ 
-  params
-}: { params: Promise<{ topicID: string}>}) => {
+  searchParams
+}: { searchParams: Promise<{ topic: string}>}) => {
 
-  const topicIDResolved = (await params).topicID;
+  const topicIDResolved = (await searchParams).topic;
  
   const createWordWithTopicID = createWord.bind(null, topicIDResolved);
+
+  const { topic } = topicIDResolved ? await fetchTopicByID(topicIDResolved) : {}
   
   return (
     <div className="w-full flex justify-center items-center py-20">
-        <Card className="p-3 w-[500px]">
+        <Card className="p-3 w-[500px] py-7 pt-10">
             <CardHeader className="w-full">
                 <CardTitle>Create a new word</CardTitle>
+                <CardDescription>Under the <em>{topic?.name}</em> topic</CardDescription>
             </CardHeader>
 
             <CardContent className="flex flex-col gap-4 w-full bg-blue-5">
@@ -50,7 +54,7 @@ const page = async ({
                     </Field>
                     
                     <Field>
-                        <Select>
+                        <Select name="type">
                             <SelectTrigger className="w-[180px]">
                                 <SelectValue placeholder="Select The Type" />
                             </SelectTrigger>
@@ -69,7 +73,7 @@ const page = async ({
                     </Field>
 
                     <Field>
-                        <Select>
+                        <Select name="language style">
                             <SelectTrigger className="w-[180px]">
                                 <SelectValue placeholder="Select The Style" />
                             </SelectTrigger>
@@ -127,7 +131,7 @@ const page = async ({
                     </Field>
 
                     <Field>
-                        <Button type="submit">Save</Button>
+                        <Button type="submit">Create</Button>
                     </Field>
                 </FieldGroup>
                 </form>

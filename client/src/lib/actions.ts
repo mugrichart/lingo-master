@@ -3,7 +3,7 @@ import { z } from 'zod'
 
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { Word } from './definitions'
+import { revalidatePath } from 'next/cache'
 
 const SignupFormSchema = z.object({
     username: z.string(),
@@ -42,8 +42,40 @@ export async function login(formData: FormData) {
         path: '/'
     })
 
-    redirect('/topics')
+    redirect('/solo-player/topics')
 
+}
+
+const CreateTopicSchema = z.object({
+    name: z.string(),
+    language: z.string()
+})
+
+export async function createTopic(parentTopicID: string, formData: FormData) {
+    const { name, language } = CreateTopicSchema.parse({
+        name: formData.get("name"),
+        language: formData.get("language")
+    })
+
+    try {
+        const sessionToken = (await cookies()).get('sessionToken')?.value
+
+        await fetch("http://localhost:3500/api/v1/topics", {
+            method: 'POST',
+            headers: {
+                'content-type': 'application/json',
+                'Authorization': `Bearer ${sessionToken}`
+            },
+            body: JSON.stringify({ name, language, parent: parentTopicID })
+        })
+
+        
+    } catch (error) {
+        console.error(error)
+        throw new Error('Error creating topic')
+    }
+
+    redirect(parentTopicID ? `/solo-player/topics/${parentTopicID}` : '/solo-player/topics')
 }
 
 export async function createWord(topicID: string, formData: FormData) {

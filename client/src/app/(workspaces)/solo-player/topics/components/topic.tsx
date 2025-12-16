@@ -11,6 +11,13 @@ import ContentView from './ContentView'
 import { Topic } from "@/lib/definitions"
 import Link from "next/link"
 
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@/components/ui/input-group"
+import { Plus, Search } from 'lucide-react'
+
 export const TopicCard = ({ topic }: { topic: Topic }) => {
   return (
     <Card className="p-3 aspect-square justify-between w-70">
@@ -40,19 +47,46 @@ export const TopicCard = ({ topic }: { topic: Topic }) => {
   )
 }
 
-
-export const TopicList = ({ topics }: { topics: Topic[]}) => {
+export const TopicList = ({ topics, topicID }: { topics: Topic[], topicID?: string}) => {
   const pathname = usePathname()
 
   return (
-    <ContentView>
-      {
-        topics.map(topic => (
-          <Link key={topic._id} href={`${pathname}/${topic._id}`}>
-            <TopicCard topic={topic} />
+    <div className='w-full h-220 pl-4'>
+       <div className='w-full flex justify-between py-4'>
+        <InputGroup className='max-w-200'>
+          <InputGroupInput placeholder="Search..." />
+          <InputGroupAddon>
+            <Search />
+          </InputGroupAddon>
+          <InputGroupAddon align="inline-end">12 results</InputGroupAddon>
+        </InputGroup>
+        <div className="flex gap-2">
+          <Link href={topicID ? `/solo-player/topics/create-topic?parentTopic=${topicID}` : `/solo-player/topics/create-topic`}>
+            <Button>
+              <Plus />
+              New {topicID ? "subtopic" : "topic"}
+            </Button>
           </Link>
-        ))
-      }
-    </ContentView>
+          {
+            topicID &&
+            <Link href={topicID ? `/solo-player/topics/create-word?topic=${topicID}` : `/solo-player/topics/create-word`}>
+              <Button>
+                <Plus />
+                New word
+              </Button>
+          </Link>
+          }
+        </div>
+      </div>
+      <ContentView>
+        {
+          topics.map(topic => (
+            <Link key={topic._id} href={`${pathname}/${topic._id}`}>
+              <TopicCard topic={topic} />
+            </Link>
+          ))
+        }
+      </ContentView>
+    </div>
   )
 }
