@@ -40,7 +40,7 @@ export const WordCard = ({ word }: { word: Word}) => {
 
 export const WordList = ({ words, topicID }: { words: Word[], topicID: string}) => {
   return (
-    <div className='w-full h-220 pl-4'>
+    <div className='w-full h-220'>
       <div className='w-full flex justify-between py-4'>
         <InputGroup className='max-w-200'>
           <InputGroupInput placeholder="Search..." />
@@ -50,10 +50,10 @@ export const WordList = ({ words, topicID }: { words: Word[], topicID: string}) 
           <InputGroupAddon align="inline-end">12 results</InputGroupAddon>
         </InputGroup>
         <div>
-          <Link href={topicID ? `/solo-player/topics/create-word?topic=${topicID}` : `/solo-player/topics/create-word`}>
+          <Link href={`/solo-player/topics/create-word?topic=${topicID}`}>
             <Button>
               <Plus />
-              Add new word
+              New word
             </Button>
           </Link>
         </div>

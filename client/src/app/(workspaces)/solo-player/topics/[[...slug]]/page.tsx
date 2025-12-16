@@ -2,7 +2,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {TopicList} from "../components/topic"
 import {WordList} from "../components/word"
 
-import { fetchTopics, fetchWords } from "@/lib/data"
+import { fetchConvos, fetchTopics, fetchWords } from "@/lib/data"
+import { ConvosList } from "../components/convos"
 
 const page = async ({
   params,
@@ -19,13 +20,15 @@ const page = async ({
 
   const { topics } = await fetchTopics(topicID ? { parent : topicID }: {})
   const { words } = topicID ? await fetchWords(topicID) : { words: [] }
+  const { convos } = topicID ? await fetchConvos(topicID) : { convos: []}
   
   return (
-    <Tabs defaultValue={tab} className="w-full h-222">
+    <Tabs defaultValue={tab} className="w-full h-222 pl-4">
       {topicID && words?.length > 0 && (
         <TabsList>
           <TabsTrigger value="topics">Topics</TabsTrigger>
           <TabsTrigger value="words">Words({words?.length || 0})</TabsTrigger>
+          <TabsTrigger value="convos">Convos</TabsTrigger>
         </TabsList>
         )
       }
@@ -38,6 +41,9 @@ const page = async ({
           <WordList words={words} topicID={topicID}/>
         </TabsContent>
       }
+      <TabsContent value="convos">
+        <ConvosList words={words} topicID={topicID} convos={convos}/>
+      </TabsContent>
   </Tabs>
   )
 }

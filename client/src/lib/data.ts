@@ -57,3 +57,17 @@ export async function fetchWords(topicID: string): Promise<{ words: Word[]}> {
     }
 }
 
+export async function fetchConvos(topicID: string): Promise<{ convos: any[]}> {
+    try {
+        const response = await fetch(`http://localhost:3500/api/v1/conversations?topic=${topicID}`, {
+            method: 'GET',
+            headers: { 
+                'content-type': 'application/json',
+            },
+        })
+        return response.json()
+    } catch (error) {
+        console.error(error)
+        throw new Error('Error fetching convos')
+    }
+}

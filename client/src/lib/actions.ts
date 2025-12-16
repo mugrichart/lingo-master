@@ -115,3 +115,40 @@ export async function createWord(topicID: string, formData: FormData) {
 
     redirect(`/solo-player/topics/${topicID}?tab=words`)
 }
+
+// Simple server action to receive a conversation form and read its FormData.
+export async function createConversation(topicID: string | null, formData: FormData) {
+    // Read simple fields
+    const title = formData.get('title')?.toString() ?? ''
+    const description = formData.get('description')?.toString() ?? ''
+
+    // Read repeated fields
+    const characters = formData.getAll('characters').map((v) => v?.toString() ?? '')
+    const lineTexts = formData.getAll('line_text').map((v) => v?.toString() ?? '')
+    const lineActors = formData.getAll('line_actor').map((v) => Number(v))
+
+    // Compose lines by index
+    const lines = lineTexts.map((text, i) => ({ actor: lineActors[i] ?? 0, text }))
+
+    const payload = {
+        topic: topicID,
+        title,
+        description,
+        characters,
+        lines,
+    }
+
+    const sessionToken = (await cookies()).get('sessionToken')?.value
+
+    await fetch("http://localhost:3500/api/v1/conversations", {
+        method: 'POST',
+        headers: {
+            'content-type': 'application/json',
+            'Authorization': `Bearer ${sessionToken}`
+        },
+        body: JSON.stringify(payload)
+    })
+
+
+    redirect(`/solo-player/topics/${topicID}?tab=convos`)
+}

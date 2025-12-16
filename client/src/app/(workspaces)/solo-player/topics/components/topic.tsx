@@ -51,7 +51,7 @@ export const TopicList = ({ topics, topicID }: { topics: Topic[], topicID?: stri
   const pathname = usePathname()
 
   return (
-    <div className='w-full h-220 pl-4'>
+    <div className='w-full h-220'>
        <div className='w-full flex justify-between py-4'>
         <InputGroup className='max-w-200'>
           <InputGroupInput placeholder="Search..." />
