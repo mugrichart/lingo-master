@@ -5,20 +5,23 @@ import {WordList} from "../components/word"
 import { fetchTopics, fetchWords } from "@/lib/data"
 
 const page = async ({
-  params
+  params,
+  searchParams
 }: {
-  params: Promise<{ slug?: string[]}>
+  params: Promise<{ slug?: string[]}>,
+  searchParams: Promise<{ tab?: "topics" | "words" }>,
 }
 ) => {
   const topicChain = (await params).slug
   const topicID = topicChain?.[topicChain.length - 1]
 
+  const tab = (await searchParams).tab || "topics"
+
   const { topics } = await fetchTopics(topicID ? { parent : topicID }: {})
-  console.log(topicID)
   const { words } = topicID ? await fetchWords(topicID) : { words: [] }
   
   return (
-    <Tabs defaultValue="topics" className="w-full h-222">
+    <Tabs defaultValue={tab} className="w-full h-222">
       {topicID && words?.length > 0 && (
         <TabsList>
           <TabsTrigger value="topics">Topics</TabsTrigger>

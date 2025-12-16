@@ -78,6 +78,40 @@ export async function createTopic(parentTopicID: string, formData: FormData) {
     redirect(parentTopicID ? `/solo-player/topics/${parentTopicID}` : '/solo-player/topics')
 }
 
+const CreateWordSchema = z.object({
+    word: z.string(),
+    type: z.string(),
+    style: z.string(),
+    meaning: z.string(),
+    example: z.string(),
+    synonym: z.string(),
+    antonym: z.string()
+})
+
 export async function createWord(topicID: string, formData: FormData) {
-    console.log(formData, topicID)
+    
+    const { word, type, style, meaning, example, synonym, antonym } = CreateWordSchema.parse({
+        word: formData.get('word'),
+        type: formData.get('type'),
+        style: formData.get('language style'),
+        meaning: formData.get('meaning'),
+        example: formData.get('example'),
+        synonym: formData.get('synonym'),
+        antonym: formData.get('antonym')
+    })
+
+    try {
+        await fetch("http://localhost:3500/api/v1/words", {
+            method: 'POST',
+            headers: {
+                'content-type': 'application/json',
+            },
+            body: JSON.stringify({ word, type, 'language style': style, meaning, example, synonym, antonym, topicID: topicID })
+        })
+    } catch (error) {
+        console.error(error)
+        throw new Error('Error creating word')
+    }
+
+    redirect(`/solo-player/topics/${topicID}?tab=words`)
 }
