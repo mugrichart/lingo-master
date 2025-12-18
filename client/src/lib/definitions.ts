@@ -39,3 +39,5 @@ export type Convo = {
     creator: string,
     isAiGenerated: boolean,
 }
+
+export type TopicSuggestion = string

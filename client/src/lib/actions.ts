@@ -53,31 +53,36 @@ const CreateTopicSchema = z.object({
     language: z.string()
 })
 
-export async function createTopic(parentTopicID: string, formData: FormData) {
+
+export async function createTopic(parentTopicID: string, prevState: any, formData: FormData) {
     const { name, language } = CreateTopicSchema.parse({
         name: formData.get("name"),
         language: formData.get("language")
-    })
+    });
 
     try {
-        const sessionToken = (await cookies()).get('sessionToken')?.value
+        const sessionToken = (await cookies()).get('sessionToken')?.value;
 
-        await fetch("http://localhost:3500/api/v1/topics", {
+        const response = await fetch("http://localhost:3500/api/v1/topics", {
             method: 'POST',
             headers: {
                 'content-type': 'application/json',
                 'Authorization': `Bearer ${sessionToken}`
             },
             body: JSON.stringify({ name, language, parent: parentTopicID })
-        })
+        });
 
+        if (!response.ok) {
+            return "Failed to create topic."; // This becomes your errorMessage
+        }
+
+        revalidatePath('/solo-player/topics');
+        return undefined; // Success case
         
     } catch (error) {
-        console.error(error)
-        throw new Error('Error creating topic')
+        console.error(error);
+        return "An error occurred."; // This becomes your errorMessage
     }
-
-    redirect(parentTopicID ? `/solo-player/topics/${parentTopicID}` : '/solo-player/topics')
 }
 
 const CreateWordSchema = z.object({

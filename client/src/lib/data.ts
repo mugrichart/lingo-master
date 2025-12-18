@@ -6,7 +6,7 @@ type FetchTopicsQuery = {
     language?: string,
 }
 
-import { Topic, Word } from '@/lib/definitions'
+import { Topic, Word, TopicSuggestion } from '@/lib/definitions'
 
 export async function fetchTopics(query: FetchTopicsQuery = {}): Promise<{ topics: Topic[] }> {
     try {
@@ -69,5 +69,22 @@ export async function fetchConvos(topicID: string): Promise<{ convos: any[]}> {
     } catch (error) {
         console.error(error)
         throw new Error('Error fetching convos')
+    }
+}
+
+export async function fetchTopicSuggestions(topic: Topic): Promise<{ suggestions: string[]}> {
+    try {
+        const { topics } = await fetchTopics({ parent: topic._id })
+        console.log('Existing subtopics:', topics.map(t => t.name))
+        const response = await fetch(`http://localhost:3500/api/v1/topics/suggestions?topic=${topic.name}&excluded=${topics.map(t => t.name).join(',')}`, {
+            method: 'GET',
+            headers: { 
+                'content-type': 'application/json',
+            },
+        })
+        return response.json()
+    } catch (error) {
+        console.error(error)
+        throw new Error('Error fetching topic suggestions')
     }
 }
