@@ -4,6 +4,8 @@ import { z } from 'zod'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
+import { fetchWords } from './data'
+import { handleBlanksGen } from './utils'
 
 const SignupFormSchema = z.object({
     username: z.string(),
@@ -127,8 +129,19 @@ export async function createConversation(topicID: string | null, formData: FormD
     const lineTexts = formData.getAll('line_text').map((v) => v?.toString() ?? '')
     const lineActors = formData.getAll('line_actor').map((v) => Number(v))
 
+    const { words } = await fetchWords(topicID || '')
+
     // Compose lines by index
-    const lines = lineTexts.map((text, i) => ({ actor: lineActors[i] ?? 0, text }))
+    const lines = lineTexts.map((text, i) => {
+        const { blanked, usedExpressions } = handleBlanksGen(text, words.map(w => w.word), false)
+
+        return { 
+            actor: lineActors[i] ?? 0, 
+            text,
+            blankedText: blanked,
+            usedWords: usedExpressions
+        }
+    })
 
     const payload = {
         topic: topicID,

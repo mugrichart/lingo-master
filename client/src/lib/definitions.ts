@@ -21,3 +21,21 @@ export type Topic = {
     isAiGenerated: boolean,
     parent: string | null,
 }
+
+export type Convo = {
+    _id: string,
+    title: string,
+    description: string,
+    characters: string[],
+    lines: [
+        {
+            actor: number, //index of character
+            text: string,
+            blankedText: string,
+            usedWords: string[],
+        }
+    ],
+    topic: string,
+    creator: string,
+    isAiGenerated: boolean,
+}

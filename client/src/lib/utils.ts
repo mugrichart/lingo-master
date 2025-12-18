@@ -92,10 +92,10 @@ let lastResult: { blanked: string; usedExpressions: string[] } | null = null
 let lastCallTime = 0
 const DEBOUNCE_DELAY = 1000 // milliseconds
 
-export const handleBlanksGen = (sentence: string, expressions: string[]) => {
+export const handleBlanksGen = (sentence: string, expressions: string[], debounceOn: boolean = true) => {
   const now = Date.now()
   
-  if (now - lastCallTime < DEBOUNCE_DELAY && lastResult) {
+  if (now - lastCallTime < DEBOUNCE_DELAY && lastResult && debounceOn) {
     return lastResult
   }
   

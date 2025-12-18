@@ -27,11 +27,13 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion"
 
-export const ConvoCard = ({ words, convo }: { words: Word[], convo: any[] }) => {
+import { Convo } from "@/lib/definitions"
+
+export const ConvoCard = ({ words, convo, topicID }: { words: Word[], convo: Convo, topicID?: string  }) => {
   return (
     <Card className="p-3 aspect-square justify-between items-end w-130 h-fit">
         <CardContent className="w-full h-[90%] justify-between flex flex-col">
-            <div className="w-full h-[200px]"></div>
+            <div className="w-full h-50"></div>
             <Accordion
                 type="single"
                 collapsible
@@ -48,8 +50,8 @@ export const ConvoCard = ({ words, convo }: { words: Word[], convo: any[] }) => 
                     <AccordionTrigger>Key Words</AccordionTrigger>
                     <AccordionContent className="flex gap-4 text-balance">
                         {
-                            ["default", "primary", "secondary", "destructive", "outline"].map(e => (
-                                <Badge variant={e}>word</Badge>
+                            convo.lines.map(line => (
+                                <Badge variant="default">{line.usedWords}</Badge>
                             ))
                         }
                     </AccordionContent>
@@ -58,7 +60,9 @@ export const ConvoCard = ({ words, convo }: { words: Word[], convo: any[] }) => 
 
         </CardContent>
         <CardFooter className="h-[10%]">
+          <Link href={`/solo-player/topics/practice-convo?topic=${topicID}&convo=${convo._id}`}>
             <Button><BookIcon />Practice</Button>
+          </Link>
         </CardFooter>       
     </Card>
   )
@@ -89,7 +93,7 @@ export const ConvosList = ({ words, topicID, convos }: { words: Word[], topicID?
         {
           convos.map(convo => (
             // <Link key={topic._id} href={`${pathname}/${topic._id}`}>
-              <ConvoCard convo={convo} words={words} />
+              <ConvoCard convo={convo} words={words} topicID={topicID}/>
             // </Link>
           ))
         }

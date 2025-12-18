@@ -38,7 +38,7 @@ const page = async ({
 
   return (
     <div className="w-full flex justify-center items-center py-20">
-        <Card className="p-3 w-[500px] py-7 pt-10">
+        <Card className="p-3 w-125 py-7 pt-10">
             <CardHeader className="w-full">
                 <CardTitle>Create a new conversation</CardTitle>
                 <CardDescription>Under the <em>{topic?.name}</em> topic</CardDescription>
@@ -50,7 +50,7 @@ const page = async ({
                     <FieldGroup>
                         {/* ConversationFormClient renders character inputs, line rows and submit button */}
                         <ConversationFormClient words={words}/>
-                </FieldGroup>
+                    </FieldGroup>
                 </form>
             </CardContent>
         </Card>
