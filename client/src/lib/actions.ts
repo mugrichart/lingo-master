@@ -95,7 +95,7 @@ const CreateWordSchema = z.object({
     antonym: z.string()
 })
 
-export async function createWord(topicID: string, formData: FormData) {
+export async function createWord(topicID: string, prevState: any, formData: FormData) {
     
     const { word, type, style, meaning, example, synonym, antonym } = CreateWordSchema.parse({
         word: formData.get('word'),
@@ -120,7 +120,8 @@ export async function createWord(topicID: string, formData: FormData) {
         throw new Error('Error creating word')
     }
 
-    redirect(`/solo-player/topics/${topicID}?tab=words`)
+    revalidatePath('/solo-player/topics');
+    return undefined; // Success case
 }
 
 // Simple server action to receive a conversation form and read its FormData.

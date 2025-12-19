@@ -41,3 +41,5 @@ export type Convo = {
 }
 
 export type TopicSuggestion = string
+
+export type WordSuggestion = Partial<Word>

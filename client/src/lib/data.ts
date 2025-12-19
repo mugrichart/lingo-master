@@ -6,7 +6,7 @@ type FetchTopicsQuery = {
     language?: string,
 }
 
-import { Topic, Word, TopicSuggestion } from '@/lib/definitions'
+import { Topic, Word, TopicSuggestion, WordSuggestion } from '@/lib/definitions'
 
 export async function fetchTopics(query: FetchTopicsQuery = {}): Promise<{ topics: Topic[] }> {
     try {
@@ -72,7 +72,7 @@ export async function fetchConvos(topicID: string): Promise<{ convos: any[]}> {
     }
 }
 
-export async function fetchTopicSuggestions(topic: Topic): Promise<{ suggestions: string[]}> {
+export async function fetchTopicSuggestions(topic: Topic): Promise<{ suggestions: TopicSuggestion[]}> {
     try {
         const { topics } = await fetchTopics({ parent: topic._id })
         console.log('Existing subtopics:', topics.map(t => t.name))
@@ -86,5 +86,41 @@ export async function fetchTopicSuggestions(topic: Topic): Promise<{ suggestions
     } catch (error) {
         console.error(error)
         throw new Error('Error fetching topic suggestions')
+    }
+}
+
+export async function fetchWordSuggestions(topic: Topic): Promise<{ suggestions: WordSuggestion[]}> {
+    try {
+        const { words } = topic.words?.length ? await fetchWords(topic._id) : { words: [] }
+        console.log('Existing words:', words, topic._id)
+        const response = await fetch(`http://localhost:3500/api/v1/words/suggestions?topic=${topic.name}&excluded=${words.map(w => w.word).join(',')}`, {
+            method: 'GET',
+            headers: { 
+                'content-type': 'application/json',
+            },
+        })
+        return response.json()
+    } catch (error) {
+        console.error(error)
+        throw new Error('Error fetching word suggestions')
+    }
+}
+
+export async function expandWordSuggestion(word: string, example: string): Promise<{ detailedSuggestion: Omit<Word, '_id' >}> {
+    try {
+        const response = await fetch(`http://localhost:3500/api/v1/words/suggestions/expand`, {
+            method: 'POST',
+            headers: { 
+                'content-type': 'application/json',
+            },
+            body: JSON.stringify({ word, example })
+        })
+        
+        const { word: detailedSuggestion } = await response.json()
+        return { detailedSuggestion }
+        
+    } catch (error) {
+        console.error(error)
+        throw new Error('Error developing word suggestion')
     }
 }
