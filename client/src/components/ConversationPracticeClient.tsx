@@ -19,6 +19,8 @@ import {
   SelectLabel,
 } from "@/components/ui/select"
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion"
+import { handleBlanksGen } from "@/lib/utils"
+import { range, shuffleArray } from "@/lib/utils/shuffle"
 
 type Props = {
   convo: Convo,
@@ -35,7 +37,7 @@ export default function ConversationPracticeClient({ convo, words }: Props) {
   const [inputValue, setInputValue] = useState('')
   const [showBlankChoicesForLine, setShowBlankChoicesForLine] = useState<number | null>(null)
   const [selectedAnswers, setSelectedAnswers] = useState<string[]>([])
-  const viewportRef = useRef<HTMLDivElement | null>(null)
+  const viewportRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
 
   useEffect(() => {
@@ -64,13 +66,15 @@ export default function ConversationPracticeClient({ convo, words }: Props) {
   }, [currentLine, step, playerIndex, convo.lines])
 
   useEffect(() => {
-    // scroll to bottom when messages change
-    const el = viewportRef.current
-    if (el) {
-      requestAnimationFrame(() => {
-        el.scrollTop = el.scrollHeight
-      })
-    }
+    if (!viewportRef.current) return
+
+    const viewport = viewportRef.current.querySelector(
+      '[data-slot="scroll-area-viewport"]'
+    ) as HTMLDivElement | null
+
+    if (!viewport) return
+
+    viewport.scrollTop = viewport.scrollHeight
   }, [messages])
 
   function chooseCharacter(idx: number) {
@@ -85,13 +89,20 @@ export default function ConversationPracticeClient({ convo, words }: Props) {
     setMessages((m) => [...m, tempMsg])
     setInputValue('')
 
+    const line = convo.lines[currentLine]
+    const match = handleBlanksGen(inputValue, line.text.split(" ")).usedExpressions.length / line.text.split(" ").length
+    if (match > .69) {
+        setMessages((m) => [...m.slice(0, -1), { actor: line.actor, text: line.text }])
+        setCurrentLine(i => i + 1);
+        return;
+    }
     // after 2s replace the temp message with the blanked one and show choices
     setTimeout(() => {
       setMessages((m) => m.filter((mm) => mm !== tempMsg))
-      const line = convo.lines[currentLine]
       if (line) {
         setMessages((m) => [...m, { actor: line.actor, text: line.blankedText, blanked: true }])
-        setShowBlankChoicesForLine(currentLine)
+        if (line.text !== line.blankedText) setShowBlankChoicesForLine(currentLine)
+        else setCurrentLine(i => i + 1)
       }
     }, 2000)
   }
@@ -163,8 +174,8 @@ export default function ConversationPracticeClient({ convo, words }: Props) {
       {step === 'practice' && (
         <div className="flex flex-col h-[60vh] w-150">
           <div className="flex-1 border rounded-md overflow-hidden">
-            <ScrollArea className="h-full">
-              <div ref={viewportRef} className="p-4 space-y-3">
+            <ScrollArea ref={viewportRef} className="h-full">
+              <div className="p-4 space-y-3">
                 {messages.map((m, idx) => {
                   const isPlayer = m.actor === playerIndex
                   const actorName = convo.characters[m.actor] ?? 'Unknown'
@@ -217,8 +228,11 @@ export default function ConversationPracticeClient({ convo, words }: Props) {
               <div className="space-y-2">
                 <div className="text-sm">Choose the missing word</div>
                 <div className="flex gap-2 flex-wrap">
-                  {words.map((w) => (
-                    <Button key={w._id} onClick={() => handleChooseBlankWord(w.word)}>{w.word}</Button>
+                  {shuffleArray([
+                    ...shuffleArray(range(words.length)).slice(0, 3).map(idx => words[idx].word), 
+                    ...convo.lines[currentLine].usedWords
+                  ]).map((w, i) => (
+                    <Button key={i} onClick={() => handleChooseBlankWord(w)}>{w}</Button>
                   ))}
                 </div>
               </div>

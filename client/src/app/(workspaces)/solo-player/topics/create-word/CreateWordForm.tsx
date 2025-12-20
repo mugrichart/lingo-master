@@ -20,7 +20,6 @@ import {
 import { Button } from "@/components/ui/button"
 
 import { createWord } from "@/lib/actions"
-import { fetchTopicByID } from "@/lib/data"
 import { useActionState, useEffect } from "react"
 import { WordSuggestion } from "@/lib/definitions"
 import { Wand, Wand2 } from "lucide-react"

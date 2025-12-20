@@ -30,6 +30,7 @@ import {
 import { Convo } from "@/lib/definitions"
 
 export const ConvoCard = ({ words, convo, topicID }: { words: Word[], convo: Convo, topicID?: string  }) => {
+  console.log(convo.lines.map( line => line.usedWords))
   return (
     <Card className="p-3 aspect-square justify-between items-end w-130 h-fit">
         <CardContent className="w-full h-[90%] justify-between flex flex-col">
@@ -50,8 +51,8 @@ export const ConvoCard = ({ words, convo, topicID }: { words: Word[], convo: Con
                     <AccordionTrigger>Key Words</AccordionTrigger>
                     <AccordionContent className="flex gap-4 text-balance">
                         {
-                            convo.lines.map(line => (
-                                <Badge variant="default">{line.usedWords}</Badge>
+                            [...new Set(convo.lines.flatMap(line => line.usedWords))].map(w =>(
+                                <Badge variant="default">{w}</Badge>
                             ))
                         }
                     </AccordionContent>

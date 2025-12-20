@@ -125,7 +125,7 @@ export async function createWord(topicID: string, prevState: any, formData: Form
 }
 
 // Simple server action to receive a conversation form and read its FormData.
-export async function createConversation(topicID: string | null, formData: FormData) {
+export async function createConversation(topicID: string | null, prevState: any, formData: FormData) {
     // Read simple fields
     const title = formData.get('title')?.toString() ?? ''
     const description = formData.get('description')?.toString() ?? ''
@@ -145,7 +145,7 @@ export async function createConversation(topicID: string | null, formData: FormD
             actor: lineActors[i] ?? 0, 
             text,
             blankedText: blanked,
-            usedWords: usedExpressions
+            usedWords: usedExpressions.filter(w => w)
         }
     })
 

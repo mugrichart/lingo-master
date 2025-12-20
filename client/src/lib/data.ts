@@ -6,7 +6,7 @@ type FetchTopicsQuery = {
     language?: string,
 }
 
-import { Topic, Word, TopicSuggestion, WordSuggestion } from '@/lib/definitions'
+import { Topic, Word, TopicSuggestion, WordSuggestion, ConvoSuggestion, Convo } from '@/lib/definitions'
 
 export async function fetchTopics(query: FetchTopicsQuery = {}): Promise<{ topics: Topic[] }> {
     try {
@@ -106,14 +106,14 @@ export async function fetchWordSuggestions(topic: Topic): Promise<{ suggestions:
     }
 }
 
-export async function expandWordSuggestion(word: string, example: string): Promise<{ detailedSuggestion: Omit<Word, '_id' >}> {
+export async function expandWordSuggestion(wordSuggestion: WordSuggestion): Promise<{ detailedSuggestion: Omit<Word, '_id' >}> {
     try {
         const response = await fetch(`http://localhost:3500/api/v1/words/suggestions/expand`, {
             method: 'POST',
             headers: { 
                 'content-type': 'application/json',
             },
-            body: JSON.stringify({ word, example })
+            body: JSON.stringify(wordSuggestion)
         })
         
         const { word: detailedSuggestion } = await response.json()
@@ -121,6 +121,40 @@ export async function expandWordSuggestion(word: string, example: string): Promi
         
     } catch (error) {
         console.error(error)
-        throw new Error('Error developing word suggestion')
+        throw new Error('Error expanding word suggestion')
+    }
+}
+
+export async function fetchConvoSuggestions(topic: Topic, words: Word[]): Promise<{ suggestions: ConvoSuggestion[]}> {
+    try {
+        const response = await fetch(`http://localhost:3500/api/v1/conversations/suggestions?topic=${topic.name}&words=${words.map(w => w.word).join(',')}`, {
+            method: 'GET',
+            headers: {
+                'content-type': 'application/json',
+            },
+        })
+        return response.json()
+    } catch (error) {
+        console.error(error)
+        throw new Error('Error fetching conversation suggestions')
+    }
+}
+
+export async function expandConvoSuggestion(topic: string, convoSuggestion: ConvoSuggestion): Promise<{ detailedSuggestion: Convo}> {
+    try {
+        const response = await fetch(`http://localhost:3500/api/v1/conversations/suggestions/expand`, {
+            method: 'POST',
+            headers: { 
+                'content-type': 'application/json',
+            },
+            body: JSON.stringify({ topic, convoSuggestion })
+        })
+        
+        const { detailedSuggestion } = await response.json()
+        return { detailedSuggestion }
+        
+    } catch (error) {
+        console.error(error)
+        throw new Error('Error expanding conversation suggestion')
     }
 }

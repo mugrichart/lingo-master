@@ -17,7 +17,6 @@ const CreateTopicClient = ({
 
   return (
     <div className="w-full flex justify-center gap-10 py-20">
-        <SuggestionsPanel page="topics" initialSuggestions={suggestions} chooseSuggestion={setSelectedSuggestion}/>
         <Card className="p-3 w-125 py-7 pt-10 h-fit">
             <CardHeader className="w-full">
                 <CardTitle>Create a new {topic ? "subtopic" : "topic"}</CardTitle>
@@ -31,6 +30,7 @@ const CreateTopicClient = ({
             </CardContent>
 
         </Card>
+        <SuggestionsPanel page="topics" initialSuggestions={suggestions} chooseSuggestion={setSelectedSuggestion}/>
     </div>
   )
 }

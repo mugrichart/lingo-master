@@ -7,9 +7,7 @@ const page = async ({
 }: { searchParams: Promise<{ topic: string}>}) => {
 
     const topicIDResolved = (await searchParams).topic;
-   
     const { topic } = await fetchTopicByID(topicIDResolved)
-    console.log(topic)
     const { suggestions } = await fetchWordSuggestions(topic)
 
     

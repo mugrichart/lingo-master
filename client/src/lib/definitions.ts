@@ -42,4 +42,10 @@ export type Convo = {
 
 export type TopicSuggestion = string
 
-export type WordSuggestion = Partial<Word>
+type OptionalExcept<T, Exceptions extends keyof T> = Pick<T, Exceptions> & Partial<Omit<T, Exceptions>>
+
+export type WordSuggestion = OptionalExcept<Word, "word" | "example">
+
+export type ConvoSuggestion = OptionalExcept<Convo, "title" | "description"> & {
+    suggestedWords?: string[]
+}

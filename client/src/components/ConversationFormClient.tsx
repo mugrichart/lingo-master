@@ -1,10 +1,10 @@
 'use client'
-import React, { useEffect, useState } from "react"
+import React, { useActionState, useEffect, useState } from "react"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { Field } from "@/components/ui/field"
-import { Plus, Trash2 } from "lucide-react"
+import { Plus, Trash2, Wand2 } from "lucide-react"
 import {
   Select,
   SelectContent,
@@ -14,25 +14,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Word } from "@/lib/definitions"
+import { ConvoSuggestion, Word } from "@/lib/definitions"
 import { Badge } from "./ui/badge"
 
 import { handleBlanksGen } from "@/lib/utils"
 
-/**
- Props:
-  - initialTopicName: just used for display (optional)
- 
- Form submission:
-  - characters -> multiple inputs named "characters" (array)
-  - line_text -> multiple inputs named "line_text" (array)
-  - line_actor -> multiple hidden inputs named "line_actor" (array of actor indices)
-  Server action should receive FormData and can reconstruct lines by order.
-*/
-
-export default function ConversationFormClient({ words }: { words: Word[] }) {
+export default function ConversationFormClient(
+  { words, convoSuggestion }: 
+  { words: Word[], convoSuggestion: ConvoSuggestion | null }
+) {
+  console.log(convoSuggestion)
   const [characters, setCharacters] = useState<string[]>([""])
   const [usedWords, setUsedWords] = useState<string[]>([])
+  const [theWords] = useState<string[]>(words.map(w => w.word))
   const [lines, setLines] = useState<{ actor: number; text: string }[]>([
     { actor: 0, text: "" },
   ])
@@ -40,9 +34,19 @@ export default function ConversationFormClient({ words }: { words: Word[] }) {
   useEffect(() => {
     const lastLine = lines[lines.length - 1]
     if (!lastLine) return;
-    const { usedExpressions } = handleBlanksGen(lastLine.text, words.map(w => w.word))
+    const { usedExpressions } = handleBlanksGen(lastLine.text, theWords)
     setUsedWords([...new Set([...usedWords, ...usedExpressions])])
   }, [lines])
+
+  useEffect(() => {
+    if (convoSuggestion?.characters) {
+      setCharacters(convoSuggestion.characters)
+    }
+    if (convoSuggestion?.lines) {
+      setLines(convoSuggestion.lines);
+      setUsedWords(convoSuggestion.lines.flatMap(line => handleBlanksGen(line.text, theWords).usedExpressions))
+    }
+  }, [convoSuggestion])
 
   const addCharacter = () => setCharacters((s) => [...s, ""])
   const updateCharacter = (idx: number, val: string) =>
@@ -71,12 +75,12 @@ export default function ConversationFormClient({ words }: { words: Word[] }) {
     <>
       <Field>
         <label className="block text-sm font-medium text-muted-foreground">Title</label>
-        <Input id="title" name="title" placeholder="Conversation title" required />
+        <Input id="title" name="title" placeholder="Conversation title" required defaultValue={convoSuggestion?.title ?? ""}/>
       </Field>
 
       <Field>
         <label className="block text-sm font-medium text-muted-foreground">Description</label>
-        <Textarea id="description" name="description" placeholder="Describe the conversation" rows={3} required />
+        <Textarea id="description" name="description" placeholder="Describe the conversation" rows={3} required defaultValue={convoSuggestion?.description ?? ""} />
       </Field>
 
       <Field>
@@ -163,18 +167,14 @@ export default function ConversationFormClient({ words }: { words: Word[] }) {
           ))}
         </div>
         <div>
-            <label className="text-sm font-medium">Key words:</label>
+            <label className="text-sm font-medium">Used words:</label>
             <div className="flex gap-1 flex-wrap">
                 {
-                    words.map(word => <Badge variant={usedWords.includes(word.word) ? "default" : "outline"}>{word.word}</Badge>)
+                    usedWords.map(word => <Badge>{word}</Badge>)
                 }
             </div>
         </div>
       </Field>
-
-      <div className="mt-4 flex justify-end">
-        <Button type="submit">Create</Button>
-      </div>
     </>
   )
 }

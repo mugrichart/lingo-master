@@ -16,26 +16,26 @@ const CreateWordClient =  ({
     suggestions: WordSuggestion[],
     topic: Topic,
 }) => {
-    const [selectedSuggestion, setSelectedSuggestion] = useState<Partial<Word> | null>(null)
+    const [selectedSuggestion, setSelectedSuggestion] = useState<WordSuggestion | null>(null)
 
     async function expandWithAI () {
-        const { detailedSuggestion } = await expandWordSuggestion(selectedSuggestion?.word!, selectedSuggestion?.example!)
+        const { detailedSuggestion } = await expandWordSuggestion(selectedSuggestion as WordSuggestion)
         setSelectedSuggestion(detailedSuggestion)
     }
  
   return (
     <div className="w-full flex justify-center gap-10 py-20">
-        <SuggestionsPanel page="words" initialSuggestions={suggestions} chooseSuggestion={setSelectedSuggestion}/>
         <Card className="p-3 w-125 py-7 pt-10 h-fit">
             <CardHeader className="w-full">
                 <CardTitle>Create a new word</CardTitle>
                 <CardDescription>Under the <em>{topic?.name}</em> topic</CardDescription>
             </CardHeader>
 
-            <CardContent className="flex flex-col gap-4 w-full bg-blue-5">
+            <CardContent className="flex flex-col gap-4 w-full">
                  <CreateWordForm topicID={topic._id} wordSuggestion={selectedSuggestion} resetForm={() => setSelectedSuggestion(null)} developWithAI={expandWithAI}/>
             </CardContent>
         </Card>
+        <SuggestionsPanel page="words" initialSuggestions={suggestions} chooseSuggestion={setSelectedSuggestion}/>
     </div>
   )
 }
