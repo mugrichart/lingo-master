@@ -96,6 +96,16 @@ const CreateWordSchema = z.object({
     antonym: z.string()
 })
 
+const PracticeBookSchema = z.object({
+    title: z.string(),
+    author: z.string(),
+    pageCount: z.coerce.number().positive(),
+    startingPage: z.coerce.number().positive(),
+    endingPage: z.coerce.number().positive(),
+    bookFile: z.file(),
+    bookCover: z.file()
+})
+
 export async function createWord(topicID: string, prevState: any, formData: FormData) {
     
     const { word, type, style, meaning, example, synonym, antonym } = CreateWordSchema.parse({
@@ -171,4 +181,32 @@ export async function createConversation(topicID: string | null, prevState: any,
 
     revalidatePath('/solo-player/topics');
     return undefined; // Success case
+}
+
+export async function uploadPracticeBook(formData: FormData) {
+    PracticeBookSchema.parse({
+        title: formData.get("title"),
+        author: formData.get("author"),
+        pageCount: formData.get("pageCount"),
+        startingPage: formData.get("startingPage"),
+        endingPage: formData.get("endingPage"),
+        bookFile: formData.get("bookFile"),
+        bookCover: formData.get("bookCover")
+    })
+    
+    try {
+        const response = await fetch(`${env.NEXT_PUBLIC_API_BASE_URL}/practice-with-books/upload`, {
+            method: "POST",
+            body: formData
+        })
+
+        if (!response.ok) {
+            throw new Error("Upload failed")
+        }
+
+        return await response.json()
+    } catch (error) {
+        console.error(error)
+        throw new Error('Error uploading the practice book')
+    }
 }

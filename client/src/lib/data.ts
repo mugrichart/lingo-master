@@ -159,3 +159,17 @@ export async function expandConvoSuggestion(topic: string, convoSuggestion: Conv
         throw new Error('Error expanding conversation suggestion')
     }
 }
+
+export async function fetchPracticeBooks() {
+    try {
+        const response = await fetch(`${env.NEXT_PUBLIC_API_BASE_URL}/practice-with-books`, {
+            headers: {
+                "content-type": "application/json"
+            }
+        })
+        return response.json()
+    } catch (error) {
+        console.error(error)
+        throw new Error("Error fetching practice books")
+    }
+}
