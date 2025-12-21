@@ -1,5 +1,6 @@
 'use server'
 import { z } from 'zod'
+import { env } from "@/env"
 
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
@@ -21,7 +22,7 @@ export async function login(formData: FormData) {
         password: formData.get('password')
     })
 
-    const response = await fetch('http://localhost:3500/api/v1/auth/login', {
+    const response = await fetch(`${env.NEXT_PUBLIC_API_BASE_URL}/auth/login`, {
         method: 'POST',
         headers: {
             'content-type': 'application/json'
@@ -38,7 +39,7 @@ export async function login(formData: FormData) {
 
     (await cookies()).set('sessionToken', authToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: env.NODE_ENV === 'production',
         sameSite: 'strict',
         maxAge: 60 * 60 * 24 * 7,
         path: '/'
@@ -63,7 +64,7 @@ export async function createTopic(parentTopicID: string, prevState: any, formDat
     try {
         const sessionToken = (await cookies()).get('sessionToken')?.value;
 
-        const response = await fetch("http://localhost:3500/api/v1/topics", {
+        const response = await fetch(`${env.NEXT_PUBLIC_API_BASE_URL}/topics`, {
             method: 'POST',
             headers: {
                 'content-type': 'application/json',
@@ -108,7 +109,7 @@ export async function createWord(topicID: string, prevState: any, formData: Form
     })
 
     try {
-        await fetch("http://localhost:3500/api/v1/words", {
+        await fetch(`${env.NEXT_PUBLIC_API_BASE_URL}/words`, {
             method: 'POST',
             headers: {
                 'content-type': 'application/json',
@@ -159,7 +160,7 @@ export async function createConversation(topicID: string | null, prevState: any,
 
     const sessionToken = (await cookies()).get('sessionToken')?.value
 
-    await fetch("http://localhost:3500/api/v1/conversations", {
+    await fetch(`${env.NEXT_PUBLIC_API_BASE_URL}/conversations`, {
         method: 'POST',
         headers: {
             'content-type': 'application/json',

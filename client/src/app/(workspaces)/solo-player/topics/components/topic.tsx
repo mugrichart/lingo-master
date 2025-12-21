@@ -67,15 +67,6 @@ export const TopicList = ({ topics, topicID }: { topics: Topic[], topicID?: stri
               New {topicID ? "subtopic" : "topic"}
             </Button>
           </Link>
-          {
-            topicID &&
-            <Link href={topicID ? `/solo-player/topics/create-word?topic=${topicID}` : `/solo-player/topics/create-word`}>
-              <Button>
-                <Plus />
-                New word
-              </Button>
-          </Link>
-          }
         </div>
       </div>
       <ContentView>

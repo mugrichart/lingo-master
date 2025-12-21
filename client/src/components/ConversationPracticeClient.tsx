@@ -75,7 +75,7 @@ export default function ConversationPracticeClient({ convo, words }: Props) {
     if (!viewport) return
 
     viewport.scrollTop = viewport.scrollHeight
-  }, [messages])
+  }, [messages, convo.lines[currentLine]?.actor === playerIndex])
 
   function chooseCharacter(idx: number) {
     setPlayerIndex(idx)
