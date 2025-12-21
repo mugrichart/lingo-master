@@ -169,6 +169,6 @@ export async function createConversation(topicID: string | null, prevState: any,
         body: JSON.stringify(payload)
     })
 
-
-    redirect(`/solo-player/topics/${topicID}?tab=convos`)
+    revalidatePath('/solo-player/topics');
+    return undefined; // Success case
 }

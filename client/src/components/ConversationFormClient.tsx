@@ -39,12 +39,13 @@ export default function ConversationFormClient(
   }, [lines])
 
   useEffect(() => {
-    if (convoSuggestion?.characters) {
-      setCharacters(convoSuggestion.characters)
-    }
+    setCharacters(convoSuggestion?.characters || [])
+    
     if (convoSuggestion?.lines) {
       setLines(convoSuggestion.lines);
       setUsedWords(convoSuggestion.lines.flatMap(line => handleBlanksGen(line.text, theWords).usedExpressions))
+    } else {
+      setLines([])
     }
   }, [convoSuggestion])
 

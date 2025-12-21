@@ -60,7 +60,7 @@ export const WordList = ({ words, topicID }: { words: Word[], topicID: string}) 
       </div>
       <ContentView>
         {
-          words.map(word => <WordCard key={word._id} word={word}/>)
+          words?.map(word => <WordCard key={word._id} word={word}/>)
         }
       </ContentView>
     </div>

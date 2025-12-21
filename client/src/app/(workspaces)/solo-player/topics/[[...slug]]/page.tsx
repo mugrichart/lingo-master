@@ -24,11 +24,11 @@ const page = async ({
   
   return (
     <Tabs defaultValue={tab} className="w-full h-222 pl-4">
-      {topicID && words?.length > 0 && (
+      {topicID && (
         <TabsList>
           <TabsTrigger value="topics">Topics</TabsTrigger>
           <TabsTrigger value="words">Words({words?.length || 0})</TabsTrigger>
-          <TabsTrigger value="convos">Convos</TabsTrigger>
+          <TabsTrigger value="convos">Convos({convos?.length || 0})</TabsTrigger>
         </TabsList>
         )
       }
