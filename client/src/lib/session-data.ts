@@ -23,3 +23,24 @@ export async function fetchUserProfile() {
         throw new Error('Error fetching user')
     }
 }
+
+
+export async function fetchPracticeBookPage(bookID: string, page?: number) {
+
+    const queryParams = new URLSearchParams({ bookID, page: page ?? "" })
+
+    try {
+        const sessionToken = (await cookies()).get('sessionToken')?.value
+        
+        const response = await fetch(`${env.NEXT_PUBLIC_API_BASE_URL}/practice-with-books/practice?${queryParams}`, {
+            headers: {
+                "content-type": "application/json",
+                "Authorization": `Bearer ${sessionToken}`
+            }
+        })
+        return response.json()
+    } catch (error) {
+        console.error(error)
+        throw new Error("Error fetching practice book page")
+    }
+}

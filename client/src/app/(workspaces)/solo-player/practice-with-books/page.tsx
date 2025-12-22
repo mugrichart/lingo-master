@@ -4,11 +4,11 @@ import { Plus, Search } from "lucide-react"
 import ContentView from "../topics/components/ContentView"
 import Link from "next/link"
 import { fetchPracticeBooks } from "@/lib/data"
+import BookCard from "./BookCard"
 
 
 const page = async () => {
   const { books } = await fetchPracticeBooks()
-  console.log(books)
   
   return (
     <div className='w-full h-220'>
@@ -30,14 +30,13 @@ const page = async () => {
         </div>
       </div>
       <ContentView>
-        {/* {
-          topics.map(topic => (
-            <Link key={topic._id} href={`${pathname}/${topic._id}`}>
-              <TopicCard topic={topic} />
+        {
+          books.map(book => (
+            <Link key={book._id} href={`/solo-player/practice-with-books/practice?bookID=${book._id}`}>
+              <BookCard book={book} />
             </Link>
           ))
-        } */}
-        <></>
+        }
       </ContentView>
     </div>
   )

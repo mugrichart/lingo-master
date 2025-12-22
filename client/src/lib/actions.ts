@@ -193,10 +193,15 @@ export async function uploadPracticeBook(formData: FormData) {
         bookFile: formData.get("bookFile"),
         bookCover: formData.get("bookCover")
     })
+
+    const sessionToken = (await cookies()).get("sessionToken")?.value
     
     try {
         const response = await fetch(`${env.NEXT_PUBLIC_API_BASE_URL}/practice-with-books/upload`, {
             method: "POST",
+            headers: {
+                "Authorization": `Bearer ${sessionToken}`
+            },
             body: formData
         })
 
@@ -204,7 +209,8 @@ export async function uploadPracticeBook(formData: FormData) {
             throw new Error("Upload failed")
         }
 
-        return await response.json()
+        revalidatePath('/solo-player/practice-with-books')
+        redirect('/solo-player/practice-with-books')
     } catch (error) {
         console.error(error)
         throw new Error('Error uploading the practice book')

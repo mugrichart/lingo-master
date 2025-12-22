@@ -7,7 +7,7 @@ type FetchTopicsQuery = {
     language?: string,
 }
 
-import { Topic, Word, TopicSuggestion, WordSuggestion, ConvoSuggestion, Convo } from '@/lib/definitions'
+import { Topic, Word, TopicSuggestion, WordSuggestion, ConvoSuggestion, Convo, PracticeBook } from '@/lib/definitions'
 
 export async function fetchTopics(query: FetchTopicsQuery = {}): Promise<{ topics: Topic[] }> {
     try {
@@ -160,7 +160,7 @@ export async function expandConvoSuggestion(topic: string, convoSuggestion: Conv
     }
 }
 
-export async function fetchPracticeBooks() {
+export async function fetchPracticeBooks(): Promise<{ books: PracticeBook[] }> {
     try {
         const response = await fetch(`${env.NEXT_PUBLIC_API_BASE_URL}/practice-with-books`, {
             headers: {

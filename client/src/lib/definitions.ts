@@ -40,6 +40,17 @@ export type Convo = {
     isAiGenerated: boolean,
 }
 
+export type PracticeBook = {
+    _id: string,
+    title: string,
+    author: string,
+    pageCount: number,
+    startingPage: number,
+    endingPage: number,
+    pdfUrl: string,
+    coverUrl: string
+}
+
 export type TopicSuggestion = string
 
 type OptionalExcept<T, Exceptions extends keyof T> = Pick<T, Exceptions> & Partial<Omit<T, Exceptions>>
