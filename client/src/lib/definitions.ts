@@ -51,6 +51,12 @@ export type PracticeBook = {
     coverUrl: string
 }
 
+export type PracticeBookPage = {
+    text: string,
+    words: string[],
+    options: string[]
+}
+
 export type TopicSuggestion = string
 
 type OptionalExcept<T, Exceptions extends keyof T> = Pick<T, Exceptions> & Partial<Omit<T, Exceptions>>

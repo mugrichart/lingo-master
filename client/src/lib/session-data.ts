@@ -1,6 +1,7 @@
 
 import { cookies } from 'next/headers'
 import { env } from '@/env'
+import { PracticeBookPage } from './definitions'
 
 export async function fetchUserProfile() {
     try {
@@ -25,7 +26,7 @@ export async function fetchUserProfile() {
 }
 
 
-export async function fetchPracticeBookPage(bookID: string, page?: number) {
+export async function fetchPracticeBookPage(bookID: string, page?: number): Promise<{ page: PracticeBookPage, cursorAt: number}> {
 
     const queryParams = new URLSearchParams({ bookID, page: page ?? "" })
 

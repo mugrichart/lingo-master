@@ -123,3 +123,12 @@
     @apply bg-background text-foreground;
   }
 }
+
+@keyframes game-pop {
+  0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+  50% { transform: translate(-50%, -50%) scale(6); opacity: 1; } /* Overshoot */
+  70% { transform: translate(-50%, -50%) scale(4.5); } /* Settle */
+  80% { transform: translate(-50%, -50%) scale(5) rotate(5deg); } /* Vibrate start */
+  90% { transform: translate(-50%, -50%) scale(5) rotate(-5deg); }
+  100% { transform: translate(-50%, -50%) scale(5) rotate(0deg); }
+}
