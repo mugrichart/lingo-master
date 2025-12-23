@@ -209,10 +209,11 @@ export async function uploadPracticeBook(formData: FormData) {
             throw new Error("Upload failed")
         }
 
-        revalidatePath('/solo-player/practice-with-books')
-        redirect('/solo-player/practice-with-books')
     } catch (error) {
         console.error(error)
         throw new Error('Error uploading the practice book')
     }
+    
+    revalidatePath('/solo-player/practice-with-books')
+    redirect('/solo-player/practice-with-books')
 }
