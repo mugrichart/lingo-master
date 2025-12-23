@@ -8,10 +8,10 @@ import { handleBlanksGen } from '@/lib/utils'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 
-const PracticeClient = ({ page, bookID, pageNumber }: { page: PracticeBookPage, bookID: string, pageNumber: number}) => {
+const PracticeClient = ({ page, bookID, pageNumber, score: initialScore }: { page: PracticeBookPage, bookID: string, pageNumber: number, score: number}) => {
     const [currentPidx, setCurrentPidx] = useState(0)
     const [solvedWords, setSolvedWords] = useState<string[]>([])
-    const [score, setScore] = useState(0)
+    const [score, setScore] = useState(initialScore)
 
     const allPs = useMemo(() => page.text.split("\n"), [page.text])
 
@@ -155,9 +155,9 @@ const PracticeClient = ({ page, bookID, pageNumber }: { page: PracticeBookPage, 
                 </ScrollArea>
                 <CardFooter className="flex justify-center">
                     <div className="flex gap-5 items-center">
-                        <Link className="bg-secondary p-1 pl-3 rounded-l-md" href={`practice?bookID=${bookID}&page=${pageNumber - 1}`}>Prev Page</Link>
+                        <Link className="bg-secondary p-1 pl-3 rounded-l-md" href={`practice?bookID=${bookID}&page=${pageNumber - 1}&score=${score}`}>Prev Page</Link>
                         <label htmlFor="">{pageNumber}</label>
-                        <Link className="bg-secondary p-1 pr-3 rounded-r-md" href={`practice?bookID=${bookID}&page=${pageNumber + 1}`}>Next Page</Link>
+                        <Link className="bg-secondary p-1 pr-3 rounded-r-md" href={`practice?bookID=${bookID}&page=${pageNumber + 1}&score=${score}`}>Next Page</Link>
                     </div>
                 </CardFooter>
             </Card>

@@ -8,10 +8,10 @@ import BookCard from "./BookCard"
 
 
 const page = async () => {
-  const { books } = await fetchPracticeBooks()
+  const { books, practiceTracking } = await fetchPracticeBooks()
   
   return (
-    <div className='w-full h-220'>
+    <div className='w-full h-220 px-5'>
        <div className='w-full flex justify-between py-4'>
         <InputGroup className='max-w-200'>
           <InputGroupInput placeholder="Search..." />
@@ -20,19 +20,20 @@ const page = async () => {
           </InputGroupAddon>
           <InputGroupAddon align="inline-end">12 results</InputGroupAddon>
         </InputGroup>
-        <div className="flex gap-2">
+        <div className="flex gap-10 items-center">
           <Link href={`/solo-player/practice-with-books/upload`}>
             <Button>
               <Plus />
               New book
             </Button>
           </Link>
+          <span>{practiceTracking.score}🪙</span>
         </div>
       </div>
       <ContentView>
         {
           books.map(book => (
-            <Link key={book._id} href={`/solo-player/practice-with-books/practice?bookID=${book._id}`}>
+            <Link key={book._id} href={`/solo-player/practice-with-books/practice?bookID=${book._id}&score=${practiceTracking.score}`}>
               <BookCard book={book} />
             </Link>
           ))

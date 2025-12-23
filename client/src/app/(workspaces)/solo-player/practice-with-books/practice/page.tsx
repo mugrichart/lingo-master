@@ -1,13 +1,16 @@
-import { fetchPracticeBookPage } from "@/lib/session-data"
+import { fetchPracticeBookPage, fetchPracticeTracking } from "@/lib/session-data"
 import PracticeClient from "./PracticeClient"
+import { updatePracticeTracking } from "@/lib/actions"
 
 const page = async ({
     searchParams
 }:{
-    searchParams: Promise<{bookID: string, page?: number}>
+    searchParams: Promise<{bookID: string, page?: number, score?: number}>
 }) => {
-    const { bookID, page: pageNumber } = await searchParams
+    const { bookID, page: pageNumber, score: sc } = await searchParams
     const { page, cursorAt } = await fetchPracticeBookPage(bookID, pageNumber)
+    const score = sc || ((await fetchPracticeTracking()).practiceTracking).score;
+    await updatePracticeTracking(score)
 
   return (
     <div className="h-screen">
@@ -22,7 +25,7 @@ const page = async ({
 
         {/* Your Content Container */}
         <div className="absolute inset-0 w-full h-screen flex justify-center px-10"  id="book">
-            <PracticeClient bookID={bookID} page={page} pageNumber={Number(pageNumber ?? cursorAt)}/>
+            <PracticeClient bookID={bookID} page={page} pageNumber={Number(pageNumber ?? cursorAt)} score={Number(score)}/>
         </div>
     </div>
   )

@@ -217,3 +217,21 @@ export async function uploadPracticeBook(formData: FormData) {
     revalidatePath('/solo-player/practice-with-books')
     redirect('/solo-player/practice-with-books')
 }
+
+export async function updatePracticeTracking(score: number) {
+    const sessionToken = (await cookies()).get('sessionToken')?.value
+    try {
+        const response = await fetch(`${env.NEXT_PUBLIC_API_BASE_URL}/practice-with-books/tracking`, {
+            method: 'POST',
+            headers: {
+                "content-type": "application/json",
+                "Authorization": `Bearer ${sessionToken}`
+            },
+            body: JSON.stringify({ score })
+        })
+        return response.json()
+    } catch (error) {
+        console.error(error)
+        throw new Error("Error updating practice tracking")
+    }
+}

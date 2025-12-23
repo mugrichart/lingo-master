@@ -45,3 +45,20 @@ export async function fetchPracticeBookPage(bookID: string, page?: number): Prom
         throw new Error("Error fetching practice book page")
     }
 }
+
+export async function fetchPracticeTracking(): Promise<{ practiceTracking: { user: string, score: number} }>{
+    const sessionToken = (await cookies()).get('sessionToken')?.value
+    try {
+        const response = await fetch(`${env.NEXT_PUBLIC_API_BASE_URL}/practice-with-books/tracking`, {
+            headers: {
+                "content-type": "application/json",
+                "Authorization": `Bearer ${sessionToken}`
+            }
+        })
+
+        return response.json()
+    } catch (error) {
+        console.error(error)
+        throw new Error("Error fetching practice tracking")
+    }
+}
