@@ -157,7 +157,9 @@ const PracticeClient = ({ page, bookID, pageNumber, score: initialScore }: { pag
                     <div className="flex gap-5 items-center">
                         <Link className="bg-secondary p-1 pl-3 rounded-l-md" href={`practice?bookID=${bookID}&page=${pageNumber - 1}&score=${score}`}>Prev Page</Link>
                         <label htmlFor="">{pageNumber}</label>
-                        <Link className="bg-secondary p-1 pr-3 rounded-r-md" href={`practice?bookID=${bookID}&page=${pageNumber + 1}&score=${score}`}>Next Page</Link>
+                        { currentPidx >= allPs.length &&
+                            <Link className="bg-secondary p-1 pr-3 rounded-r-md" href={`practice?bookID=${bookID}&page=${pageNumber + 1}&score=${score}`}>Next Page</Link>
+                        }
                     </div>
                 </CardFooter>
             </Card>

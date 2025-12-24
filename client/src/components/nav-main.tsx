@@ -37,6 +37,10 @@ const items = [
           url: "/solo-player/topics",
         },
         {
+          title: "Books",
+          url: "/solo-player/practice-with-books",
+        },
+        {
           title: "ForYou",
           url: "#",
         },

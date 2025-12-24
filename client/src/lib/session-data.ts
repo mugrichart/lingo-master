@@ -28,7 +28,7 @@ export async function fetchUserProfile() {
 
 export async function fetchPracticeBookPage(bookID: string, page?: number): Promise<{ page: PracticeBookPage, cursorAt: number}> {
 
-    const queryParams = new URLSearchParams({ bookID, page: page ?? "" })
+    const queryParams = new URLSearchParams({ bookID, page: page?.toString() || "" })
 
     try {
         const sessionToken = (await cookies()).get('sessionToken')?.value
