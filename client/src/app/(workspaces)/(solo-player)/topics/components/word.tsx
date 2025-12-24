@@ -50,7 +50,7 @@ export const WordList = ({ words, topicID }: { words: Word[], topicID: string}) 
           <InputGroupAddon align="inline-end">12 results</InputGroupAddon>
         </InputGroup>
         <div>
-          <Link href={`/solo-player/topics/create-word?topic=${topicID}`}>
+          <Link href={`/topics/create-word?topic=${topicID}`}>
             <Button>
               <Plus />
               New word

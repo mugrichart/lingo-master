@@ -21,7 +21,7 @@ const page = async () => {
           <InputGroupAddon align="inline-end">12 results</InputGroupAddon>
         </InputGroup>
         <div className="flex gap-10 items-center">
-          <Link href={`/solo-player/practice-with-books/upload`}>
+          <Link href={`/practice-with-books/upload`}>
             <Button>
               <Plus />
               New book
@@ -33,7 +33,7 @@ const page = async () => {
       <ContentView>
         {
           books.map(book => (
-            <Link key={book._id} href={`/solo-player/practice-with-books/practice?bookID=${book._id}&score=${practiceTracking.score}`}>
+            <Link key={book._id} href={`/practice-with-books/practice?bookID=${book._id}&score=${practiceTracking.score}`}>
               <BookCard book={book} />
             </Link>
           ))

@@ -61,7 +61,7 @@ export const TopicList = ({ topics, topicID }: { topics: Topic[], topicID?: stri
           <InputGroupAddon align="inline-end">12 results</InputGroupAddon>
         </InputGroup>
         <div className="flex gap-2">
-          <Link href={topicID ? `/solo-player/topics/create-topic?parentTopic=${topicID}` : `/solo-player/topics/create-topic`}>
+          <Link href={topicID ? `/topics/create-topic?parentTopic=${topicID}` : `/topics/create-topic`}>
             <Button>
               <Plus />
               New {topicID ? "subtopic" : "topic"}

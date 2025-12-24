@@ -34,11 +34,11 @@ const items = [
       items: [
         {
           title: "Topics",
-          url: "/solo-player/topics",
+          url: "/topics",
         },
         {
           title: "Books",
-          url: "/solo-player/practice-with-books",
+          url: "/practice-with-books",
         },
         {
           title: "ForYou",

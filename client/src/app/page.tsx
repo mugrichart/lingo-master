@@ -19,7 +19,7 @@ const Logo = () => {
 
 export default async function Home() {
   const sessionToken = (await cookies()).get("sessionToken")?.value
-  if (sessionToken) redirect("/solo-player/topics")
+  if (sessionToken) redirect("/topics")
 
   return (
     <div className='Home'>

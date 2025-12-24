@@ -61,7 +61,7 @@ export const ConvoCard = ({ words, convo, topicID }: { words: Word[], convo: Con
 
         </CardContent>
         <CardFooter className="h-[10%]">
-          <Link href={`/solo-player/topics/practice-convo?topic=${topicID}&convo=${convo._id}`}>
+          <Link href={`/topics/practice-convo?topic=${topicID}&convo=${convo._id}`}>
             <Button><BookIcon />Practice</Button>
           </Link>
         </CardFooter>       
@@ -82,7 +82,7 @@ export const ConvosList = ({ words, topicID, convos }: { words: Word[], topicID?
                 <InputGroupAddon align="inline-end">12 results</InputGroupAddon>
             </InputGroup>
             <div className="flex gap-2">
-               <Link href={ `/solo-player/topics/create-convo?topic=${topicID}` }>
+               <Link href={ `/topics/create-convo?topic=${topicID}` }>
                     <Button>
                         <Plus />
                         New convo

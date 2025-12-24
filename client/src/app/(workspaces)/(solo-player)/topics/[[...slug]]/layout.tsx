@@ -1,14 +1,34 @@
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb"
-import { SidebarTrigger } from "@/components/ui/sidebar"
-import { Separator } from "@radix-ui/react-separator"
-import { ReactNode } from "react"
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
+import { Separator } from "@/components/ui/separator"
 
-const layout = ({ children }: { children: ReactNode}) => {
-    const breadcrumbs: {name: string, slug: string}[] = []
+import {
+  SidebarTrigger,
+} from "@/components/ui/sidebar"
+
+import { fetchTopicByID } from "@/lib/data"
+
+const topicsLayout = async (
+    { children, params }: 
+    { 
+        children : React.ReactNode, 
+        params: Promise<{ slug?: string[]}>
+    }
+) => {
+
+    const chain = (await params).slug ?? []
+    const topics = await Promise.all(chain.map(fetchTopicByID))
+    const breadcrumbs = topics.map(data => ({ slug: data.topic._id, name: data.topic.name }))
 
   return (
     <>
-      {/* <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
+      <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
           <div className="flex items-center gap-2 px-4">
             <SidebarTrigger className="-ml-1" />
             <Separator
@@ -18,8 +38,8 @@ const layout = ({ children }: { children: ReactNode}) => {
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="/solo-player/topics">
-                    Books
+                  <BreadcrumbLink href="/topics">
+                    Topics
                   </BreadcrumbLink>
                 </BreadcrumbItem>
                 {
@@ -31,7 +51,7 @@ const layout = ({ children }: { children: ReactNode}) => {
                                 ) : (
                                     <BreadcrumbLink
                                         href={`
-                                            /solo-player/topics/${breadcrumbs
+                                            /topics/${breadcrumbs
                                                 .slice(0, i+1)
                                                 .map(bc => bc.slug)
                                                 .join('/')}
@@ -46,8 +66,8 @@ const layout = ({ children }: { children: ReactNode}) => {
               </BreadcrumbList>
             </Breadcrumb>
           </div>
-        </header> */}
-        <div className="flex flex-1 flex-col gap-4">
+        </header>
+        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
           {/* <div className="grid auto-rows-min gap-4 md:grid-cols-3">
             <div className="bg-muted/50 aspect-video rounded-xl" />
             <div className="bg-muted/50 aspect-video rounded-xl" />
@@ -62,4 +82,4 @@ const layout = ({ children }: { children: ReactNode}) => {
   )
 }
 
-export default layout
+export default topicsLayout

@@ -3,7 +3,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import CreateTopicForm from "./CreateTopicForm"
 import { Topic, TopicSuggestion } from "@/lib/definitions"
-import SuggestionsPanel from "@/app/(workspaces)/solo-player/topics/components/Suggestions"
+import SuggestionsPanel from "@/app/(workspaces)/topics/components/Suggestions"
 import { useState } from "react"
 
 const CreateTopicClient = ({

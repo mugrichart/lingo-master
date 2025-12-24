@@ -45,7 +45,7 @@ export async function login(formData: FormData) {
         path: '/'
     })
 
-    redirect('/solo-player/topics')
+    redirect('/topics')
 
 }
 
@@ -77,7 +77,7 @@ export async function createTopic(parentTopicID: string, prevState: any, formDat
             return "Failed to create topic."; // This becomes your errorMessage
         }
 
-        revalidatePath('/solo-player/topics');
+        revalidatePath('/topics');
         return undefined; // Success case
         
     } catch (error) {
@@ -131,7 +131,7 @@ export async function createWord(topicID: string, prevState: any, formData: Form
         throw new Error('Error creating word')
     }
 
-    revalidatePath('/solo-player/topics');
+    revalidatePath('/topics');
     return undefined; // Success case
 }
 
@@ -179,7 +179,7 @@ export async function createConversation(topicID: string | null, prevState: any,
         body: JSON.stringify(payload)
     })
 
-    revalidatePath('/solo-player/topics');
+    revalidatePath('/topics');
     return undefined; // Success case
 }
 
@@ -214,8 +214,8 @@ export async function uploadPracticeBook(formData: FormData) {
         throw new Error('Error uploading the practice book')
     }
     
-    revalidatePath('/solo-player/practice-with-books')
-    redirect('/solo-player/practice-with-books')
+    revalidatePath('/practice-with-books')
+    redirect('/practice-with-books')
 }
 
 export async function updatePracticeTracking(score: number) {
