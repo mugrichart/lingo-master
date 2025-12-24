@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation"
 
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Trash, Edit, Share } from "lucide-react"
+import { Trash, Edit, Share, Book, FolderOpen, Move3d, MoveHorizontal } from "lucide-react"
 
 import ContentView from './ContentView'
 
@@ -18,22 +18,20 @@ import {
 } from "@/components/ui/input-group"
 import { Plus, Search } from 'lucide-react'
 
+
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from "@/components/ui/context-menu"
+
+
 export const TopicCard = ({ topic }: { topic: Topic }) => {
   return (
     <Card className="p-3 aspect-square justify-between w-70">
         <div className="w-full flex justify-between">
             <label>{ topic.language }</label>
-            <div>
-                <Button variant="ghost" size="icon" aria-label="Delete">
-                    <Trash />
-                </Button>
-                <Button variant="ghost" size="icon" aria-label="Edit">
-                    <Edit />
-                </Button>
-                <Button variant="ghost" size="icon" aria-label="Share">
-                    <Share />
-                </Button>
-            </div>
             <label className="mr-2">Yours</label>
         </div>
         <CardContent className="flex justify-center">
@@ -72,12 +70,42 @@ export const TopicList = ({ topics, topicID }: { topics: Topic[], topicID?: stri
       <ContentView>
         {
           topics.map(topic => (
-            <Link key={topic._id} href={`${pathname}/${topic._id}`}>
-              <TopicCard topic={topic} />
-            </Link>
+            <ContextMenu key={topic._id}>
+              <ContextMenuTrigger>
+                  <Link href={`${pathname}/${topic._id}`}>
+                    <TopicCard topic={topic} />
+                  </Link>
+              </ContextMenuTrigger>
+              <ContextMenuContent className="">
+                  <ContextMenuItem>
+                      <Link href={`${pathname}/${topic._id}`} className="flex items-center gap-2">
+                        <FolderOpen /> Open Topic
+                      </Link>
+                  </ContextMenuItem>
+                  <ContextMenuItem>
+                      <Edit /> Edit Topic
+                  </ContextMenuItem>
+                  <ContextMenuItem>
+                      <Share /> Share Topic
+                  </ContextMenuItem>
+                  <ContextMenuItem>
+                      <MoveHorizontal /> Move Topic
+                  </ContextMenuItem>
+                  <ContextMenuItem>
+                      <Plus /> New word
+                  </ContextMenuItem>
+                  <ContextMenuItem>
+                      <Book /> Learn Topic
+                  </ContextMenuItem>
+                  <ContextMenuItem variant="destructive">
+                      <Trash />Delete Topic
+                  </ContextMenuItem>
+              </ContextMenuContent>
+          </ContextMenu>
           ))
         }
       </ContentView>
     </div>
   )
 }
+
