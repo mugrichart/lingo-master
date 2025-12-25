@@ -3,7 +3,7 @@ import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/in
 import { Plus, Search } from "lucide-react"
 import ContentView from "../topics/components/ContentView"
 import Link from "next/link"
-import { fetchPracticeBooks } from "@/lib/data"
+import { fetchPracticeBooks } from "@/lib/session-data"
 import BookCard from "./BookCard"
 
 

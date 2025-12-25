@@ -1,7 +1,7 @@
 
 import { cookies } from 'next/headers'
 import { env } from '@/env'
-import { PracticeBookPage } from './definitions'
+import { PracticeBook, PracticeBookPage } from './definitions'
 
 export async function fetchUserProfile() {
     try {
@@ -60,5 +60,21 @@ export async function fetchPracticeTracking(): Promise<{ practiceTracking: { use
     } catch (error) {
         console.error(error)
         throw new Error("Error fetching practice tracking")
+    }
+}
+
+export async function fetchPracticeBooks(): Promise<{ books: PracticeBook[], practiceTracking: { user: string, score: number} }> {
+    const sessionToken = (await cookies()).get("sessionToken")?.value
+    try {
+        const response = await fetch(`${env.NEXT_PUBLIC_API_BASE_URL}/practice-with-books`, {
+            headers: {
+                "content-type": "application/json",
+                "Authorization": `Bearer ${sessionToken}`
+            }
+        })
+        return response.json()
+    } catch (error) {
+        console.error(error)
+        throw new Error("Error fetching practice books")
     }
 }

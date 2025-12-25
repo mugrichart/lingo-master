@@ -22,7 +22,7 @@ import { Button } from "@/components/ui/button"
 import { createWord } from "@/lib/actions"
 import { useActionState, useEffect } from "react"
 import { WordSuggestion } from "@/lib/definitions"
-import { Wand, Wand2 } from "lucide-react"
+import { Wand2 } from "lucide-react"
 
 function CreateWordForm ({
     wordSuggestion,

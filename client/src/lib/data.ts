@@ -7,8 +7,7 @@ type FetchTopicsQuery = {
     language?: string,
 }
 
-import { Topic, Word, TopicSuggestion, WordSuggestion, ConvoSuggestion, Convo, PracticeBook } from '@/lib/definitions'
-import { cookies } from 'next/headers'
+import { Topic, Word, TopicSuggestion, WordSuggestion, ConvoSuggestion, Convo } from '@/lib/definitions'
 
 export async function fetchTopics(query: FetchTopicsQuery = {}): Promise<{ topics: Topic[] }> {
     try {
@@ -161,18 +160,3 @@ export async function expandConvoSuggestion(topic: string, convoSuggestion: Conv
     }
 }
 
-export async function fetchPracticeBooks(): Promise<{ books: PracticeBook[], practiceTracking: { user: string, score: number} }> {
-    const sessionToken = (await cookies()).get("sessionToken")?.value
-    try {
-        const response = await fetch(`${env.NEXT_PUBLIC_API_BASE_URL}/practice-with-books`, {
-            headers: {
-                "content-type": "application/json",
-                "Authorization": `Bearer ${sessionToken}`
-            }
-        })
-        return response.json()
-    } catch (error) {
-        console.error(error)
-        throw new Error("Error fetching practice books")
-    }
-}
