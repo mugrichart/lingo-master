@@ -85,6 +85,37 @@ export async function createTopic(parentTopicID: string, prevState: any, formDat
         return "An error occurred."; // This becomes your errorMessage
     }
 }
+export async function editTopic(topicID: string, prevState: any, formData: FormData) {
+    const update = CreateTopicSchema.parse({
+        name: formData.get("name"),
+        language: formData.get("language")
+    });
+
+    try {
+        const sessionToken = (await cookies()).get('sessionToken')?.value;
+
+        const response = await fetch(`${env.NEXT_PUBLIC_API_BASE_URL}/topics/${topicID}`, {
+            method: 'PATCH',
+            headers: {
+                'content-type': 'application/json',
+                'Authorization': `Bearer ${sessionToken}`
+            },
+            body: JSON.stringify(update)
+        });
+
+        if (!response.ok) {
+            return "Failed to update topic."; // This becomes your errorMessage
+        }
+
+        
+    } catch (error) {
+        console.error(error);
+        return "An error occurred."; // This becomes your errorMessage
+    }
+
+    revalidatePath('/topics');
+    redirect(`/topics/${topicID}`);
+}
 
 const CreateWordSchema = z.object({
     word: z.string(),

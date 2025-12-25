@@ -1,5 +1,5 @@
 
-import CreateTopicClient from "@/app/(workspaces)/topics/create-topic/CreateTopicClient"
+import CreateTopicClient from "@/app/(workspaces)/(solo-player)/topics/create-topic/CreateTopicClient"
 
 import { createTopic } from "@/lib/actions"
 import { fetchTopicByID, fetchTopicSuggestions } from "@/lib/data"

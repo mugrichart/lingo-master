@@ -83,7 +83,9 @@ export const TopicList = ({ topics, topicID }: { topics: Topic[], topicID?: stri
                       </Link>
                   </ContextMenuItem>
                   <ContextMenuItem>
-                      <Edit /> Edit Topic
+                      <Link href={`/topics/edit-topic?topicID=${topic._id}`} className="flex items-center gap-2">
+                        <Edit /> Edit Topic
+                      </Link>
                   </ContextMenuItem>
                   <ContextMenuItem>
                       <Share /> Share Topic

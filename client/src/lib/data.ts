@@ -76,9 +76,9 @@ export async function fetchConvos(topicID: string): Promise<{ convos: any[]}> {
 
 export async function fetchTopicSuggestions(topic: Topic): Promise<{ suggestions: TopicSuggestion[]}> {
     try {
-        const { topics } = await fetchTopics({ parent: topic._id })
-        console.log('Existing subtopics:', topics.map(t => t.name))
-        const response = await fetch(`${env.NEXT_PUBLIC_API_BASE_URL}/topics/suggestions?topic=${topic.name}&excluded=${topics.map(t => t.name).join(',')}`, {
+        const { topics } = await fetchTopics({ parent: topic?._id })
+        // console.log('Existing subtopics:', topics.map(t => t.name))
+        const response = await fetch(`${env.NEXT_PUBLIC_API_BASE_URL}/topics/suggestions?topic=${topic?.name}&excluded=${topics?.map(t => t.name).join(',')}`, {
             method: 'GET',
             headers: { 
                 'content-type': 'application/json',
