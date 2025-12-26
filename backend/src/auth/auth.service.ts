@@ -7,7 +7,7 @@ import { JwtService } from '@nestjs/jwt';
 export class AuthService {
     constructor(private usersService: UsersService, private jwtService: JwtService) {}
 
-    async signIn(email: string, pass: string): Promise<any> {
+    async signIn(email: string, pass: string): Promise<{token: string}> {
         const user = await this.usersService.findOne(email)
 
         if (!user) {
@@ -19,7 +19,7 @@ export class AuthService {
             throw new UnauthorizedException();
         }
 
-        const payload = { sub:  user._id }
+        const payload = { sub:  user._id, userID: user._id }
 
         return {
             token: await this.jwtService.signAsync(payload)
