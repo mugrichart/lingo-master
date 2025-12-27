@@ -12,9 +12,9 @@ const CreateTopicClient = ({
     topic,
 }:{
     suggestions: TopicSuggestion[],
-    topic: Topic,
+    topic: Topic | null,
 }) => {
-    const createTopicWithParentTopicID = createTopic.bind(null, topic?._id);
+    const createTopicWithParentTopicID = createTopic.bind(null, topic?._id || null);
     const [selectedSuggestion, setSelectedSuggestion] = useState<TopicSuggestion | null>(null)
     
     // access action state to know when the server action is pending

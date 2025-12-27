@@ -17,7 +17,7 @@ export type Topic = {
     name: string,
     language: string,
     creator: string,
-    words: Word[],
+    words: string[],
     isAiGenerated: boolean,
     parent: string | null,
 }

@@ -12,7 +12,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar"
 
-import { fetchTopicByID } from "@/lib/data"
+import { fetchTopicByID } from "@/lib/session-data"
 
 const topicsLayout = async (
     { children, params }: 
@@ -24,7 +24,7 @@ const topicsLayout = async (
 
     const chain = (await params).slug ?? []
     const topics = await Promise.all(chain.map(fetchTopicByID))
-    const breadcrumbs = topics.map(data => ({ slug: data.topic._id, name: data.topic.name }))
+    const breadcrumbs = topics.map(topic => ({ slug: topic._id, name: topic.name }))
 
   return (
     <>

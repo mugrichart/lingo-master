@@ -8,6 +8,7 @@ type FetchTopicsQuery = {
 }
 
 import { Topic, Word, TopicSuggestion, WordSuggestion, ConvoSuggestion, Convo } from '@/lib/definitions'
+import { fetchTopicByID } from './session-data'
 
 export async function fetchTopics(query: FetchTopicsQuery = {}): Promise<{ topics: Topic[] }> {
     try {
@@ -26,25 +27,11 @@ export async function fetchTopics(query: FetchTopicsQuery = {}): Promise<{ topic
     }
 }
 
-export async function fetchTopicByID(id: string): Promise<{ topic: Topic }> {
-    try {
-        const response = await fetch(`${env.NEXT_PUBLIC_API_BASE_URL}/topics/${id}`, {
-            method: 'GET',
-            headers: { 
-                'content-type': 'application/json',
-            },
-        })
-        
-        return response.json()
-    } catch (error) {
-        console.error(error)
-        throw new Error('Error fetching The topic')
-    }
-}
+
 
 export async function fetchWords(topicID: string): Promise<{ words: Word[]}> {
     try {
-        const { topic } = await fetchTopicByID(topicID)
+        const topic = await fetchTopicByID(topicID)
         const response = await fetch(`${env.NEXT_PUBLIC_API_BASE_URL}/words?words=${topic.words}`, {
             method: 'GET',
             headers: { 

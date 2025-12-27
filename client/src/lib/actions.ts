@@ -22,31 +22,34 @@ export async function login(formData: FormData) {
         password: formData.get('password')
     })
 
-    const response = await fetch(`${env.NEXT_PUBLIC_API_BASE_URL}/auth/login`, {
-        method: 'POST',
-        headers: {
-            'content-type': 'application/json'
-        },
-        body: JSON.stringify({ email, password })
-    })
+    try {
+        const response = await fetch(`${env.NEXT_PUBLIC_API_BASE_URL}/auth/login`, {
+            method: 'POST',
+            headers: {
+                'content-type': 'application/json'
+            },
+            body: JSON.stringify({ email, password })
+        })
+        
+        if (!response.ok) {
+            throw new Error("Invalid credentials")
+        }
 
-    // if (!response.ok) {
-    //     return { error: "Invalid credentials"}
-    // }
+        const data = await response.json()
+        const authToken = data.token; // JWT Token
 
-    const data = await response.json()
-    const authToken = data.token; // JWT Token
-
-    (await cookies()).set('sessionToken', authToken, {
-        httpOnly: true,
-        secure: env.NODE_ENV === 'production',
-        sameSite: 'strict',
-        maxAge: 60 * 60 * 24 * 7,
-        path: '/'
-    })
-
+        (await cookies()).set('sessionToken', authToken, {
+            httpOnly: true,
+            secure: env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 60 * 60 * 24 * 7,
+            path: '/'
+        })
+    } catch (error) {
+        console.log(error)
+        throw new Error("Error logging in")
+    }
     redirect('/topics')
-
 }
 
 const CreateTopicSchema = z.object({
@@ -55,7 +58,7 @@ const CreateTopicSchema = z.object({
 })
 
 
-export async function createTopic(parentTopicID: string, prevState: any, formData: FormData) {
+export async function createTopic(parentTopicID: string | null, prevState: any, formData: FormData) {
     const { name, language } = CreateTopicSchema.parse({
         name: formData.get("name"),
         language: formData.get("language")

@@ -2,7 +2,7 @@
 import CreateTopicClient from "@/app/(workspaces)/(solo-player)/topics/create-topic/CreateTopicClient"
 
 import { createTopic } from "@/lib/actions"
-import { fetchTopicByID, fetchTopicSuggestions } from "@/lib/data"
+import { fetchTopicByID, fetchTopicSuggestions } from "@/lib/session-data"
 
 const page = async ({ 
   searchParams
@@ -10,12 +10,12 @@ const page = async ({
 
   const topicIDResolved = (await searchParams).parentTopic;
  
-  const { topic } = await fetchTopicByID(topicIDResolved)
+  const topic = topicIDResolved ? await fetchTopicByID(topicIDResolved) : null
 
-  const { suggestions } = await fetchTopicSuggestions(topic)
+  const { topics } = await fetchTopicSuggestions(topic) 
 
   return (
-    <CreateTopicClient suggestions={suggestions} topic={topic} />
+    <CreateTopicClient suggestions={topics} topic={topic} />
   )
 }
 
