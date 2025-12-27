@@ -15,7 +15,12 @@ export class ListAllTopicsDto {
     @IsOptional() @IsString() name?: string;
     @IsOptional() @IsString() language?: string;
     @IsOptional() @IsString() creator?: string;
-    @IsOptional() @IsString() parent?: string;
+
+    @IsOptional() 
+    @IsString() 
+    @Transform(({ value }) => value == "null" ? null : value)
+    parent?: string | null;
+    
     @IsOptional()
     @Transform(({ value }) => value === true || value === 'true')
     @IsBoolean()

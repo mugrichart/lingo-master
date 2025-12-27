@@ -9,7 +9,6 @@ export class TopicsService {
     constructor(@InjectModel(Topic.name) private topicModel: Model<Topic>) {}
 
     async create(createDto: CreateTopicDto, userID: string) {
-        console.log(userID)
         return this.topicModel.create({...createDto, creator: userID})
     }
 
@@ -17,12 +16,17 @@ export class TopicsService {
         const filters: Record<PropertyKey, string | boolean> = {}
         
         Object.keys(query).map((key) => {
-            if (query[key] !== undefined && query[key] !== null) {
+            if (query[key] !== undefined) {
                 filters[key] = query[key]
             }
         })
+        try {
+            return this.topicModel.find(filters).exec()
+        } catch (error) {
+            console.log(error.message)
+            throw new Error('Error fetching topics')
+        }
 
-        return this.topicModel.find(filters).exec()
     }
 
     async findOne(id: string): Promise<TopicDocument | null> {
