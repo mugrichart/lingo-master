@@ -1,11 +1,12 @@
 import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
 import { TopicsService } from './topics.service';
-import { CreateTopicDto, ListAllTopicsDto, UpdateTopicDto } from './topics.dto';
+import { CreateTopicDto, GenerateTopicSuggestionsDto, ListAllTopicsDto, UpdateTopicDto } from './topics.dto';
 import { GetUser } from 'src/auth/get-user.decorator';
+import { AiSuggestionsService } from 'src/ai-suggestions/ai-suggestions.service';
 
 @Controller('topics')
 export class TopicsController {
-    constructor(private topicsService: TopicsService) {}
+    constructor(private topicsService: TopicsService, private aiSuggestionsService: AiSuggestionsService) {}
 
     @Post()
     async createTopic(@Body() createTopicDto: CreateTopicDto, @GetUser('userID') id: string) {
@@ -26,4 +27,10 @@ export class TopicsController {
     async update(@Param('id') id: string, @Body() updateTopicDto: UpdateTopicDto) {
         return this.topicsService.update(id, updateTopicDto)
     }
+    
+    @Post('/suggestions')
+    async generateSuggestions(@Body() generateTopicSuggestionsDto: GenerateTopicSuggestionsDto) {
+        return this.aiSuggestionsService.generateTopicSuggestions(generateTopicSuggestionsDto)
+    }
+
 }

@@ -7,6 +7,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TopicsModule } from './topics/topics.module';
 import { WordsModule } from './words/words.module';
+import { AiSuggestionsModule } from './ai-suggestions/ai-suggestions.module';
 import configuration from './config/configuration';
 
 @Module({
@@ -25,7 +26,8 @@ import configuration from './config/configuration';
       })
     }),
     TopicsModule,
-    WordsModule
+    WordsModule,
+    AiSuggestionsModule
   ],
   controllers: [AppController],
   providers: [AppService],

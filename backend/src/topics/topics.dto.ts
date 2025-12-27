@@ -1,5 +1,5 @@
 import { Transform } from "class-transformer";
-import { IsBoolean, IsOptional, IsString } from "class-validator";
+import { IsArray, IsBoolean, IsOptional, IsString } from "class-validator";
 
 export class CreateTopicDto {
     @IsString() name: string;
@@ -25,4 +25,9 @@ export class ListAllTopicsDto {
 export class UpdateTopicDto {
     @IsOptional() @IsString() name?: string;
     @IsOptional() @IsString() language?: string;
+}
+
+export class GenerateTopicSuggestionsDto {
+    @IsOptional() @IsString() parentTopic?: string;
+    @IsOptional() @IsArray() @IsString({ each: true }) alreadyExistingTopics?: string[]
 }
