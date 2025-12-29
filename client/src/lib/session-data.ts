@@ -1,4 +1,4 @@
-import { Topic, Word, TopicSuggestion, WordSuggestion, ConvoSuggestion, Convo } from '@/lib/definitions'
+import { Topic, Word, TopicSuggestion, WordSuggestion, ConvoSuggestion, Conversation } from '@/lib/definitions'
 
 import { cookies } from 'next/headers'
 import { PracticeBook, PracticeBookPage } from './definitions'
@@ -147,11 +147,30 @@ export async function expandWordSuggestion(wordSuggestion: WordSuggestion): Prom
 }
 
 // =================== Conversations related ===========================
+export async function fetchConversations(topicId: string): Promise<Conversation[]> {
+    const headers = await getHeaders()
+    try {
+        return apiRequest(`/conversations?topicId=${topicId}`, 
+            z.array(ConversationSchema),
+            {
+            method: 'GET',
+            headers
+        })
+    } catch (error) {
+        console.error(error)
+        throw new Error('Error fetching convos')
+    }
+}
+
 export async function fetchConversationSuggestions(topicId: string): Promise<{ conversations: ConvoSuggestion[]}> {
     const headers = await getHeaders()
     try {
         return apiRequest(`/conversations/suggestions?topicId=${topicId}`, 
-            z.object({ conversations: z.array(ConversationSchema.pick({ title: true, description: true })) }),
+            z.object({ conversations: z.array(
+                ConversationSchema.
+                    pick({ title: true, description: true })
+                    .extend({ suggestedWords: z.array(z.string())})
+            )}),
             {
             method: 'GET',
             headers

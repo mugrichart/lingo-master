@@ -6,7 +6,7 @@ import SuggestionsPanel from "../components/Suggestions"
 import { ConvoSuggestion, Topic, Word } from "@/lib/definitions"
 import { useState } from "react"
 
-import { expandConvoSuggestion, expandWordSuggestion } from "@/lib/data"
+// import { expandConvoSuggestion } from "@/lib/session-data"
 import CreateConvoForm from "./CreateConvoForm"
 
 const CreateConvoClient =  ({
@@ -21,7 +21,7 @@ const CreateConvoClient =  ({
     const [selectedSuggestion, setSelectedSuggestion] = useState<ConvoSuggestion | null>(null)
 
     async function expandWithAI () {
-        const { detailedSuggestion } = await expandConvoSuggestion(topic.name, selectedSuggestion as ConvoSuggestion)
+        const { detailedSuggestion } = {} //await expandConvoSuggestion(topic.name, selectedSuggestion as ConvoSuggestion)
         setSelectedSuggestion(detailedSuggestion)
     }
  

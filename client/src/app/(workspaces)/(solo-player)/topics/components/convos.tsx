@@ -27,9 +27,9 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion"
 
-import { Convo } from "@/lib/definitions"
+import { Conversation } from "@/lib/definitions"
 
-export const ConvoCard = ({ words, convo, topicID }: { words: Word[], convo: Convo, topicID?: string  }) => {
+export const ConvoCard = ({ words, convo, topicID }: { words: Word[], convo: Conversation, topicID?: string  }) => {
   console.log(convo.lines.map( line => line.usedWords))
   return (
     <Card className="p-3 aspect-square justify-between items-end w-130 h-fit">
@@ -69,7 +69,7 @@ export const ConvoCard = ({ words, convo, topicID }: { words: Word[], convo: Con
   )
 }
 
-export const ConvosList = ({ words, topicID, convos }: { words: Word[], topicID?: string, convos: any[]}) => {
+export const ConvosList = ({ words, topicID, conversations }: { words: Word[], topicID?: string, conversations: Conversation[]}) => {
 
   return (
     <div className='w-full h-220'>
@@ -85,14 +85,14 @@ export const ConvosList = ({ words, topicID, convos }: { words: Word[], topicID?
                <Link href={ `/topics/create-convo?topic=${topicID}` }>
                     <Button>
                         <Plus />
-                        New convo
+                        New conversation
                     </Button>
                 </Link>
             </div>
         </div>
       <ContentView>
         {
-          convos.map(convo => (
+          conversations.map(convo => (
             // <Link key={topic._id} href={`${pathname}/${topic._id}`}>
               <ConvoCard convo={convo} words={words} topicID={topicID}/>
             // </Link>

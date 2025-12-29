@@ -22,21 +22,17 @@ export type Topic = {
     parent: string | null,
 }
 
-export type Convo = {
+export type Conversation = {
     _id: string,
     title: string,
     description: string,
     characters: string[],
-    lines: [
-        {
-            actor: number, //index of character
-            text: string,
-            blankedText: string,
-            usedWords: string[],
-        }
-    ],
-    topic: string,
-    creator: string,
+    lines: {
+        actor: number, //index of character
+        text: string,
+        blankedText: string,
+        usedWords: string[],
+    }[],
     isAiGenerated: boolean,
 }
 
@@ -63,6 +59,6 @@ type OptionalExcept<T, Exceptions extends keyof T> = Pick<T, Exceptions> & Parti
 
 export type WordSuggestion = OptionalExcept<Word, "word" | "example">
 
-export type ConvoSuggestion = OptionalExcept<Convo, "title" | "description"> & {
+export type ConvoSuggestion = OptionalExcept<Conversation, "title" | "description"> & {
     suggestedWords?: string[]
 }

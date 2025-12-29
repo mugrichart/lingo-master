@@ -25,15 +25,16 @@ export const WordSchema = z.object({
 })
 
 export const ConversationSchema = z.object({
+    _id: z.string(),
     title: z.string(),
     description: z.string(),
     characters: z.array(z.string()),
-    lines: z.object({
+    lines: z.array(z.object({
         actor: z.number(),
         text: z.string(),
         blankedText: z.string(),
         usedWords: z.array(z.string())
-    }),
+    })),
     isAiGenerated: z.boolean()
 })
 

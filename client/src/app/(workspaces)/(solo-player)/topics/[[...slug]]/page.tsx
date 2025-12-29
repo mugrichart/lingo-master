@@ -3,8 +3,9 @@ import {TopicList} from "../components/topic"
 import {WordList} from "../components/word"
 
 // import { fetchConvos, fetchWords } from "@/lib/session-data"
-import { fetchTopics, fetchWords } from "@/lib/session-data"
+import { fetchConversations, fetchTopics, fetchWords } from "@/lib/session-data"
 import { ConvosList } from "../components/convos"
+import { Conversation } from "@/lib/definitions"
 
 const page = async ({
   params,
@@ -21,15 +22,15 @@ const page = async ({
 
   const topics = await fetchTopics({ parent : topicID || null })
   const words = topicID ? await fetchWords(topicID) : []
-  // const { convos } = topicID ? await fetchConvos(topicID) : { convos: []}
-  
+  const conversations = topicID ? await fetchConversations(topicID) : []
+
   return (
     <Tabs defaultValue={tab} className="w-full h-222 pl-4">
       {topicID && (
         <TabsList>
           <TabsTrigger value="topics">Topics</TabsTrigger>
           <TabsTrigger value="words">Words({words?.length || 0})</TabsTrigger>
-          {/*<TabsTrigger value="convos">Convos({convos?.length || 0})</TabsTrigger> */}
+          <TabsTrigger value="conversations">Conversations({conversations?.length || 0})</TabsTrigger>
         </TabsList>
         )
       }
@@ -42,9 +43,9 @@ const page = async ({
           <WordList words={words} topicID={topicID}/>
         </TabsContent>
       }
-      {/*<TabsContent value="convos">
-        <ConvosList words={words} topicID={topicID} convos={convos}/>
-      </TabsContent> */}
+      <TabsContent value="conversations">
+        <ConvosList words={words} topicID={topicID} conversations={conversations as Conversation[]}/>
+      </TabsContent>
   </Tabs>
   )
 }

@@ -1,6 +1,5 @@
 
-import { createConversation } from "@/lib/actions"
-import { fetchConvoSuggestions, fetchTopicByID, fetchWords } from "@/lib/data"
+import { fetchConversationSuggestions, fetchTopicByID, fetchWords } from "@/lib/session-data"
 
 import CreateConvoClient from "./CreateConvoClient"
 
@@ -10,14 +9,14 @@ const page = async ({
 
   const topicIDResolved = (await searchParams).topic;
  
-  const { topic } = await fetchTopicByID(topicIDResolved)
+  const topic = await fetchTopicByID(topicIDResolved)
 
-  const { words } = await fetchWords(topicIDResolved)
+  const words = await fetchWords(topicIDResolved)
 
-  const { suggestions } = await fetchConvoSuggestions(topic, words)
+  const { conversations } = await fetchConversationSuggestions(topicIDResolved)
 
   return (
-    <CreateConvoClient words={words} topic={topic} suggestions={suggestions}/>
+    <CreateConvoClient words={words} topic={topic} suggestions={conversations}/>
   )
 }
 
