@@ -6,6 +6,10 @@ import { Types } from 'mongoose';
 @Controller('conversations')
 export class ConversationsController {
     constructor( private conversationsService: ConversationsService) {}
+    @Get()
+    async findAll(@Query('topicId', ParseObjectIdPipe) topicId: Types.ObjectId) {
+        return this.conversationsService.findAll(topicId)
+    }
 
     @Get('/suggestions')
     async generateConversationSuggestions(@Query('topicId', ParseObjectIdPipe) topicId: Types.ObjectId) {
