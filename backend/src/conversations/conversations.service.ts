@@ -21,9 +21,10 @@ export class ConversationsService {
             if (!topic) {
                 throw new NotFoundException(`Topic with id ${topicId} not found`)
             }
-            const conversations = await Promise.all(topic.conversations.map(cId => this.findOne(cId)))
+            return Promise.all(topic.conversations.map(cId => this.findOne(cId)))
         } catch (error) {
-            
+            console.error(error.message)
+            throw error
         }
     }
 

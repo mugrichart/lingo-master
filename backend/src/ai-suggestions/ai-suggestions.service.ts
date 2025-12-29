@@ -33,7 +33,7 @@ export class AiSuggestionsService {
         return JSON.parse(expansionString)
     }
 
-    async generateConversationSuggestions(topic: string, words: string[]): Promise<{title: string, description: string}[]> {
+    async generateConversationSuggestions(topic: string, words: string[]): Promise<{title: string, description: string, suggestedWords: string[]}[]> {
         const { userPrompt, systemPrompt} = this.promptsProvider.conversationSuggestionsPromptGenerator(topic, words)
         const suggestionsString = await this.openaiHandle("gpt-4o-mini", systemPrompt, userPrompt, true)
         return JSON.parse(suggestionsString)
