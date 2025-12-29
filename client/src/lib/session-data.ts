@@ -4,6 +4,11 @@ import { cookies } from 'next/headers'
 import { PracticeBook, PracticeBookPage } from './definitions'
 
 
+import z from 'zod';
+import { apiRequest } from './api-client'
+import { WordSchema, UserSchema, TopicSchema, ConversationSchema } from './api-schemas'
+
+
 type FetchTopicsQuery = {
     parent?: string | null, // parent topic
     creator?: string, // creator id
@@ -28,31 +33,18 @@ export async function fetchUserProfile() {
     }
 }
 
-import z from 'zod';
-import { apiRequest } from './api-client'
-import { CreateWordSchema, WordSchema } from './api-schemas'
-import { UserSchema } from './api-schemas'
 
 // ============= Topics related ====================
 
-const TopicSchema = z.object({
-    _id: z.string(),
-    name: z.string(),
-    language: z.string(),
-    creator: z.string(),
-    words: z.array(z.string()),
-    parent: z.string().nullable(),
-    isAiGenerated: z.boolean()
-})
 
-const TopicsSchema = z.array(TopicSchema);
+
 
 export async function fetchTopics(query: FetchTopicsQuery = {}): Promise<Topic[]> {
     const headers = await getHeaders()
     try {
         const queryParams = new URLSearchParams(query as any).toString()
         console.log(queryParams, 'queryParams', query)
-        return apiRequest(`/topics?${queryParams}`, TopicsSchema,  {
+        return apiRequest(`/topics?${queryParams}`, z.array(TopicSchema),  {
             method: 'GET',
             headers,
             next: { revalidate: 60 }
@@ -122,7 +114,7 @@ export async function fetchWordSuggestions(topic: Topic): Promise<{ words: WordS
     try {
         const words: string[] = []//topic.words?.length ? await fetchWords(topic._id) : { words: [] }
         return apiRequest(`/words/suggestions`,
-            z.object({ words: z.array(z.object({ word: z.string(), example: z.string()}))}),
+            z.object({ words: z.array(WordSchema.pick({word: true, example: true}))}),
             {
                 method: 'POST',
                 headers,
@@ -135,13 +127,13 @@ export async function fetchWordSuggestions(topic: Topic): Promise<{ words: WordS
     }
 }
 
-export async function expandWordSuggestion(wordSuggestion: WordSuggestion): Promise<Omit<Word, '_id' >> {
+export async function expandWordSuggestion(wordSuggestion: WordSuggestion): Promise<Omit<Word, '_id' | 'blanked example' | 'language' | 'related words' >> {
     'use server'
     const headers = await getHeaders()
 
     try {
         return apiRequest(`/words/suggestions/expand`, 
-            CreateWordSchema.omit({ "blanked example": true}),
+            WordSchema.omit({ "blanked example": true, _id: true, language: true, "related words": true}),
             {
             method: 'POST',
             headers,
@@ -151,6 +143,22 @@ export async function expandWordSuggestion(wordSuggestion: WordSuggestion): Prom
     } catch (error) {
         console.error(error)
         throw new Error('Error expanding word suggestion')
+    }
+}
+
+// =================== Conversations related ===========================
+export async function fetchConversationSuggestions(topicId: string): Promise<{ conversations: ConvoSuggestion[]}> {
+    const headers = await getHeaders()
+    try {
+        return apiRequest(`/conversations/suggestions?topicId=${topicId}`, 
+            z.object({ conversations: z.array(ConversationSchema.pick({ title: true, description: true })) }),
+            {
+            method: 'GET',
+            headers
+        })
+    } catch (error) {
+        console.error(error)
+        throw new Error('Error fetching conversation suggestions')
     }
 }
 

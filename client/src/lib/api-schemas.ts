@@ -1,6 +1,18 @@
 import z from "zod"
 
-export const CreateWordSchema = z.object({
+export const TopicSchema = z.object({
+    _id: z.string(),
+    name: z.string(),
+    language: z.string(),
+    creator: z.string(),
+    words: z.array(z.string()),
+    parent: z.string().nullable(),
+    isAiGenerated: z.boolean()
+})
+
+export const WordSchema = z.object({
+    _id: z.string(),
+    language: z.string(),
     type: z.string(),
     "language style": z.string(),
     word: z.string(),
@@ -12,9 +24,17 @@ export const CreateWordSchema = z.object({
     "related words": z.array(z.string()).optional()
 })
 
-export const WordSchema = CreateWordSchema.extend({
-    _id: z.string(),
-    language: z.string(),
+export const ConversationSchema = z.object({
+    title: z.string(),
+    description: z.string(),
+    characters: z.array(z.string()),
+    lines: z.object({
+        actor: z.number(),
+        text: z.string(),
+        blankedText: z.string(),
+        usedWords: z.array(z.string())
+    }),
+    isAiGenerated: z.boolean()
 })
 
 export const PracticeBookSchema = z.object({
@@ -34,16 +54,9 @@ export const UserSchema = z.object({
 })
 
 
-export const CreateTopicSchema = z.object({
-    name: z.string(),
-    language: z.string()
-})
 
-
-export const SignupFormSchema = z.object({
+export const AuthFormSchema = z.object({
     username: z.string(),
     email: z.email(),
     password: z.string()
 })
-
-export const LoginFormSchema = SignupFormSchema.omit({ username: true })

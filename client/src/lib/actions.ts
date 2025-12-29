@@ -5,15 +5,15 @@ import { env } from "@/env"
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
-import { fetchWords } from './data'
+import { fetchWords } from './session-data'
 import { handleBlanksGen } from './utils'
-import { CreateTopicSchema, CreateWordSchema, LoginFormSchema, PracticeBookSchema, WordSchema } from './api-schemas'
+import { AuthFormSchema, PracticeBookSchema, TopicSchema, WordSchema } from './api-schemas'
 import { apiRequest } from './api-client'
 import { getHeaders } from './session-data'
 
 
 export async function login(formData: FormData) {
-    const { email, password } = LoginFormSchema.parse({
+    const { email, password } = AuthFormSchema.omit({ username: true }).parse({
         email: formData.get('email'),
         password: formData.get('password')
     })
@@ -50,26 +50,22 @@ export async function login(formData: FormData) {
 
 
 export async function createTopic(parentTopicID: string | null, prevState: any, formData: FormData) {
-    const { name, language } = CreateTopicSchema.parse({
-        name: formData.get("name"),
-        language: formData.get("language")
+    const { name, language } = TopicSchema.pick({name: true, language: true}).parse({
+        name: formData.get("name")?.toString(),
+        language: formData.get("language")?.toString()
     });
 
     try {
-        const sessionToken = (await cookies()).get('sessionToken')?.value;
+        const headers = await getHeaders()
 
-        const response = await fetch(`${env.NEXT_PUBLIC_API_BASE_URL}/topics`, {
-            method: 'POST',
-            headers: {
-                'content-type': 'application/json',
-                'Authorization': `Bearer ${sessionToken}`
-            },
-            body: JSON.stringify({ name, language, parent: parentTopicID })
-        });
-
-        if (!response.ok) {
-            return "Failed to create topic."; // This becomes your errorMessage
-        }
+        await apiRequest(`/topics`, 
+            TopicSchema, 
+            {
+                method: 'POST',
+                headers,
+                body: JSON.stringify({ name, language, parent: parentTopicID })
+            }
+        )
 
         revalidatePath('/topics');
         return undefined; // Success case
@@ -80,7 +76,7 @@ export async function createTopic(parentTopicID: string | null, prevState: any, 
     }
 }
 export async function editTopic(topicID: string, prevState: any, formData: FormData) {
-    const update = CreateTopicSchema.parse({
+    const update = TopicSchema.pick({ name: true, language: true}).parse({
         name: formData.get("name"),
         language: formData.get("language")
     });
@@ -115,15 +111,17 @@ export async function editTopic(topicID: string, prevState: any, formData: FormD
 
 export async function createWord(topicID: string, prevState: any, formData: FormData) {
     
-    const validated = CreateWordSchema.omit({ "blanked example": true}).parse({
-        word: formData.get('word')?.toString(),
-        type: formData.get('type')?.toString(),
-        'language style': formData.get('language style')?.toString(),
-        meaning: formData.get('meaning')?.toString(),
-        example: formData.get('example')?.toString(),
-        synonym: formData.get('synonym')?.toString(),
-        antonym: formData.get('antonym')?.toString()
-    })
+    const validated = WordSchema
+                        .pick({ word: true, type: true, "language style": true, meaning: true, example: true, synonym: true, antonym: true})
+                        .parse({
+                            word: formData.get('word')?.toString(),
+                            type: formData.get('type')?.toString(),
+                            'language style': formData.get('language style')?.toString(),
+                            meaning: formData.get('meaning')?.toString(),
+                            example: formData.get('example')?.toString(),
+                            synonym: formData.get('synonym')?.toString(),
+                            antonym: formData.get('antonym')?.toString()
+                        })
 
     const headers = await getHeaders()
 
@@ -156,7 +154,7 @@ export async function createConversation(topicID: string | null, prevState: any,
     const lineTexts = formData.getAll('line_text').map((v) => v?.toString() ?? '')
     const lineActors = formData.getAll('line_actor').map((v) => Number(v))
 
-    const { words } = await fetchWords(topicID || '')
+    const words = await fetchWords(topicID || '')
 
     // Compose lines by index
     const lines = lineTexts.map((text, i) => {
