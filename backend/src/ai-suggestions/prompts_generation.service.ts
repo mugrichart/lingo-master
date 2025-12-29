@@ -28,7 +28,7 @@ export class PromptsProvider {
         return { userPrompt, systemPrompt }
     }
 
-    wordSuggestionExpander(word: string, example: string): PromptGenReturnType {
+    wordSuggestionExpansionPromptGenerator(word: string, example: string): PromptGenReturnType {
         const systemPrompt = this.SYSTEM_PROMPTS['wordSuggestionExpansion']
         const userPrompt = `
         You are expanding a word given to you and you are returning a structured expanded version
@@ -48,7 +48,20 @@ export class PromptsProvider {
         return { userPrompt, systemPrompt }
     }
 
-    private load_system_prompts(): Record<'topicSuggestions' | 'wordSuggestions' | 'wordSuggestionExpansion' | 'conversationSuggestions', string> {
+    conversationSuggestionExpansionPromptGenerator(title: string, description: string, suggestedWords: string[]): PromptGenReturnType {
+        const systemPrompt = this.SYSTEM_PROMPTS['conversationSuggestionExpansion']
+        const userPrompt = `
+        You are fleshing out this conversation and you are returning a structured expanded version:
+        The title: ${title}
+        The description: ${description}
+        Suggested Words: ${suggestedWords}
+        `
+        return { userPrompt, systemPrompt }
+    }
+
+    private load_system_prompts(): 
+        Record<'topicSuggestions' | 'wordSuggestions' | 'wordSuggestionExpansion' | 'conversationSuggestions' | 'conversationSuggestionExpansion', string> 
+    {
         const filePath = path.join(process.cwd(), './src/ai-suggestions/system_prompts.json')
         const systemPromptsFile = fs.readFileSync(filePath, 'utf-8')
         return JSON.parse(systemPromptsFile)

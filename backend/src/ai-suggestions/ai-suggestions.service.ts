@@ -6,6 +6,7 @@ import { GenerateTopicSuggestionsDto } from 'src/topics/topics.dto';
 import { ChatCompletionSystemMessageParam, ChatCompletionUserMessageParam } from 'openai/resources';
 import { ExpandWordSuggestionDto, GenerateWordSuggestionsDto } from 'src/words/words.dto';
 import { WordDocument } from 'src/words/words.schema';
+import { ConversationDocument } from 'src/conversations/conversations.schema';
 
 type OPENAI_MODELS = 'gpt-4o' | 'gpt-4o-mini' | 'gpt-3.5-turbo'
 
@@ -28,13 +29,21 @@ export class AiSuggestionsService {
     }
 
     async expandWordSuggestion(dto: ExpandWordSuggestionDto): Promise<Omit<WordDocument, '_id'>> {
-        const { userPrompt, systemPrompt} = this.promptsProvider.wordSuggestionExpander(dto.word, dto.example)
+        const { userPrompt, systemPrompt} = this.promptsProvider.wordSuggestionExpansionPromptGenerator(dto.word, dto.example)
         const expansionString = await this.openaiHandle("gpt-4o-mini", systemPrompt, userPrompt, true)
         return JSON.parse(expansionString)
     }
 
     async generateConversationSuggestions(topic: string, words: string[]): Promise<{title: string, description: string, suggestedWords: string[]}[]> {
         const { userPrompt, systemPrompt} = this.promptsProvider.conversationSuggestionsPromptGenerator(topic, words)
+        const suggestionsString = await this.openaiHandle("gpt-4o-mini", systemPrompt, userPrompt, true)
+        return JSON.parse(suggestionsString)
+    }
+
+    async expandConversationSuggestion(
+        title: string, description: string, suggestedWords: string[]
+    ): Promise<Omit<ConversationDocument, '_id' | 'isAiGenerated'>> {
+        const { userPrompt, systemPrompt} = this.promptsProvider.conversationSuggestionExpansionPromptGenerator(title, description, suggestedWords)
         const suggestionsString = await this.openaiHandle("gpt-4o-mini", systemPrompt, userPrompt, true)
         return JSON.parse(suggestionsString)
     }

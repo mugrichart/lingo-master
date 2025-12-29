@@ -5,6 +5,7 @@ import { AiSuggestionsService } from 'src/ai-suggestions/ai-suggestions.service'
 import { TopicsService } from 'src/topics/topics.service';
 import { WordsService } from 'src/words/words.service';
 import { Conversation, ConversationDocument } from './conversations.schema';
+import { ConversationSuggestionExpansionDto } from './conversations.dto';
 
 @Injectable()
 export class ConversationsService {
@@ -45,7 +46,13 @@ export class ConversationsService {
         }
     }
 
+    async expandConversationSuggestion(dto: ConversationSuggestionExpansionDto) {
+        return this.aiSuggestionsService.expandConversationSuggestion(dto.title, dto.description, dto.suggestedWords)
+    }
+
     async findOne(conversationId: Types.ObjectId) {
         return this.conversationModel.findById(conversationId).exec()
     }
 }
+
+
