@@ -57,4 +57,23 @@ export class TopicsService {
             { session } 
         );
     }
+    
+    /**
+     * Adds a conversation reference to a topic.
+     * @param topicId The ID of the topic to update
+     * @param conversationId The ID of the conversation to add
+     * @param session Optional session for transactions
+     */
+    async addNewConversation(
+        topicId: Types.ObjectId,
+        conversationId: Types.ObjectId,
+        session?: ClientSession
+    ) {
+        return this.topicModel.updateOne(
+            { _id: topicId },
+            { $push: { conversations: conversationId }},
+            { session }
+        )
+    }
+
 }

@@ -2,7 +2,7 @@ import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { ConversationsService } from './conversations.service';
 import { ParseObjectIdPipe } from '@nestjs/mongoose';
 import { Types } from 'mongoose';
-import { ConversationSuggestionExpansionDto } from './conversations.dto';
+import { ConversationSuggestionExpansionDto, CreateConversationDto } from './conversations.dto';
 
 @Controller('conversations')
 export class ConversationsController {
@@ -12,6 +12,11 @@ export class ConversationsController {
         return this.conversationsService.findAll(topicId)
     }
 
+    @Post()
+    async create(@Body() dto: CreateConversationDto) {
+        return this.conversationsService.create(dto)
+    }
+
     @Get('/suggestions')
     async generateConversationSuggestions(@Query('topicId', ParseObjectIdPipe) topicId: Types.ObjectId) {
         return this.conversationsService.generateConversationsSuggestions(topicId)
@@ -19,6 +24,7 @@ export class ConversationsController {
 
     @Post('/suggestions/expansion')
     async expandConversationSuggestion(@Body() dto: ConversationSuggestionExpansionDto) {
+        console.log('hit')
         return this.conversationsService.expandConversationSuggestion(dto)
     }
 }

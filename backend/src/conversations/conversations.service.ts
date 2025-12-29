@@ -1,11 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
+import { InjectConnection, InjectModel } from '@nestjs/mongoose';
+import { Connection, Model, Types } from 'mongoose';
 import { AiSuggestionsService } from 'src/ai-suggestions/ai-suggestions.service';
 import { TopicsService } from 'src/topics/topics.service';
 import { WordsService } from 'src/words/words.service';
 import { Conversation, ConversationDocument } from './conversations.schema';
-import { ConversationSuggestionExpansionDto } from './conversations.dto';
+import { ConversationSuggestionExpansionDto, CreateConversationDto } from './conversations.dto';
 
 @Injectable()
 export class ConversationsService {
@@ -13,8 +13,33 @@ export class ConversationsService {
         private aiSuggestionsService: AiSuggestionsService, 
         private topicsService: TopicsService, 
         private wordsService: WordsService,
-        @InjectModel(Conversation.name) private conversationModel: Model<ConversationDocument>
+        @InjectModel(Conversation.name) private conversationModel: Model<ConversationDocument>,
+        @InjectConnection() private connection: Connection
     ) {}
+
+    async create(dto: CreateConversationDto) {
+        const session = await this.connection.startSession()
+        session.startTransaction()
+        try {
+            const topic = await this.topicsService.findOne(dto.topicId)
+            if (!topic) {
+                throw new NotFoundException(`Topic with id ${dto.topicId} not found`)
+            }
+
+            const [ conversation ] = await this.conversationModel.create([dto], { session })
+
+            await this.topicsService.addNewConversation(dto.topicId, conversation._id, session)
+            await session.commitTransaction()
+            return conversation
+
+        } catch (error) {
+            console.error(error.message)
+            await session.abortTransaction()
+            throw error
+        } finally {
+            await session.endSession()
+        }
+    }
 
     async findAll(topicId: Types.ObjectId) {
         try {
