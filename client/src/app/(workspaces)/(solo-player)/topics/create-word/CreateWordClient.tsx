@@ -7,19 +7,19 @@ import CreateWordForm from "./CreateWordForm"
 import { Topic, Word, WordSuggestion } from "@/lib/definitions"
 import { useState } from "react"
 
-import { expandWordSuggestion } from "@/lib/data"
-
 const CreateWordClient =  ({
     suggestions,
     topic,
+    expandWordSuggestion
 }:{
     suggestions: WordSuggestion[],
     topic: Topic,
+    expandWordSuggestion: (selectedSuggestion: WordSuggestion) => Promise<WordSuggestion>
 }) => {
     const [selectedSuggestion, setSelectedSuggestion] = useState<WordSuggestion | null>(null)
 
     async function expandWithAI () {
-        const { detailedSuggestion } = await expandWordSuggestion(selectedSuggestion as WordSuggestion)
+        const detailedSuggestion = await expandWordSuggestion (selectedSuggestion as WordSuggestion)
         setSelectedSuggestion(detailedSuggestion)
     }
  

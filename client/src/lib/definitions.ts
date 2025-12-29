@@ -6,8 +6,8 @@ export type Word = {
     "language style": string,
     meaning: string,
     example: string,
-    "blanked example": string,
-    "related words": string[],
+    "blanked example"?: string,
+    "related words"?: string[],
     synonym: string,
     antonym: string,
 }

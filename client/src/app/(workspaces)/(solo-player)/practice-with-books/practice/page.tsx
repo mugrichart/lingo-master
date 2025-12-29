@@ -1,6 +1,6 @@
 import { fetchPracticeBookPage, fetchPracticeTracking } from "@/lib/session-data"
 import PracticeClient from "./PracticeClient"
-import { updatePracticeTracking } from "@/lib/actions"
+// import { updatePracticeTracking } from "@/lib/actions"
 
 const page = async ({
     searchParams
@@ -10,7 +10,7 @@ const page = async ({
     const { bookID, page: pageNumber, score: sc } = await searchParams
     const { page, cursorAt } = await fetchPracticeBookPage(bookID, pageNumber)
     const score = sc || ((await fetchPracticeTracking()).practiceTracking).score;
-    await updatePracticeTracking(score)
+    // await updatePracticeTracking(score)
 
   return (
     <div className="h-screen">

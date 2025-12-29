@@ -4,8 +4,6 @@ import { cookies } from 'next/headers'
 import { PracticeBook, PracticeBookPage } from './definitions'
 
 
-
-
 type FetchTopicsQuery = {
     parent?: string | null, // parent topic
     creator?: string, // creator id
@@ -13,12 +11,9 @@ type FetchTopicsQuery = {
     language?: string,
 }
 
-const UserSchema = z.object({
-    username: z.string(),
-    email: z.email(),
-    avatar: z.string().optional()
-})
 
+
+// ---------- User related --------------
 export async function fetchUserProfile() {
     const headers = await getHeaders()
     try {
@@ -35,6 +30,10 @@ export async function fetchUserProfile() {
 
 import z from 'zod';
 import { apiRequest } from './api-client'
+import { CreateWordSchema, WordSchema } from './api-schemas'
+import { UserSchema } from './api-schemas'
+
+// ============= Topics related ====================
 
 const TopicSchema = z.object({
     _id: z.string(),
@@ -98,6 +97,65 @@ export async function fetchTopicSuggestions(topic: Topic | null): Promise<{ topi
     }
 }
 
+// =================== Words realted ============================
+
+
+export async function fetchWords(topicID?: string, search?: string): Promise<Word[]> {
+    const headers = await getHeaders()
+
+    try {
+        return apiRequest(`/words?topic=${topicID}&search=${search}`, 
+            z.array(WordSchema),
+            {
+            method: 'GET',
+            headers,
+        })
+    } catch (error) {
+        console.error(error)
+        throw new Error('Error fetching words')
+    }
+}
+
+export async function fetchWordSuggestions(topic: Topic): Promise<{ words: WordSuggestion[]}> {
+    const headers = await getHeaders()
+
+    try {
+        const words: string[] = []//topic.words?.length ? await fetchWords(topic._id) : { words: [] }
+        return apiRequest(`/words/suggestions`,
+            z.object({ words: z.array(z.object({ word: z.string(), example: z.string()}))}),
+            {
+                method: 'POST',
+                headers,
+                body: JSON.stringify({ topic: topic?.name, alreadyExistingWords: words})
+            },
+        )
+    } catch (error) {
+        console.error(error)
+        throw new Error('Error fetching word suggestions')
+    }
+}
+
+export async function expandWordSuggestion(wordSuggestion: WordSuggestion): Promise<Omit<Word, '_id' >> {
+    'use server'
+    const headers = await getHeaders()
+
+    try {
+        return apiRequest(`/words/suggestions/expand`, 
+            CreateWordSchema.omit({ "blanked example": true}),
+            {
+            method: 'POST',
+            headers,
+            body: JSON.stringify(wordSuggestion)
+        })
+        
+    } catch (error) {
+        console.error(error)
+        throw new Error('Error expanding word suggestion')
+    }
+}
+
+// =================== Books related ===================================
+
 export async function fetchPracticeBookPage(bookID: string, page?: number): Promise<{ page: PracticeBookPage, cursorAt: number}> {
 
     const queryParams = new URLSearchParams({ bookID, page: page?.toString() || "" })
@@ -141,7 +199,7 @@ export async function fetchPracticeBooks(): Promise<{ books: PracticeBook[], pra
     }
 }
 
-async function getHeaders() {
+export async function getHeaders() {
     const sessionToken = (await cookies()).get("sessionToken")?.value
     return {
         "content-type": "application/json",

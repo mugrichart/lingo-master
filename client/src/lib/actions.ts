@@ -7,14 +7,10 @@ import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 import { fetchWords } from './data'
 import { handleBlanksGen } from './utils'
+import { CreateTopicSchema, CreateWordSchema, LoginFormSchema, PracticeBookSchema, WordSchema } from './api-schemas'
+import { apiRequest } from './api-client'
+import { getHeaders } from './session-data'
 
-const SignupFormSchema = z.object({
-    username: z.string(),
-    email: z.email(),
-    password: z.string()
-})
-
-const LoginFormSchema = SignupFormSchema.omit({ username: true })
 
 export async function login(formData: FormData) {
     const { email, password } = LoginFormSchema.parse({
@@ -51,11 +47,6 @@ export async function login(formData: FormData) {
     }
     redirect('/topics')
 }
-
-const CreateTopicSchema = z.object({
-    name: z.string(),
-    language: z.string()
-})
 
 
 export async function createTopic(parentTopicID: string | null, prevState: any, formData: FormData) {
@@ -120,45 +111,30 @@ export async function editTopic(topicID: string, prevState: any, formData: FormD
     redirect(`/topics/${topicID}`);
 }
 
-const CreateWordSchema = z.object({
-    word: z.string(),
-    type: z.string(),
-    style: z.string(),
-    meaning: z.string(),
-    example: z.string(),
-    synonym: z.string(),
-    antonym: z.string()
-})
 
-const PracticeBookSchema = z.object({
-    title: z.string(),
-    author: z.string(),
-    pageCount: z.coerce.number().positive(),
-    startingPage: z.coerce.number().positive(),
-    endingPage: z.coerce.number().positive(),
-    bookFile: z.file(),
-    bookCover: z.file()
-})
 
 export async function createWord(topicID: string, prevState: any, formData: FormData) {
     
-    const { word, type, style, meaning, example, synonym, antonym } = CreateWordSchema.parse({
-        word: formData.get('word'),
-        type: formData.get('type'),
-        style: formData.get('language style'),
-        meaning: formData.get('meaning'),
-        example: formData.get('example'),
-        synonym: formData.get('synonym'),
-        antonym: formData.get('antonym')
+    const validated = CreateWordSchema.omit({ "blanked example": true}).parse({
+        word: formData.get('word')?.toString(),
+        type: formData.get('type')?.toString(),
+        'language style': formData.get('language style')?.toString(),
+        meaning: formData.get('meaning')?.toString(),
+        example: formData.get('example')?.toString(),
+        synonym: formData.get('synonym')?.toString(),
+        antonym: formData.get('antonym')?.toString()
     })
 
+    const headers = await getHeaders()
+
+    const blanked = validated.word && validated.example ? handleBlanksGen(validated.example, [validated.word]).blanked : validated.example
+
     try {
-        await fetch(`${env.NEXT_PUBLIC_API_BASE_URL}/words`, {
+        await apiRequest(`/words`, 
+            WordSchema, {
             method: 'POST',
-            headers: {
-                'content-type': 'application/json',
-            },
-            body: JSON.stringify({ word, type, 'language style': style, meaning, example, synonym, antonym, topicID: topicID })
+            headers,
+            body: JSON.stringify({ ...validated, 'blanked example': blanked, topicID: topicID })
         })
     } catch (error) {
         console.error(error)
