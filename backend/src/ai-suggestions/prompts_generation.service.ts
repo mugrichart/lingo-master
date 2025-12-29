@@ -51,7 +51,7 @@ export class PromptsProvider {
     conversationSuggestionExpansionPromptGenerator(title: string, description: string, suggestedWords: string[]): PromptGenReturnType {
         const systemPrompt = this.SYSTEM_PROMPTS['conversationSuggestionExpansion']
         const userPrompt = `
-        You are fleshing out this conversation and you are returning a structured expanded version:
+        You are fleshing out this conversation and you are returning a structured expanded version.
         The title: ${title}
         The description: ${description}
         Suggested Words: ${suggestedWords}

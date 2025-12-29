@@ -44,7 +44,7 @@ export class AiSuggestionsService {
         title: string, description: string, suggestedWords: string[]
     ): Promise<Omit<ConversationDocument, '_id' | 'isAiGenerated'>> {
         const { userPrompt, systemPrompt} = this.promptsProvider.conversationSuggestionExpansionPromptGenerator(title, description, suggestedWords)
-        const suggestionsString = await this.openaiHandle("gpt-4o-mini", systemPrompt, userPrompt, true)
+        const suggestionsString = await this.openaiHandle("gpt-4o", systemPrompt, userPrompt, true)
         return JSON.parse(suggestionsString)
     }
 
