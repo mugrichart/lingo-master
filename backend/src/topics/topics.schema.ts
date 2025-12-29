@@ -16,6 +16,9 @@ export class Topic {
     @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Word'}], default: []})
     words: Types.ObjectId[]
 
+    @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Conversation'}], default: []})
+    conversations: Types.ObjectId[]
+
     @Prop({ required: true, type: mongoose.Schema.Types.ObjectId, ref: 'User'})
     creator: Types.ObjectId
 

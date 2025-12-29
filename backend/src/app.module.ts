@@ -8,6 +8,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TopicsModule } from './topics/topics.module';
 import { WordsModule } from './words/words.module';
 import { AiSuggestionsModule } from './ai-suggestions/ai-suggestions.module';
+import { ConversationsModule } from './conversations/conversations.module';
 import configuration from './config/configuration';
 
 @Module({
@@ -27,7 +28,8 @@ import configuration from './config/configuration';
     }),
     TopicsModule,
     WordsModule,
-    AiSuggestionsModule
+    AiSuggestionsModule,
+    ConversationsModule
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -38,7 +38,17 @@ export class PromptsProvider {
         return { userPrompt, systemPrompt }
     }
 
-    private load_system_prompts(): Record<'topicSuggestions' | 'wordSuggestions' | 'wordSuggestionExpansion', string> {
+    conversationSuggestionsPromptGenerator(topic: string, words: string[]): PromptGenReturnType {
+        const systemPrompt = this.SYSTEM_PROMPTS['conversationSuggestions']
+        const userPrompt = `
+        You are suggesting a list of 5 conversations
+        The topic: ${topic}
+        The words: ${words}
+        `
+        return { userPrompt, systemPrompt }
+    }
+
+    private load_system_prompts(): Record<'topicSuggestions' | 'wordSuggestions' | 'wordSuggestionExpansion' | 'conversationSuggestions', string> {
         const filePath = path.join(process.cwd(), './src/ai-suggestions/system_prompts.json')
         const systemPromptsFile = fs.readFileSync(filePath, 'utf-8')
         return JSON.parse(systemPromptsFile)
