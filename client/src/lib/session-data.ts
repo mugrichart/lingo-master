@@ -1,4 +1,4 @@
-import { Topic, Word, TopicSuggestion, WordSuggestion, ConvoSuggestion, Conversation } from '@/lib/definitions'
+import { Topic, Word, TopicSuggestion, WordSuggestion, ConvoSuggestion, Conversation, ExpandedSuggestion } from '@/lib/definitions'
 
 import { cookies } from 'next/headers'
 import { PracticeBook, PracticeBookPage } from './definitions'
@@ -178,6 +178,32 @@ export async function fetchConversationSuggestions(topicId: string): Promise<{ c
     } catch (error) {
         console.error(error)
         throw new Error('Error fetching conversation suggestions')
+    }
+}
+
+export async function expandConversationSuggestion(topic: string, convoSuggestion: ConvoSuggestion): Promise<ExpandedSuggestion> 
+{
+    'use server'
+    const headers = await getHeaders()
+    try {
+        return apiRequest(`/conversations/suggestions/expansion`, 
+            ConversationSchema
+                .omit({ _id: true, isAiGenerated: true})
+                .extend({ lines: z.array(z.object({
+                    actor: z.number(),
+                    text: z.string()
+                }))})
+            ,
+            {
+                method: 'POST',
+                headers,
+                body: JSON.stringify({ topic, ...convoSuggestion })
+            }
+        )
+        
+    } catch (error) {
+        console.error(error)
+        throw new Error('Error expanding conversation suggestion')
     }
 }
 

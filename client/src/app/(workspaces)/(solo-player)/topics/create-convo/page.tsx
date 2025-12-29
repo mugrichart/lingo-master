@@ -1,5 +1,5 @@
 
-import { fetchConversationSuggestions, fetchTopicByID, fetchWords } from "@/lib/session-data"
+import { fetchConversationSuggestions, fetchTopicByID, fetchWords, expandConversationSuggestion } from "@/lib/session-data"
 
 import CreateConvoClient from "./CreateConvoClient"
 
@@ -16,7 +16,7 @@ const page = async ({
   const { conversations } = await fetchConversationSuggestions(topicIDResolved)
 
   return (
-    <CreateConvoClient words={words} topic={topic} suggestions={conversations}/>
+    <CreateConvoClient words={words} topic={topic} suggestions={conversations} expandConversationSuggestion={expandConversationSuggestion}/>
   )
 }
 

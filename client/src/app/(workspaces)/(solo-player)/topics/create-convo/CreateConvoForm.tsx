@@ -8,7 +8,7 @@ import {
 
 import { createConversation, createWord } from "@/lib/actions"
 import { useActionState, useEffect } from "react"
-import { ConvoSuggestion, Word } from "@/lib/definitions"
+import { ExpandedSuggestion, Word } from "@/lib/definitions"
 import ConversationFormClient from "@/components/ConversationFormClient"
 import { Button } from "@/components/ui/button"
 import { Wand2 } from "lucide-react"
@@ -21,7 +21,7 @@ function CreateConvoForm ({
     resetForm
 }:{
     words: Word[],
-    convoSuggestion: ConvoSuggestion | null,
+    convoSuggestion: Partial<ExpandedSuggestion> | null,
     developWithAI: () => void
     topicID: string,
     resetForm: () => void

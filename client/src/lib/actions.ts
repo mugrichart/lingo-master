@@ -7,7 +7,7 @@ import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 import { fetchWords } from './session-data'
 import { handleBlanksGen } from './utils'
-import { AuthFormSchema, PracticeBookSchema, TopicSchema, WordSchema } from './api-schemas'
+import { AuthFormSchema, ConversationSchema, PracticeBookSchema, TopicSchema, WordSchema } from './api-schemas'
 import { apiRequest } from './api-client'
 import { getHeaders } from './session-data'
 
@@ -144,7 +144,7 @@ export async function createWord(topicID: string, prevState: any, formData: Form
 }
 
 // Simple server action to receive a conversation form and read its FormData.
-export async function createConversation(topicID: string | null, prevState: any, formData: FormData) {
+export async function createConversation(topicId: string | null, prevState: any, formData: FormData) {
     // Read simple fields
     const title = formData.get('title')?.toString() ?? ''
     const description = formData.get('description')?.toString() ?? ''
@@ -154,7 +154,7 @@ export async function createConversation(topicID: string | null, prevState: any,
     const lineTexts = formData.getAll('line_text').map((v) => v?.toString() ?? '')
     const lineActors = formData.getAll('line_actor').map((v) => Number(v))
 
-    const words = await fetchWords(topicID || '')
+    const words = await fetchWords(topicId || '')
 
     // Compose lines by index
     const lines = lineTexts.map((text, i) => {
@@ -169,22 +169,22 @@ export async function createConversation(topicID: string | null, prevState: any,
     })
 
     const payload = {
-        topic: topicID,
+        topicId,
         title,
         description,
         characters,
         lines,
     }
 
-    const sessionToken = (await cookies()).get('sessionToken')?.value
+    const headers = await getHeaders()
 
-    await fetch(`${env.NEXT_PUBLIC_API_BASE_URL}/conversations`, {
-        method: 'POST',
-        headers: {
-            'content-type': 'application/json',
-            'Authorization': `Bearer ${sessionToken}`
-        },
-        body: JSON.stringify(payload)
+    await apiRequest(`/conversations`, 
+        ConversationSchema,
+        {
+            method: 'POST',
+            headers,
+            body: JSON.stringify(payload)
+        
     })
 
     revalidatePath('/topics');

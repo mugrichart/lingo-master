@@ -1,5 +1,5 @@
 'use client'
-import React, { useActionState, useEffect, useState } from "react"
+import {useEffect, useState } from "react"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
@@ -14,16 +14,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { ConvoSuggestion, Word } from "@/lib/definitions"
+import { ExpandedSuggestion, Word } from "@/lib/definitions"
 import { Badge } from "./ui/badge"
 
 import { handleBlanksGen } from "@/lib/utils"
 
 export default function ConversationFormClient(
   { words, convoSuggestion }: 
-  { words: Word[], convoSuggestion: ConvoSuggestion | null }
+  { words: Word[], convoSuggestion: Partial<ExpandedSuggestion> | null }
 ) {
-  console.log(convoSuggestion)
   const [characters, setCharacters] = useState<string[]>([""])
   const [usedWords, setUsedWords] = useState<string[]>([])
   const [theWords] = useState<string[]>(words.map(w => w.word))

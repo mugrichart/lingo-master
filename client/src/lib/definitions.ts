@@ -59,6 +59,14 @@ type OptionalExcept<T, Exceptions extends keyof T> = Pick<T, Exceptions> & Parti
 
 export type WordSuggestion = OptionalExcept<Word, "word" | "example">
 
-export type ConvoSuggestion = OptionalExcept<Conversation, "title" | "description"> & {
+export type ConvoSuggestion = Partial<Conversation> & {
     suggestedWords?: string[]
 }
+
+export type ExpandedSuggestion = Omit<Conversation, '_id' | 'isAiGenerated' | 'lines'> & 
+        { lines: 
+            {
+                actor: number;
+                text: string;
+            }[];
+        }
