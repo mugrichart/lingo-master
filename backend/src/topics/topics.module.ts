@@ -14,6 +14,7 @@ import { AiSuggestionsModule } from 'src/ai-suggestions/ai-suggestions.module';
     AiSuggestionsModule
   ],
   controllers: [TopicsController],
-  providers: [TopicsService]
+  providers: [TopicsService],
+  exports: [TopicsService]
 })
 export class TopicsModule {}

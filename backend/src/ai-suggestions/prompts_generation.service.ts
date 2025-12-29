@@ -8,8 +8,8 @@ type PromptGenReturnType = {userPrompt: string, systemPrompt: string}
 export class PromptsProvider {
     private SYSTEM_PROMPTS = this.load_system_prompts()
 
-    topic_suggestions_prompts_generator(parenTopic?: string, alreadyExistingTopics?: string[]): PromptGenReturnType {
-        const systemPrompt = this.SYSTEM_PROMPTS['topic_suggestions']
+    topicSuggestionsPromptsGenerator(parenTopic?: string, alreadyExistingTopics?: string[]): PromptGenReturnType {
+        const systemPrompt = this.SYSTEM_PROMPTS['topicSuggestions']
         const userPrompt = `
         You are suggesting a list of 5 topics.
         ${parenTopic ? "The topics should be subtopics of: " + parenTopic : ""}.
@@ -18,7 +18,27 @@ export class PromptsProvider {
         return { userPrompt, systemPrompt }
     }
 
-    private load_system_prompts(): Record<'topic_suggestions', string> {
+    wordSuggestionsPromptsGenerator(topic: string, alreadyExistingWords?: string[]): PromptGenReturnType {
+        const systemPrompt = this.SYSTEM_PROMPTS['wordSuggestions']
+        const userPrompt = `
+        You are suggesting a list of 5 words.
+        The words should fall under topic: ${topic}.
+        ${alreadyExistingWords?.length ? "Exclude these already known words: " + alreadyExistingWords.join(', ') : ""}
+        `
+        return { userPrompt, systemPrompt }
+    }
+
+    wordSuggestionExpander(word: string, example: string): PromptGenReturnType {
+        const systemPrompt = this.SYSTEM_PROMPTS['wordSuggestionExpansion']
+        const userPrompt = `
+        You are expanding a word given to you and you are returning a structured expanded version
+        The word: ${word}
+        The example: ${example}
+        `
+        return { userPrompt, systemPrompt }
+    }
+
+    private load_system_prompts(): Record<'topicSuggestions' | 'wordSuggestions' | 'wordSuggestionExpansion', string> {
         const filePath = path.join(process.cwd(), './src/ai-suggestions/system_prompts.json')
         const systemPromptsFile = fs.readFileSync(filePath, 'utf-8')
         return JSON.parse(systemPromptsFile)

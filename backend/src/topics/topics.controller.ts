@@ -3,13 +3,14 @@ import { TopicsService } from './topics.service';
 import { CreateTopicDto, GenerateTopicSuggestionsDto, ListAllTopicsDto, UpdateTopicDto } from './topics.dto';
 import { GetUser } from 'src/auth/get-user.decorator';
 import { AiSuggestionsService } from 'src/ai-suggestions/ai-suggestions.service';
+import { Types } from 'mongoose';
 
 @Controller('topics')
 export class TopicsController {
     constructor(private topicsService: TopicsService, private aiSuggestionsService: AiSuggestionsService) {}
 
     @Post()
-    async createTopic(@Body() createTopicDto: CreateTopicDto, @GetUser('userID') id: string) {
+    async createTopic(@Body() createTopicDto: CreateTopicDto, @GetUser('userID') id: Types.ObjectId) {
         return this.topicsService.create(createTopicDto, id)
     }
 
@@ -19,12 +20,12 @@ export class TopicsController {
     }
 
     @Get(':id')
-    async findOne(@Param('id') id: string) {
+    async findOne(@Param('id') id: Types.ObjectId) {
         return this.topicsService.findOne(id)
     }
 
     @Put(':id')
-    async update(@Param('id') id: string, @Body() updateTopicDto: UpdateTopicDto) {
+    async update(@Param('id') id: Types.ObjectId, @Body() updateTopicDto: UpdateTopicDto) {
         return this.topicsService.update(id, updateTopicDto)
     }
     

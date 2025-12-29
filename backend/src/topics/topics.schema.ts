@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import mongoose, { HydratedDocument } from "mongoose";
+import mongoose, { HydratedDocument, Types } from "mongoose";
 import { User } from "src/users/users.schema";
 import { Word } from "src/words/words.schema";
 
@@ -14,13 +14,13 @@ export class Topic {
     language: string
 
     @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Word'}], default: []})
-    words: Word[]
+    words: Types.ObjectId[]
 
     @Prop({ required: true, type: mongoose.Schema.Types.ObjectId, ref: 'User'})
-    creator: string
+    creator: Types.ObjectId
 
     @Prop({ default: null, type: mongoose.Schema.Types.ObjectId, ref: 'Topic'})
-    parent: string | null
+    parent: Types.ObjectId | null
 
     @Prop({ default: false })
     isAiGenerated: boolean

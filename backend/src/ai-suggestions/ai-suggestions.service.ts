@@ -4,6 +4,8 @@ import OpenAI
  from 'openai';
 import { GenerateTopicSuggestionsDto } from 'src/topics/topics.dto';
 import { ChatCompletionSystemMessageParam, ChatCompletionUserMessageParam } from 'openai/resources';
+import { ExpandWordSuggestionDto, GenerateWordSuggestionsDto } from 'src/words/words.dto';
+import { WordDocument } from 'src/words/words.schema';
 
 type OPENAI_MODELS = 'gpt-4o' | 'gpt-4o-mini' | 'gpt-3.5-turbo'
 
@@ -14,12 +16,24 @@ export class AiSuggestionsService {
     constructor(private promptsProvider: PromptsProvider) {}
 
     async generateTopicSuggestions(dto: GenerateTopicSuggestionsDto): Promise<{ topics: string[] }> {
-       const { userPrompt, systemPrompt } = this.promptsProvider.topic_suggestions_prompts_generator(dto.parentTopic, dto.alreadyExistingTopics)
+       const { userPrompt, systemPrompt } = this.promptsProvider.topicSuggestionsPromptsGenerator(dto.parentTopic, dto.alreadyExistingTopics)
        const suggestionsString = await this.openaiHandle("gpt-4o-mini", systemPrompt, userPrompt, true)
        return JSON.parse(suggestionsString)
     }
 
-    async openaiHandle(model: OPENAI_MODELS, systemPrompt: string, userPrompt: string, request_structured_output: boolean) {
+    async generateWordSuggestions(dto: GenerateWordSuggestionsDto): Promise<{ words: {word: string, example: string}[] }> {
+       const { userPrompt, systemPrompt } = this.promptsProvider.wordSuggestionsPromptsGenerator(dto.topic, dto.alreadyExistingWords)
+       const suggestionsString = await this.openaiHandle("gpt-4o-mini", systemPrompt, userPrompt, true)
+       return JSON.parse(suggestionsString)
+    }
+
+    async expandWordSuggestion(dto: ExpandWordSuggestionDto): Promise<Omit<WordDocument, '_id'>> {
+        const { userPrompt, systemPrompt} = this.promptsProvider.wordSuggestionExpander(dto.word, dto.example)
+        const expansionString = await this.openaiHandle("gpt-4o-mini", systemPrompt, userPrompt, true)
+        return JSON.parse(expansionString)
+    }
+
+    private async openaiHandle(model: OPENAI_MODELS, systemPrompt: string, userPrompt: string, request_structured_output: boolean) {
         const messages: [ChatCompletionSystemMessageParam, ChatCompletionUserMessageParam] = [
             { role: "system", content: systemPrompt},
             { role: "user", content: userPrompt}
