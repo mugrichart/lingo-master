@@ -10,6 +10,7 @@ import { WordsModule } from './words/words.module';
 import { AiSuggestionsModule } from './ai-suggestions/ai-suggestions.module';
 import { ConversationsModule } from './conversations/conversations.module';
 import { BooksModule } from './books/books.module';
+import { FileStorageModule } from './file-storage/file-storage.module';
 import configuration from './config/configuration';
 
 @Module({
@@ -31,7 +32,8 @@ import configuration from './config/configuration';
     WordsModule,
     AiSuggestionsModule,
     ConversationsModule,
-    BooksModule
+    BooksModule,
+    FileStorageModule
   ],
   controllers: [AppController],
   providers: [AppService],
