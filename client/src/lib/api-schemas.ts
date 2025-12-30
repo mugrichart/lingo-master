@@ -46,6 +46,15 @@ export const PracticeBookSchema = z.object({
     endingPage: z.coerce.number().positive(),
 })
 
+export const PracticeBookPageSchema = z.object({ 
+    pageContent: z.object({ 
+        text: z.string(),       
+        words: z.array(z.string()),
+        options: z.array(z.string())
+    }),
+    pageNumber: z.number()
+})
+
 export const UserSchema = z.object({
     username: z.string(),
     email: z.email(),

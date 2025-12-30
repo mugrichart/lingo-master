@@ -4,9 +4,9 @@ import { cookies } from 'next/headers'
 import { PracticeBook, PracticeBookPage } from './definitions'
 
 
-import z from 'zod';
+import z, { number } from 'zod';
 import { apiRequest } from './api-client'
-import { WordSchema, UserSchema, TopicSchema, ConversationSchema, PracticeBookSchema } from './api-schemas'
+import { WordSchema, UserSchema, TopicSchema, ConversationSchema, PracticeBookSchema, PracticeBookPageSchema } from './api-schemas'
 
 
 type FetchTopicsQuery = {
@@ -208,37 +208,6 @@ export async function expandConversationSuggestion(topic: string, convoSuggestio
 }
 
 // =================== Books related ===================================
-
-export async function fetchPracticeBookPage(bookID: string, page?: number): Promise<{ page: PracticeBookPage, cursorAt: number}> {
-
-    const queryParams = new URLSearchParams({ bookID, page: page?.toString() || "" })
-    const headers = await getHeaders()
-
-    try {        
-        const response = await fetch(`/books/practice?${queryParams}`, {
-            headers
-        })
-        return response.json()
-    } catch (error) {
-        console.error(error)
-        throw new Error("Error fetching practice book page")
-    }
-}
-
-export async function fetchPracticeTracking(): Promise<{ practiceTracking: { user: string, score: number} }>{
-    const headers = await getHeaders()
-    try {
-        const response = await fetch(`/practice-with-books/tracking`, {
-            headers
-        })
-
-        return response.json()
-    } catch (error) {
-        console.error(error)
-        throw new Error("Error fetching practice tracking")
-    }
-}
-//, practiceTracking: { user: string, score: number}
 export async function fetchPracticeBooks(): Promise<PracticeBook[]> {
     const headers = await getHeaders()
     try {
@@ -249,6 +218,79 @@ export async function fetchPracticeBooks(): Promise<PracticeBook[]> {
     } catch (error) {
         console.error(error)
         throw new Error("Error fetching practice books")
+    }
+}
+
+export async function fetchPracticeBookPage(bookId: string, pageNumber?: number): Promise<{ pageContent: PracticeBookPage, pageNumber: number} | null> {
+
+    const queryParams = new URLSearchParams({ bookId, pageNumber: (pageNumber ?? 0).toString() })
+    const headers = await getHeaders()
+
+    try {        
+        return apiRequest(`/books/practice?${queryParams}`, 
+            PracticeBookPageSchema.nullable(),
+            { headers}
+        )
+    } catch (error) {
+        console.error(error)
+        throw new Error("Error fetching practice book page")
+    }
+}
+export async function fetchPracticeData(bookId: string): Promise<{ bookId: string, user: string, cursorAt: number, pages: string[]} | null> {
+
+    const queryParams = new URLSearchParams({ bookId })
+    const headers = await getHeaders()
+
+    try {        
+        return apiRequest(`/books/practice?${queryParams}`, 
+            z.object({bookId: z.string(), user: z.string(), cursorAt: z.number(), pages: z.array(z.string())}).nullable(),
+            { headers}
+        )
+    } catch (error) {
+        console.error(error)
+        throw new Error("Error fetching practice book page")
+    }
+}
+
+export async function createPracticeData(bookId: string): Promise<{ bookId: string, user: string, cursorAt: number, pages: string[]} | null> {
+
+    const queryParams = new URLSearchParams({ bookId })
+    const headers = await getHeaders()
+
+    try {        
+        return apiRequest(`/books/practice?${queryParams}`, 
+            z.object({bookId: z.string(), user: z.string(), cursorAt: z.number(), pages: z.array(z.string())}).nullable(),
+            { headers}
+        )
+    } catch (error) {
+        console.error(error)
+        throw new Error("Error fetching practice book page")
+    }
+}
+
+export async function fetchPracticeTracking(): Promise<{ _id: string, user: string, score: number} | null> {
+    const headers = await getHeaders()
+    try {
+        return apiRequest('/books/practice/tracking', 
+            z.object({ _id: z.string(), user: z.string(), score: z.number()}).nullable(), 
+            { headers }
+        )
+    } catch (error) {
+        console.error(error)
+        throw new Error("Error fetching practice tracking data")
+    }
+}
+
+export async function createPracticeTracking(): Promise<{ _id: string, user: string, score: number}> {
+    const headers = await getHeaders()
+    try {
+        return apiRequest('/books/practice/tracking', 
+            z.object({ _id: z.string(), user: z.string(), score: z.number()}), 
+            { method: 'POST', headers }
+        )
+    } catch (error) {
+        console.error(error)
+        throw new Error("Error fetching practice tracking data")
     }
 }
 

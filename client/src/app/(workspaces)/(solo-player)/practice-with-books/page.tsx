@@ -3,12 +3,20 @@ import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/in
 import { Plus, Search } from "lucide-react"
 import ContentView from "../topics/components/ContentView"
 import Link from "next/link"
-import { fetchPracticeBooks } from "@/lib/data"
+import { createPracticeTracking, fetchPracticeBooks, fetchPracticeTracking } from "@/lib/data"
 import BookCard from "./BookCard"
 
 
 const page = async () => {
   const books = await fetchPracticeBooks()
+  let tracking = await fetchPracticeTracking()
+  if (!tracking) {//create tracking
+    tracking = await createPracticeTracking()
+    if (!tracking) {
+      //TODO: Fix this ASA you can
+      return <div>Error creating tracking data</div>
+    }
+  }
   
   return (
     <div className='w-full h-220 px-5'>
@@ -27,15 +35,15 @@ const page = async () => {
               New book
             </Button>
           </Link>
-          {/* <span>{practiceTracking.score}🪙</span> */}
+          <span>{tracking?.score || 0}🪙</span>
         </div>
       </div>
       <ContentView>
         {
           books.map(book => (
-            // <Link key={book._id} href={`/practice-with-books/practice?bookID=${book._id}&score=${practiceTracking.score}`}>
+            <Link key={book._id} href={`/practice-with-books/practice?bookID=${book._id}&score=${tracking.score || 0}`}>
               <BookCard book={book} />
-            // </Link>
+            </Link>
           ))
         }
       </ContentView>
