@@ -1,5 +1,5 @@
-import { Body, Controller, Get, Post, UploadedFiles, UseInterceptors } from '@nestjs/common';
-import { UploadMetadataDto } from './books.dto';
+import { Body, Controller, Get, Post, Put, Query, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import { QueryPracticePageDto, UploadMetadataDto } from './books.dto';
 import { FileFieldsInterceptor } from "@nestjs/platform-express"
 import { BooksService } from './books.service';
 import { GetUser } from 'src/auth/get-user.decorator';
@@ -15,7 +15,6 @@ export class BooksController {
         return this.booksService.findAll()
     }
     
-
     @Post('/upload')
     @UseInterceptors(FileFieldsInterceptor([
         { name: 'bookFile', maxCount: 1 },
@@ -27,6 +26,43 @@ export class BooksController {
         @GetUser('userID') userId: Types.ObjectId
     ) {
         return this.booksService.upload(metadata, files, userId)
+    }
+
+    //---------------------------------------------------------------------
+    @Get('/practice/page')
+    async getBookPracticePage(@Query() dto: QueryPracticePageDto, @GetUser('userID') userId: Types.ObjectId) {
+        return this.booksService.getBookPracticePage(dto, userId)
+    }
+
+    @Get('/practice')
+    async getBookPracticePlan(@Query('bookId') bookId: Types.ObjectId, @GetUser('userID') userId: Types.ObjectId) {
+        return this.booksService.getBookPracticePlan(bookId, userId)
+    }
+
+    @Post('/practice')
+    async createBookPracticePlan(@Query('bookId') bookId: Types.ObjectId, @GetUser('userID') userId: Types.ObjectId) {
+        return this.booksService.createBookPracticePlan(bookId, userId)
+    }
+
+    @Put('/practice')
+    async updateBookPracticeData() {
+
+    }
+
+    //--------------------------------------------------------------------
+    @Get('/practice/tracking')
+    async getUserPracticeTracking(@GetUser('userID') userId: Types.ObjectId) {
+        return this.booksService.getUserPracticeTracking(userId)
+    }
+
+    @Post('/practice/tracking')
+    async createUserPracticeTracking(@GetUser('userID') userId: Types.ObjectId) {
+        return this.booksService.createUserPracticeTracking(userId)
+    }
+
+    @Put('/practice/tracking')
+    async updateUserPracticeTracking() {
+
     }
 
 }
