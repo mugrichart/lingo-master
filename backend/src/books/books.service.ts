@@ -14,6 +14,10 @@ export class BooksService {
         private fileStorageService: FileStorageService
     ) {}
 
+    async findAll() {
+        return this.bookModel.find().exec()
+    }
+
     async upload(metadata: UploadMetadataDto, files: { bookFile: Express.Multer.File[], bookCover: Express.Multer.File[]}, userId: Types.ObjectId) {
 
         const timestamp = Date.now();
