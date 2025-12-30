@@ -12,7 +12,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar"
 
-import { fetchTopicByID } from "@/lib/session-data"
+import { fetchTopicByID } from "@/lib/data"
 
 const topicsLayout = async (
     { children, params }: 

@@ -2,7 +2,7 @@
 import CreateTopicClient from "@/app/(workspaces)/(solo-player)/topics/create-topic/CreateTopicClient"
 
 import { createTopic } from "@/lib/actions"
-import { fetchTopicByID, fetchTopicSuggestions } from "@/lib/session-data"
+import { fetchTopicByID, fetchTopicSuggestions } from "@/lib/data"
 
 const page = async ({ 
   searchParams

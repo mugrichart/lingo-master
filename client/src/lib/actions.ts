@@ -5,11 +5,11 @@ import { env } from "@/env"
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
-import { fetchWords } from './session-data'
+import { fetchWords } from './data'
 import { handleBlanksGen } from './utils'
 import { AuthFormSchema, ConversationSchema, PracticeBookSchema, TopicSchema, WordSchema } from './api-schemas'
 import { apiRequest } from './api-client'
-import { getHeaders } from './session-data'
+import { getHeaders } from './data'
 
 
 export async function login(formData: FormData) {

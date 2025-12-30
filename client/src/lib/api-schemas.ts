@@ -44,8 +44,6 @@ export const PracticeBookSchema = z.object({
     pageCount: z.coerce.number().positive(),
     startingPage: z.coerce.number().positive(),
     endingPage: z.coerce.number().positive(),
-    bookFile: z.file(),
-    bookCover: z.file()
 })
 
 export const UserSchema = z.object({

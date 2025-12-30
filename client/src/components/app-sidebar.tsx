@@ -17,7 +17,7 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar"
 
-import { fetchUserProfile } from "@/lib/session-data"
+import { fetchUserProfile } from "@/lib/data"
 
 // This is sample data.
 

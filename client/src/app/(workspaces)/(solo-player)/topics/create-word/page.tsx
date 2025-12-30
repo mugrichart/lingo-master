@@ -1,5 +1,5 @@
 
-import { expandWordSuggestion, fetchTopicByID, fetchWordSuggestions } from "@/lib/session-data"
+import { expandWordSuggestion, fetchTopicByID, fetchWordSuggestions } from "@/lib/data"
 import CreateWordClient from "./CreateWordClient"
 import { WordSuggestion } from "@/lib/definitions";
 

@@ -2,8 +2,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {TopicList} from "../components/topic"
 import {WordList} from "../components/word"
 
-// import { fetchConvos, fetchWords } from "@/lib/session-data"
-import { fetchConversations, fetchTopics, fetchWords } from "@/lib/session-data"
+// import { fetchConvos, fetchWords } from "@/lib/data"
+import { fetchConversations, fetchTopics, fetchWords } from "@/lib/data"
 import { ConvosList } from "../components/convos"
 import { Conversation } from "@/lib/definitions"
 

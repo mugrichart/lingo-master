@@ -3,12 +3,12 @@ import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/in
 import { Plus, Search } from "lucide-react"
 import ContentView from "../topics/components/ContentView"
 import Link from "next/link"
-import { fetchPracticeBooks } from "@/lib/session-data"
+import { fetchPracticeBooks } from "@/lib/data"
 import BookCard from "./BookCard"
 
 
 const page = async () => {
-  const { books, practiceTracking } = await fetchPracticeBooks()
+  const books = await fetchPracticeBooks()
   
   return (
     <div className='w-full h-220 px-5'>
@@ -27,15 +27,15 @@ const page = async () => {
               New book
             </Button>
           </Link>
-          <span>{practiceTracking.score}🪙</span>
+          {/* <span>{practiceTracking.score}🪙</span> */}
         </div>
       </div>
       <ContentView>
         {
           books.map(book => (
-            <Link key={book._id} href={`/practice-with-books/practice?bookID=${book._id}&score=${practiceTracking.score}`}>
+            // <Link key={book._id} href={`/practice-with-books/practice?bookID=${book._id}&score=${practiceTracking.score}`}>
               <BookCard book={book} />
-            </Link>
+            // </Link>
           ))
         }
       </ContentView>

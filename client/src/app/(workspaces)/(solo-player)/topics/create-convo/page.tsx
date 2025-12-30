@@ -1,5 +1,5 @@
 
-import { fetchConversationSuggestions, fetchTopicByID, fetchWords, expandConversationSuggestion } from "@/lib/session-data"
+import { fetchConversationSuggestions, fetchTopicByID, fetchWords, expandConversationSuggestion } from "@/lib/data"
 
 import CreateConvoClient from "./CreateConvoClient"
 

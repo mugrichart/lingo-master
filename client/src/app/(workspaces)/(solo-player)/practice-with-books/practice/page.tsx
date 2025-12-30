@@ -1,4 +1,4 @@
-import { fetchPracticeBookPage, fetchPracticeTracking } from "@/lib/session-data"
+import { fetchPracticeBookPage, fetchPracticeTracking } from "@/lib/data"
 import PracticeClient from "./PracticeClient"
 // import { updatePracticeTracking } from "@/lib/actions"
 
