@@ -61,7 +61,7 @@ export const ConvoCard = ({ words, convo, topicID }: { words: Word[], convo: Con
 
         </CardContent>
         <CardFooter className="h-[10%]">
-          <Link href={`/topics/practice-convo?topic=${topicID}&convo=${convo._id}`}>
+          <Link href={`/topics/practice-convo?topic=${topicID}&conversation=${convo._id}`}>
             <Button><BookIcon />Practice</Button>
           </Link>
         </CardFooter>       
@@ -93,9 +93,7 @@ export const ConvosList = ({ words, topicID, conversations }: { words: Word[], t
       <ContentView>
         {
           conversations.map(convo => (
-            // <Link key={topic._id} href={`${pathname}/${topic._id}`}>
               <ConvoCard convo={convo} words={words} topicID={topicID}/>
-            // </Link>
           ))
         }
       </ContentView>
