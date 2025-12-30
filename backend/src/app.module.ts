@@ -9,6 +9,7 @@ import { TopicsModule } from './topics/topics.module';
 import { WordsModule } from './words/words.module';
 import { AiSuggestionsModule } from './ai-suggestions/ai-suggestions.module';
 import { ConversationsModule } from './conversations/conversations.module';
+import { BooksModule } from './books/books.module';
 import configuration from './config/configuration';
 
 @Module({
@@ -29,7 +30,8 @@ import configuration from './config/configuration';
     TopicsModule,
     WordsModule,
     AiSuggestionsModule,
-    ConversationsModule
+    ConversationsModule,
+    BooksModule
   ],
   controllers: [AppController],
   providers: [AppService],
