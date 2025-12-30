@@ -192,7 +192,9 @@ export async function createConversation(topicId: string | null, prevState: any,
 }
 
 export async function uploadPracticeBook(formData: FormData) {
-    PracticeBookSchema.parse({
+    PracticeBookSchema
+    .extend({ bookFile: z.file(), bookCover: z.file()})
+    .parse({
         title: formData.get("title"),
         author: formData.get("author"),
         pageCount: formData.get("pageCount"),
@@ -202,20 +204,17 @@ export async function uploadPracticeBook(formData: FormData) {
         bookCover: formData.get("bookCover")
     })
 
-    const sessionToken = (await cookies()).get("sessionToken")?.value
+    const { "content-type": _, ...safeHeaders} = await getHeaders() // remove content-type and let the browser handle it for us
     
     try {
-        const response = await fetch(`${env.NEXT_PUBLIC_API_BASE_URL}/practice-with-books/upload`, {
-            method: "POST",
-            headers: {
-                "Authorization": `Bearer ${sessionToken}`
-            },
-            body: formData
-        })
-
-        if (!response.ok) {
-            throw new Error("Upload failed")
-        }
+        await apiRequest(`/books/upload`, 
+            PracticeBookSchema.extend({ _id: z.string(), pdfUrl: z.url(), coverUrl: z.url()}),
+            {
+                method: "POST",
+                headers:  safeHeaders,
+                body: formData
+            }
+        )
 
     } catch (error) {
         console.error(error)

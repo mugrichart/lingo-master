@@ -243,7 +243,7 @@ export async function fetchPracticeBooks(): Promise<PracticeBook[]> {
     const headers = await getHeaders()
     try {
         return apiRequest(`/books`, 
-            z.array(PracticeBookSchema.extend({_id: z.string(), pdfUrl: z.string(), coverUrl: z.string()})),
+            z.array(PracticeBookSchema.extend({_id: z.string(), pdfUrl: z.url(), coverUrl: z.url()})),
             { headers }
         )
     } catch (error) {
