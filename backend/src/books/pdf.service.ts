@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import * as pdfjsLib from 'pdfjs-dist';
+import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
 // For Node environments, you must point to the worker
 import { TextContent, TextItem } from 'pdfjs-dist/types/src/display/api';
 
