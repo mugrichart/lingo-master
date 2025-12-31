@@ -227,25 +227,25 @@ export async function fetchPracticeBookPage(bookId: string, pageNumber?: number)
     const headers = await getHeaders()
 
     try {        
-        return apiRequest(`/books/practice/page?${queryParams}`, 
+        return await apiRequest(`/books/practice/page?${queryParams}`, 
             PracticeBookPageSchema.nullable(),
             { headers}
         )
     } catch (error) {
         console.error(error)
-        throw new Error("Error fetching practice book page")
+        // throw new Error("Error fetching practice book page")
+        return null
     }
 }
 
 export async function createPracticeBookPage(bookId: string, pageNumber?: number): Promise<{ pageContent: PracticeBookPage, pageNumber: number} | null> {
 
-    const queryParams = new URLSearchParams({ bookId, pageNumber: (pageNumber ?? 0).toString() })
     const headers = await getHeaders()
 
     try {        
-        return apiRequest(`/books/practice/page?${queryParams}`, 
+        return apiRequest(`/books/practice/page`, 
             PracticeBookPageSchema.nullable(),
-            { method: 'Post', headers}
+            { method: 'Post', headers, body: JSON.stringify({ bookId, pageNumber })}
         )
     } catch (error) {
         console.error(error)
@@ -257,27 +257,26 @@ export async function fetchPracticePlan(bookId: string): Promise<{ bookId: strin
 
     const queryParams = new URLSearchParams({ bookId })
     const headers = await getHeaders()
-
     try {        
-        return apiRequest(`/books/practice/plan?${queryParams}`, 
+        return await apiRequest(`/books/practice/plan?${queryParams.toString()}`, 
             z.object({bookId: z.string(), user: z.string(), cursorAt: z.number(), pages: z.array(z.string())}).nullable(),
             { headers}
         )
     } catch (error) {
         console.error(error)
-        throw new Error("Error fetching practice book page")
+        // throw new Error("Error fetching practice book page")
+        return null
     }
 }
 
 export async function createPracticePlan(bookId: string): Promise<{ bookId: string, user: string, cursorAt: number, pages: string[]} | null> {
 
-    const queryParams = new URLSearchParams({ bookId })
     const headers = await getHeaders()
 
     try {        
-        return apiRequest(`/books/practice/plan?${queryParams}`, 
+        return apiRequest(`/books/practice/plan`, 
             z.object({bookId: z.string(), user: z.string(), cursorAt: z.number(), pages: z.array(z.string())}).nullable(),
-            { headers}
+            { method: 'Post', headers, body: JSON.stringify({ bookId })}
         )
     } catch (error) {
         console.error(error)
