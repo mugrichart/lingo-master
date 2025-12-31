@@ -4,6 +4,7 @@ import { BooksService } from './books.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Book, BookPractice, BookPracticePage, BookPracticePageSchema, BookPracticeSchema, BookPracticeTracking, BookPracticeTrackingSchema, BookSchema } from './books.schema';
 import { FileStorageModule } from 'src/file-storage/file-storage.module';
+import { PdfService } from './pdf.service';
 
 @Module({
   imports: [
@@ -16,6 +17,6 @@ import { FileStorageModule } from 'src/file-storage/file-storage.module';
     FileStorageModule
   ],
   controllers: [BooksController],
-  providers: [BooksService]
+  providers: [BooksService, PdfService]
 })
 export class BooksModule {}

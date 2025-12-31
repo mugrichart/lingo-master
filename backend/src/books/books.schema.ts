@@ -41,7 +41,7 @@ export class BookPracticePage {
     @Prop({ type: mongoose.SchemaTypes.ObjectId, ref: 'BookPracticePageContent'}) 
     content: Types.ObjectId
 
-    @Prop({ default: 'not-processed', enum: contentStatusValues})
+    @Prop({ type: String, default: 'not-processed', enum: contentStatusValues})
     contentStatus: typeof contentStatusValues[number]
 
     @Prop() topic: string // the topic of the keywords

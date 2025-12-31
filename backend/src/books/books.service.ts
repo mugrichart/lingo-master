@@ -80,7 +80,7 @@ export class BooksService {
     
             const pageContent = await this.pageModel.findById(pageId).exec()
             
-            return { pageContent, pageNumber }
+            return pageContent ? { pageContent, pageNumber } : null
         } catch (error) {
             console.error(error.message)
             throw error            
@@ -97,8 +97,8 @@ export class BooksService {
         }
 
         const practicePageIndex = practicePageIdx ?? practicePlan.pages.length - 1 // 0-indexed in the practice plan
-        const totalPracticeablePages = book.endingPage - book.startingPage // We have the user tell us the first page the reading actually starts, and where it ends
-        if (practicePageIndex >= totalPracticeablePages) {
+        const lastPageIndex = book.endingPage - book.startingPage // We have the user tell us the first page the reading actually starts, and where it ends
+        if (practicePageIndex > lastPageIndex) {
             throw new NotFoundException(`Last page of the book is ${book.endingPage}`)
         }
 
@@ -107,7 +107,10 @@ export class BooksService {
         const pageContent = await this.pdfService.getPageContent(pdfFile, pageNumber)
 
         //! band-aid for now
-        return { text: pageContent, words: [], options: []}
+        return {
+            pageContent: { text: pageContent, words: [], options: [] },
+            pageNumber: 0
+        }
 
     }
 
