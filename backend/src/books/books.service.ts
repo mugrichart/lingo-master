@@ -5,7 +5,8 @@ import { Book, BookPractice, BookPracticePage, BookPracticeTracking } from './bo
 import { Model, Types } from 'mongoose';
 import { ConfigService } from '@nestjs/config';
 import { FileStorageService } from 'src/file-storage/file-storage.service';
-import { GetUser } from 'src/auth/get-user.decorator';
+import { PdfService } from './pdf.service';
+import { PDFDocumentProxy } from 'pdfjs-dist';
 
 @Injectable()
 export class BooksService {
@@ -15,7 +16,8 @@ export class BooksService {
         @InjectModel(BookPracticePage.name) private pageModel: Model<BookPracticePage>,
         @InjectModel(BookPracticeTracking.name) private userTrackingModel: Model<BookPracticeTracking>,
         private configService: ConfigService,
-        private fileStorageService: FileStorageService
+        private fileStorageService: FileStorageService,
+        private pdfService: PdfService
     ) {}
 
     async findAll() {
@@ -55,11 +57,15 @@ export class BooksService {
     }
 
     async createBookPracticePlan(bookId: Types.ObjectId, userId: Types.ObjectId) {
-        const book = await this.bookModel.findOne(bookId)
+        const[book, practicePlan] = await Promise.all([ this.bookModel.findOne(bookId), this.getBookPracticePlan(bookId, userId) ])
         if (!book) {
             throw new NotFoundException(`Book with id ${bookId} not found`)
         }
-        const bookFile = await fetch(book.pdfUrl)
+        if (practicePlan) {
+            return practicePlan
+        }
+
+        return this.practiceModel.create({ bookId, user: userId, cursorAt: 0, pages: []})
     }
 
     async getBookPracticePage(dto: QueryPracticePageDto, userId: Types.ObjectId) {
@@ -79,6 +85,30 @@ export class BooksService {
             console.error(error.message)
             throw error            
         }
+    }
+
+    async createBookPracticePage(bookId: Types.ObjectId, userId: Types.ObjectId, practicePageIdx?: number) {
+        const[book, practicePlan] = await Promise.all([ this.bookModel.findOne(bookId), this.getBookPracticePlan(bookId, userId) ])
+        if (!book) {
+            throw new NotFoundException(`Book with id ${bookId} not found`)
+        }
+        if (!practicePlan) {
+            throw new NotFoundException(`Practice plan for book with id ${bookId} not found`)
+        }
+
+        const practicePageIndex = practicePageIdx ?? practicePlan.pages.length - 1 // 0-indexed in the practice plan
+        const totalPracticeablePages = book.endingPage - book.startingPage // We have the user tell us the first page the reading actually starts, and where it ends
+        if (practicePageIndex >= totalPracticeablePages) {
+            throw new NotFoundException(`Last page of the book is ${book.endingPage}`)
+        }
+
+        const pdfFile: PDFDocumentProxy = await this.pdfService.getPdf(book.pdfUrl)
+        const pageNumber = practicePageIndex + book.startingPage
+        const pageContent = await this.pdfService.getPageContent(pdfFile, pageNumber)
+
+        //! band-aid for now
+        return { text: pageContent, words: [], options: []}
+
     }
 
     //----------------------------------------------------------------------

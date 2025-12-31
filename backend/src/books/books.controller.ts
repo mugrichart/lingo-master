@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Put, Query, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, NotAcceptableException, NotImplementedException, Post, Put, Query, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { QueryPracticePageDto, UploadMetadataDto } from './books.dto';
 import { FileFieldsInterceptor } from "@nestjs/platform-express"
 import { BooksService } from './books.service';
@@ -29,25 +29,31 @@ export class BooksController {
     }
 
     //---------------------------------------------------------------------
+    @Get('/practice/plan')
+    async getBookPracticePlan(@Query('bookId') bookId: Types.ObjectId, @GetUser('userID') userId: Types.ObjectId) {
+        return this.booksService.getBookPracticePlan(bookId, userId)
+    }
+
+    @Post('/practice/plan')
+    async createBookPracticePlan(@Query('bookId') bookId: Types.ObjectId, @GetUser('userID') userId: Types.ObjectId) {
+        return this.booksService.createBookPracticePlan(bookId, userId)
+    }
+
+    @Put('/practice/plan')
+    async updateBookPracticePlan() {
+        throw new NotImplementedException()
+    }
+    //---------------------------------------------------------------------
     @Get('/practice/page')
     async getBookPracticePage(@Query() dto: QueryPracticePageDto, @GetUser('userID') userId: Types.ObjectId) {
         return this.booksService.getBookPracticePage(dto, userId)
     }
 
-    @Get('/practice')
-    async getBookPracticePlan(@Query('bookId') bookId: Types.ObjectId, @GetUser('userID') userId: Types.ObjectId) {
-        return this.booksService.getBookPracticePlan(bookId, userId)
+    @Get('/practice/page')
+    async createBookPracticePage(@Query() dto: QueryPracticePageDto, @GetUser('userID') userId: Types.ObjectId) {
+        return this.booksService.createBookPracticePage(dto.bookId, userId, dto.pageNumber)
     }
 
-    @Post('/practice')
-    async createBookPracticePlan(@Query('bookId') bookId: Types.ObjectId, @GetUser('userID') userId: Types.ObjectId) {
-        return this.booksService.createBookPracticePlan(bookId, userId)
-    }
-
-    @Put('/practice')
-    async updateBookPracticeData() {
-
-    }
 
     //--------------------------------------------------------------------
     @Get('/practice/tracking')
@@ -62,7 +68,7 @@ export class BooksController {
 
     @Put('/practice/tracking')
     async updateUserPracticeTracking() {
-
+        throw new NotImplementedException()
     }
 
 }

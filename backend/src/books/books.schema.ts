@@ -5,6 +5,7 @@ import { type Service } from "src/file-storage/storage.types";
 export type BookDocument = HydratedDocument<Book>
 export type BookPracticeDocument = HydratedDocument<BookPractice>
 export type BookPracticePageDocument = HydratedDocument<BookPracticePage>
+export type BookPracticePageContentDocument = HydratedDocument<BookPracticePageContent>
 export type BookPracticeTrackingDocument = HydratedDocument<BookPracticeTracking>
 
 @Schema()
@@ -33,12 +34,28 @@ export class BookPractice {
     pages: Types.ObjectId[]
 }
 
+const contentStatusValues = ['not-processed', 'processing', 'ready'] as const
+
 @Schema()
 export class BookPracticePage {
-    @Prop() text: string
+    @Prop({ type: mongoose.SchemaTypes.ObjectId, ref: 'BookPracticePageContent'}) 
+    content: Types.ObjectId
+
+    @Prop({ default: 'not-processed', enum: contentStatusValues})
+    contentStatus: typeof contentStatusValues[number]
+
+    @Prop() topic: string // the topic of the keywords
     @Prop() words: string[] // the keywords that have been used from the set
     @Prop() options: string[] // the option words from which the keywords were picked from
 }
+
+@Schema()
+export class BookPracticePageContent {
+    @Prop()
+    text: string
+}
+
+
 
 @Schema()
 export class BookPracticeTracking {
@@ -49,4 +66,5 @@ export class BookPracticeTracking {
 export const BookSchema = SchemaFactory.createForClass(Book)
 export const BookPracticeSchema = SchemaFactory.createForClass(BookPractice)
 export const BookPracticePageSchema = SchemaFactory.createForClass(BookPracticePage)
+export const BookPracticePageContentSchema = SchemaFactory.createForClass(BookPracticePageContent)
 export const BookPracticeTrackingSchema = SchemaFactory.createForClass(BookPracticeTracking)
