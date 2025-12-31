@@ -30,13 +30,13 @@ export class BooksController {
 
     //---------------------------------------------------------------------
     @Get('/practice/plan')
-    async getBookPracticePlan(@Query('bookId') bookId: Types.ObjectId, @GetUser('userID') userId: Types.ObjectId) {
-        return this.booksService.getBookPracticePlan(bookId, userId)
+    async getBookPracticePlan(@Query() dto: QueryPracticePageDto, @GetUser('userID') userId: Types.ObjectId) {
+        return this.booksService.getBookPracticePlan(dto.bookId, userId)
     }
 
     @Post('/practice/plan')
-    async createBookPracticePlan(@Query('bookId') bookId: Types.ObjectId, @GetUser('userID') userId: Types.ObjectId) {
-        return this.booksService.createBookPracticePlan(bookId, userId)
+    async createBookPracticePlan(@Body() dto: QueryPracticePageDto, @GetUser('userID') userId: Types.ObjectId) {
+        return this.booksService.createBookPracticePlan(dto.bookId, userId)
     }
 
     @Put('/practice/plan')
@@ -49,8 +49,8 @@ export class BooksController {
         return this.booksService.getBookPracticePage(dto, userId)
     }
 
-    @Get('/practice/page')
-    async createBookPracticePage(@Query() dto: QueryPracticePageDto, @GetUser('userID') userId: Types.ObjectId) {
+    @Post('/practice/page')
+    async createBookPracticePage(@Body() dto: QueryPracticePageDto, @GetUser('userID') userId: Types.ObjectId) {
         return this.booksService.createBookPracticePage(dto.bookId, userId, dto.pageNumber)
     }
 
