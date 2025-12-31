@@ -227,7 +227,7 @@ export async function fetchPracticeBookPage(bookId: string, pageNumber?: number)
     const headers = await getHeaders()
 
     try {        
-        return apiRequest(`/books/practice?${queryParams}`, 
+        return apiRequest(`/books/practice/page?${queryParams}`, 
             PracticeBookPageSchema.nullable(),
             { headers}
         )
@@ -236,13 +236,30 @@ export async function fetchPracticeBookPage(bookId: string, pageNumber?: number)
         throw new Error("Error fetching practice book page")
     }
 }
-export async function fetchPracticeData(bookId: string): Promise<{ bookId: string, user: string, cursorAt: number, pages: string[]} | null> {
+
+export async function createPracticeBookPage(bookId: string, pageNumber?: number): Promise<{ pageContent: PracticeBookPage, pageNumber: number} | null> {
+
+    const queryParams = new URLSearchParams({ bookId, pageNumber: (pageNumber ?? 0).toString() })
+    const headers = await getHeaders()
+
+    try {        
+        return apiRequest(`/books/practice/page?${queryParams}`, 
+            PracticeBookPageSchema.nullable(),
+            { method: 'Post', headers}
+        )
+    } catch (error) {
+        console.error(error)
+        throw new Error("Error fetching practice book page")
+    }
+}
+
+export async function fetchPracticePlan(bookId: string): Promise<{ bookId: string, user: string, cursorAt: number, pages: string[]} | null> {
 
     const queryParams = new URLSearchParams({ bookId })
     const headers = await getHeaders()
 
     try {        
-        return apiRequest(`/books/practice?${queryParams}`, 
+        return apiRequest(`/books/practice/plan?${queryParams}`, 
             z.object({bookId: z.string(), user: z.string(), cursorAt: z.number(), pages: z.array(z.string())}).nullable(),
             { headers}
         )
@@ -252,13 +269,13 @@ export async function fetchPracticeData(bookId: string): Promise<{ bookId: strin
     }
 }
 
-export async function createPracticeData(bookId: string): Promise<{ bookId: string, user: string, cursorAt: number, pages: string[]} | null> {
+export async function createPracticePlan(bookId: string): Promise<{ bookId: string, user: string, cursorAt: number, pages: string[]} | null> {
 
     const queryParams = new URLSearchParams({ bookId })
     const headers = await getHeaders()
 
     try {        
-        return apiRequest(`/books/practice?${queryParams}`, 
+        return apiRequest(`/books/practice/plan?${queryParams}`, 
             z.object({bookId: z.string(), user: z.string(), cursorAt: z.number(), pages: z.array(z.string())}).nullable(),
             { headers}
         )
