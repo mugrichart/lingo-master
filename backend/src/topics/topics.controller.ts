@@ -29,9 +29,12 @@ export class TopicsController {
         return this.topicsService.update(id, updateTopicDto)
     }
     
+    //--------------------------------------------------
     @Post('/suggestions')
     async generateSuggestions(@Body() generateTopicSuggestionsDto: GenerateTopicSuggestionsDto) {
         return this.aiSuggestionsService.generateTopicSuggestions(generateTopicSuggestionsDto)
     }
+
+   
 
 }

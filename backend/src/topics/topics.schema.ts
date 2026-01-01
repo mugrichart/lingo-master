@@ -31,7 +31,7 @@ export class Topic {
 
 }
 
-@Schema()
+@Schema({ id: false })
 class LearningWord {
     @Prop({ type: mongoose.SchemaTypes.ObjectId, ref: 'Word'})
     word: Types.ObjectId
@@ -47,7 +47,7 @@ export class Learning {
     @Prop({ type: mongoose.SchemaTypes.ObjectId, ref: 'Topic'})
     topic: Types.ObjectId
 
-    @Prop({ type: LearningWord})
+    @Prop({ type: [LearningWord]})
     words: { word: Types.ObjectId, level: number}[]
 
     @Prop({ default: 0}) chunkIndex: number
