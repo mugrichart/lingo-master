@@ -39,7 +39,7 @@ export class AiSuggestionsService {
         const suggestionsString = await this.openaiHandle("gpt-4o-mini", systemPrompt, userPrompt, true)
         return JSON.parse(suggestionsString)
     }
-
+    
     async expandConversationSuggestion(
         title: string, description: string, suggestedWords: string[]
     ): Promise<Omit<ConversationDocument, '_id' | 'isAiGenerated'>> {
@@ -47,8 +47,14 @@ export class AiSuggestionsService {
         const suggestionsString = await this.openaiHandle("gpt-4o", systemPrompt, userPrompt, true)
         return JSON.parse(suggestionsString)
     }
+    
+    async bookPageAugmentation (title: string, topic: string, words: { word: string, example: string}[], pageContent: string) {
+        const { userPrompt, systemPrompt} = this.promptsProvider.bookPageAugmentationPromptGenerator(title, topic, words, pageContent)
+        const suggestionsString = await this.openaiHandle("gpt-4o-mini", systemPrompt, userPrompt)
+        return suggestionsString
+    }
 
-    private async openaiHandle(model: OPENAI_MODELS, systemPrompt: string, userPrompt: string, request_structured_output: boolean) {
+    private async openaiHandle(model: OPENAI_MODELS, systemPrompt: string, userPrompt: string, request_structured_output: boolean = false) {
         const messages: [ChatCompletionSystemMessageParam, ChatCompletionUserMessageParam] = [
             { role: "system", content: systemPrompt},
             { role: "user", content: userPrompt}

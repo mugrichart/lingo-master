@@ -59,8 +59,18 @@ export class PromptsProvider {
         return { userPrompt, systemPrompt }
     }
 
+    bookPageAugmentationPromptGenerator(title: string, topic: string, words: { word: string, example: string}[], pageContent: string) {
+        const systemPrompt = this.SYSTEM_PROMPTS['bookPageAugmentation']
+        const userPrompt = `
+        The title: ${title}
+        The topic: ${topic}
+        The words:
+            ${words.map(w => `-> word: ${w.word}, example: ${w.example}`).join(' \n')}`
+        return { userPrompt, systemPrompt }
+    }
+
     private load_system_prompts(): 
-        Record<'topicSuggestions' | 'wordSuggestions' | 'wordSuggestionExpansion' | 'conversationSuggestions' | 'conversationSuggestionExpansion', string> 
+        Record<'topicSuggestions' | 'wordSuggestions' | 'wordSuggestionExpansion' | 'conversationSuggestions' | 'conversationSuggestionExpansion' | 'bookPageAugmentation', string> 
     {
         const filePath = path.join(process.cwd(), './src/ai-suggestions/system_prompts.json')
         const systemPromptsFile = fs.readFileSync(filePath, 'utf-8')
