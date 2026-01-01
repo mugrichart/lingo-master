@@ -65,7 +65,10 @@ export class PromptsProvider {
         The title: ${title}
         The topic: ${topic}
         The words:
-            ${words.map(w => `-> word: ${w.word}, example: ${w.example}`).join(' \n')}`
+            ${words.map(w => `-> word: ${w.word}, example: ${w.example}`).join(' \n')}
+        The page content:
+        ${pageContent}`
+        
         return { userPrompt, systemPrompt }
     }
 
