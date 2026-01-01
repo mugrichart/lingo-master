@@ -12,7 +12,9 @@ import { Connection } from 'mongoose';
 export class WordsService {
     constructor(
         @InjectConnection() private connection: Connection,
-        private topicService: TopicsService, @InjectModel(Word.name) private wordModel: Model<Word>) {}
+        @InjectModel(Word.name) private wordModel: Model<Word>,
+        private topicService: TopicsService, 
+    ) {}
 
     async findAll(query: WordsQueryDto): Promise<(WordDocument | null)[]> {
         if (query.topic) {

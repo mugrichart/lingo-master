@@ -5,6 +5,11 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Book, BookPractice, BookPracticePage, BookPracticePageSchema, BookPracticeSchema, BookPracticeTracking, BookPracticeTrackingSchema, BookSchema } from './books.schema';
 import { FileStorageModule } from 'src/file-storage/file-storage.module';
 import { PdfService } from './pdf.service';
+import { TopicsModule } from 'src/topics/topics.module';
+import { AiSuggestionsModule } from 'src/ai-suggestions/ai-suggestions.module';
+import { WordsService } from 'src/words/words.service';
+import { AiSuggestionsService } from 'src/ai-suggestions/ai-suggestions.service';
+import { WordsModule } from 'src/words/words.module';
 
 @Module({
   imports: [
@@ -14,7 +19,7 @@ import { PdfService } from './pdf.service';
       {name: BookPracticePage.name, schema: BookPracticePageSchema},
       {name: BookPracticeTracking.name, schema: BookPracticeTrackingSchema},
     ]),
-    FileStorageModule
+    FileStorageModule, TopicsModule, WordsModule, AiSuggestionsModule
   ],
   controllers: [BooksController],
   providers: [BooksService, PdfService]

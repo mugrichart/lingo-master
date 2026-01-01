@@ -123,18 +123,18 @@ export class BooksService {
             throw new NotFoundException(`Learning plan not found`)
         }
         const sortedByRelevance = learnings.sort((a, b) => b.chunkLevel - a.chunkLevel) // Find the most recent topic, with highest level. If user is actice, this will keep changing
-        const relevantWords = sortedByRelevance[0]?.words ?? []
-        const shuffled = shuffleArray(relevantWords.map(w => w.word))
+        const relevantWords = sortedByRelevance[0]?.words?.map(w => w.word) ?? []
         const howMany = 2 // We want to insert two words in the page content
-        const queryWords: (WordDocument | null)[] = await Promise.all(shuffled.map(wId => this.wordsService.findOne(wId)))
-        const words = queryWords.slice(0, howMany).flatMap(w => w ? [{ word: w.word, example: w.example}] : [])
+        const queryWords: (WordDocument | null)[] = await Promise.all(relevantWords.map(wId => this.wordsService.findOne(wId)))
+        const shuffled = shuffleArray(queryWords)
+        const words = shuffled.slice(0, howMany).flatMap(w => w ? [{ word: w.word, example: w.example}] : [])
         const topic = (await this.topicService.findOne(sortedByRelevance[0].topic))?.name ?? ""
 
         // Insert the words in the page content with the help of ai
         const augmentedPageContent = await this.aiSuggestionsService.bookPageAugmentation(book.title, topic, words, pageContent)
 
         return {
-            pageContent: { text: augmentedPageContent, words: words.map(w => w.word), options: queryWords.flatMap(w => w ? [w.word] : []) },
+            pageContent: { text: augmentedPageContent, words: words.map(w => w.word), options: shuffleArray(queryWords.flatMap(w => w ? [w.word] : [])) },
             pageNumber: 0
         }
 
