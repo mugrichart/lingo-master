@@ -8,7 +8,7 @@ import { ExpandWordSuggestionDto, GenerateWordSuggestionsDto } from 'src/words/w
 import { WordDocument } from 'src/words/words.schema';
 import { ConversationDocument } from 'src/conversations/conversations.schema';
 
-type OPENAI_MODELS = 'gpt-4o' | 'gpt-4o-mini' | 'gpt-3.5-turbo'
+type OPENAI_MODELS = 'gpt-4o' | 'gpt-4o-mini' | 'gpt-3.5-turbo' | 'o4-mini'
 
 @Injectable()
 export class AiSuggestionsService {
@@ -50,7 +50,7 @@ export class AiSuggestionsService {
     
     async bookPageAugmentation (title: string, topic: string, words: { word: string, example: string}[], pageContent: string) {
         const { userPrompt, systemPrompt} = this.promptsProvider.bookPageAugmentationPromptGenerator(title, topic, words, pageContent)
-        const suggestionsString = await this.openaiHandle("gpt-4o-mini", systemPrompt, userPrompt)
+        const suggestionsString = await this.openaiHandle("o4-mini", systemPrompt, userPrompt)
         return suggestionsString
     }
 

@@ -17,7 +17,7 @@ export class PdfService {
 
   async getPageContent(pdf: pdfjsLib.PDFDocumentProxy, pageNumber: number = 0): Promise<string> {
     // You must ensure the pageNumber exists; pdf.numPages is the total count.
-    const page = await pdf.getPage(pageNumber + 1);
+    const page = await pdf.getPage(pageNumber);
     const content = await page.getTextContent();
     
     return this.pdfTextContentToText(content);

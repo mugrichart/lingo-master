@@ -107,7 +107,7 @@ export class BooksService {
             throw new NotFoundException(`Practice plan for book with id ${bookId} not found`)
         }
 
-        const practicePageIndex = practicePageIdx ?? practicePlan.pages.length - 1 // 0-indexed in the practice plan
+        const practicePageIndex = practicePageIdx ?? practicePlan.pages.length // 0-indexed in the practice plan -> next page
         const lastPageIndex = book.endingPage - book.startingPage // We have the user tell us the first page the reading actually starts, and where it ends
         if (practicePageIndex > lastPageIndex) {
             throw new NotFoundException(`Last page of the book is ${book.endingPage}`)
@@ -116,7 +116,6 @@ export class BooksService {
         const pdfFile: PDFDocumentProxy = await this.pdfService.getPdf(book.pdfUrl)
         const pageNumber = practicePageIndex + book.startingPage
         const pageContent = await this.pdfService.getPageContent(pdfFile, pageNumber)
-
         // fetching the relevant words to practice with, and under which topic
         const learnings = await this.topicLearningService.findAll(userId)
         if (!learnings?.length) {
@@ -132,7 +131,7 @@ export class BooksService {
 
         // Insert the words in the page content with the help of ai
         const augmentedPageContent = await this.aiSuggestionsService.bookPageAugmentation(book.title, topic, words, pageContent)
-
+        
         return {
             pageContent: { text: augmentedPageContent, words: words.map(w => w.word), options: shuffleArray(queryWords.flatMap(w => w ? [w.word] : [])) },
             pageNumber: 0

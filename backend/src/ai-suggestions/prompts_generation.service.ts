@@ -63,12 +63,14 @@ export class PromptsProvider {
         const systemPrompt = this.SYSTEM_PROMPTS['bookPageAugmentation']
         const userPrompt = `
         The title: ${title}
+
         The topic: ${topic}
+
         The words:
             ${words.map(w => `-> word: ${w.word}, example: ${w.example}`).join(' \n')}
+
         The page content:
         ${pageContent}`
-        
         return { userPrompt, systemPrompt }
     }
 
