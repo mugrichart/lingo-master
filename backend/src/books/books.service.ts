@@ -7,6 +7,13 @@ import { ConfigService } from '@nestjs/config';
 import { FileStorageService } from 'src/file-storage/file-storage.service';
 import { PdfService } from './pdf.service';
 import { PDFDocumentProxy } from 'pdfjs-dist';
+import { Learning } from 'src/topics/topics.schema';
+import { TopicLearningPlanService } from 'src/topics/learning.service';
+import { shuffleArray } from 'src/lib/shuffle';
+import { WordsService } from 'src/words/words.service';
+import { TopicsService } from 'src/topics/topics.service';
+import { AiSuggestionsService } from 'src/ai-suggestions/ai-suggestions.service';
+import { WordDocument } from 'src/words/words.schema';
 
 @Injectable()
 export class BooksService {
@@ -17,7 +24,11 @@ export class BooksService {
         @InjectModel(BookPracticeTracking.name) private userTrackingModel: Model<BookPracticeTracking>,
         private configService: ConfigService,
         private fileStorageService: FileStorageService,
-        private pdfService: PdfService
+        private pdfService: PdfService,
+        private topicLearningService: TopicLearningPlanService,
+        private topicService: TopicsService,
+        private wordsService: WordsService,
+        private aiSuggestionsService: AiSuggestionsService
     ) {}
 
     async findAll() {
@@ -106,9 +117,24 @@ export class BooksService {
         const pageNumber = practicePageIndex + book.startingPage
         const pageContent = await this.pdfService.getPageContent(pdfFile, pageNumber)
 
-        //! band-aid for now
+        // fetching the relevant words to practice with, and under which topic
+        const learnings = await this.topicLearningService.findAll(userId)
+        if (!learnings?.length) {
+            throw new NotFoundException(`Learning plan not found`)
+        }
+        const sortedByRelevance = learnings.sort((a, b) => b.chunkLevel - a.chunkLevel) // Find the most recent topic, with highest level. If user is actice, this will keep changing
+        const relevantWords = sortedByRelevance[0]?.words ?? []
+        const shuffled = shuffleArray(relevantWords.map(w => w.word))
+        const howMany = 2 // We want to insert two words in the page content
+        const queryWords: (WordDocument | null)[] = await Promise.all(shuffled.map(wId => this.wordsService.findOne(wId)))
+        const words = queryWords.slice(0, howMany).flatMap(w => w ? [{ word: w.word, example: w.example}] : [])
+        const topic = (await this.topicService.findOne(sortedByRelevance[0].topic))?.name ?? ""
+
+        // Insert the words in the page content with the help of ai
+        const augmentedPageContent = await this.aiSuggestionsService.bookPageAugmentation(book.title, topic, words, pageContent)
+
         return {
-            pageContent: { text: pageContent, words: [], options: [] },
+            pageContent: { text: augmentedPageContent, words: words.map(w => w.word), options: queryWords.flatMap(w => w ? [w.word] : []) },
             pageNumber: 0
         }
 
