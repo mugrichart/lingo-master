@@ -238,14 +238,18 @@ export async function fetchPracticeBookPage(bookId: string, pageNumber?: number)
     }
 }
 
-export async function createPracticeBookPage(bookId: string, pageNumber?: number): Promise<{ pageContent: PracticeBookPage, pageNumber: number} | null> {
+export async function createPracticeBookPage(
+    bookId: string, options: { pageNumber?: number, topicId?: string, wordsPerPage?: number}
+): 
+Promise<{ pageContent: PracticeBookPage, pageNumber: number} | null> 
+{
 
     const headers = await getHeaders()
 
     try {        
         return apiRequest(`/books/practice/page`, 
             PracticeBookPageSchema.nullable(),
-            { method: 'Post', headers, body: JSON.stringify({ bookId, pageNumber })}
+            { method: 'Post', headers, body: JSON.stringify({ bookId, ...options })}
         )
     } catch (error) {
         console.error(error)

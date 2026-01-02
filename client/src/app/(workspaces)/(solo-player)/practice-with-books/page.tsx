@@ -11,6 +11,7 @@ const page = async () => {
   const books = await fetchPracticeBooks()
   let tracking = await fetchPracticeTracking()
   if (!tracking) {//create tracking
+    console.warn("Couldn't find tracking... Creating it")
     tracking = await createPracticeTracking()
     if (!tracking) {
       //TODO: Fix this ASA you can
@@ -41,7 +42,7 @@ const page = async () => {
       <ContentView>
         {
           books.map(book => (
-            <Link key={book._id} href={`/practice-with-books/practice?bookID=${book._id}&score=${tracking.score || 0}`}>
+            <Link key={book._id} href={`/practice-with-books/practice?bookID=${book._id}&score=${tracking.score}`}>
               <BookCard book={book} />
             </Link>
           ))

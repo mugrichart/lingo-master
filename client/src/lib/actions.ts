@@ -225,18 +225,17 @@ export async function uploadPracticeBook(formData: FormData) {
     redirect('/practice-with-books')
 }
 
-export async function updatePracticeTracking(score: number) {
-    const sessionToken = (await cookies()).get('sessionToken')?.value
+export async function updatePracticeTracking(score: number): Promise<{ user: string, score: number}> {
+    const headers = await getHeaders()
     try {
-        const response = await fetch(`${env.NEXT_PUBLIC_API_BASE_URL}/practice-with-books/tracking`, {
-            method: 'POST',
-            headers: {
-                "content-type": "application/json",
-                "Authorization": `Bearer ${sessionToken}`
-            },
-            body: JSON.stringify({ score })
-        })
-        return response.json()
+        return apiRequest(`/books/practice/tracking`, 
+            z.object({ user: z.string(), score: z.number() }),
+            {
+                method: 'Put',
+                headers,
+                body: JSON.stringify({ score })
+            }
+        )
     } catch (error) {
         console.error(error)
         throw new Error("Error updating practice tracking")

@@ -8,7 +8,10 @@ import { handleBlanksGen } from '@/lib/utils'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 
-const PracticeClient = ({ page, bookID, pageNumber, score: initialScore }: { page: PracticeBookPage, bookID: string, pageNumber: number, score: number}) => {
+const PracticeClient = (
+    { page, bookID, pageNumber, score: initialScore, topicId, wordsPerPage }: 
+    { page: PracticeBookPage, bookID: string, pageNumber: number, score: number, topicId?: string, wordsPerPage?: number}
+) => {
     const [currentPidx, setCurrentPidx] = useState(0)
     const [solvedWords, setSolvedWords] = useState<string[]>([])
     const [score, setScore] = useState(initialScore)
@@ -134,7 +137,7 @@ const PracticeClient = ({ page, bookID, pageNumber, score: initialScore }: { pag
                 </CardContent>
             </Card>
             
-            <Card className="w-200 bg-card/50 backdrop-blur-2xl">
+            <Card className="w-200 bg-card/50 backdrop-blur-2xl pl-10">
                 <ScrollArea className="h-full overflow-hidden">
                     <CardContent>
                         {allPs.map((pg, idx) => {
@@ -148,7 +151,9 @@ const PracticeClient = ({ page, bookID, pageNumber, score: initialScore }: { pag
                                 // displayedText
                             }
                             
-                            return <p key={idx} className="mt-5">{displayedText}</p>
+                            return <p key={idx} className={
+                                    displayedText[0] === displayedText[0]?.toUpperCase() ? 'mt-5' : 'mt-1'
+                                }>{displayedText}</p>
                         })}
                     </CardContent>
                     <ScrollBar orientation='vertical' />
@@ -158,7 +163,7 @@ const PracticeClient = ({ page, bookID, pageNumber, score: initialScore }: { pag
                         <Link className="bg-secondary p-1 pl-3 rounded-l-md" href={`practice?bookID=${bookID}&page=${pageNumber - 1}&score=${score}`}>Prev Page</Link>
                         <label htmlFor="">{pageNumber}</label>
                         { currentPidx >= allPs.length &&
-                            <Link className="bg-secondary p-1 pr-3 rounded-r-md" href={`practice?bookID=${bookID}&page=${pageNumber + 1}&score=${score}`}>Next Page</Link>
+                            <Link className="bg-secondary p-1 pr-3 rounded-r-md" href={`practice?bookID=${bookID}&page=${pageNumber + 1}&score=${score}&topicId=${topicId}&wordsPerPage=${wordsPerPage || 2}`}>Next Page</Link>
                         }
                     </div>
                 </CardFooter>
