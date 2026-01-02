@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { TopicsController } from './topics.controller';
 import { TopicsService } from './topics.service';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -19,6 +19,6 @@ import { WordsModule } from 'src/words/words.module';
   ],
   controllers: [TopicLearningPlanController, TopicsController],
   providers: [TopicsService, TopicLearningPlanService],
-  exports: [TopicsService, TopicLearningPlanService]
+  exports: [TopicsService]
 })
 export class TopicsModule {}

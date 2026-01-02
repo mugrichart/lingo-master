@@ -51,7 +51,10 @@ export class BooksController {
 
     @Post('/practice/page')
     async createBookPracticePage(@Body() dto: QueryPracticePageDto, @GetUser('userID') userId: Types.ObjectId) {
-        return this.booksService.createBookPracticePage(dto.bookId, userId, dto.pageNumber)
+        return this.booksService.createBookPracticePage(
+            dto.bookId, userId, 
+            { practicePageIdx: dto.pageNumber, topicId: dto.topicId, wordsPerPage: dto.wordsPerPage }
+        )
     }
 
 

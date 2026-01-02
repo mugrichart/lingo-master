@@ -7,9 +7,6 @@ import { FileStorageModule } from 'src/file-storage/file-storage.module';
 import { PdfService } from './pdf.service';
 import { TopicsModule } from 'src/topics/topics.module';
 import { AiSuggestionsModule } from 'src/ai-suggestions/ai-suggestions.module';
-import { WordsService } from 'src/words/words.service';
-import { AiSuggestionsService } from 'src/ai-suggestions/ai-suggestions.service';
-import { WordsModule } from 'src/words/words.module';
 
 @Module({
   imports: [
@@ -19,7 +16,7 @@ import { WordsModule } from 'src/words/words.module';
       {name: BookPracticePage.name, schema: BookPracticePageSchema},
       {name: BookPracticeTracking.name, schema: BookPracticeTrackingSchema},
     ]),
-    FileStorageModule, TopicsModule, WordsModule, AiSuggestionsModule
+    FileStorageModule, TopicsModule, AiSuggestionsModule
   ],
   controllers: [BooksController],
   providers: [BooksService, PdfService]

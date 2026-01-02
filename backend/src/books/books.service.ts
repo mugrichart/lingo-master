@@ -7,13 +7,9 @@ import { ConfigService } from '@nestjs/config';
 import { FileStorageService } from 'src/file-storage/file-storage.service';
 import { PdfService } from './pdf.service';
 import { PDFDocumentProxy } from 'pdfjs-dist';
-import { Learning } from 'src/topics/topics.schema';
-import { TopicLearningPlanService } from 'src/topics/learning.service';
 import { shuffleArray } from 'src/lib/shuffle';
-import { WordsService } from 'src/words/words.service';
 import { TopicsService } from 'src/topics/topics.service';
 import { AiSuggestionsService } from 'src/ai-suggestions/ai-suggestions.service';
-import { WordDocument } from 'src/words/words.schema';
 
 @Injectable()
 export class BooksService {
@@ -25,9 +21,7 @@ export class BooksService {
         private configService: ConfigService,
         private fileStorageService: FileStorageService,
         private pdfService: PdfService,
-        private topicLearningService: TopicLearningPlanService,
         private topicService: TopicsService,
-        private wordsService: WordsService,
         private aiSuggestionsService: AiSuggestionsService
     ) {}
 
@@ -98,7 +92,7 @@ export class BooksService {
         }
     }
 
-    async createBookPracticePage(bookId: Types.ObjectId, userId: Types.ObjectId, practicePageIdx?: number) {
+    async createBookPracticePage(bookId: Types.ObjectId, userId: Types.ObjectId, options: {practicePageIdx?: number, topicId?: Types.ObjectId, wordsPerPage?: number} = {}) {
         const[book, practicePlan] = await Promise.all([ this.bookModel.findOne(bookId), this.getBookPracticePlan(bookId, userId) ])
         if (!book) {
             throw new NotFoundException(`Book with id ${bookId} not found`)
@@ -107,7 +101,7 @@ export class BooksService {
             throw new NotFoundException(`Practice plan for book with id ${bookId} not found`)
         }
 
-        const practicePageIndex = practicePageIdx ?? practicePlan.pages.length // 0-indexed in the practice plan -> next page
+        const practicePageIndex = options.practicePageIdx ?? practicePlan.pages.length // 0-indexed in the practice plan -> next page
         const lastPageIndex = book.endingPage - book.startingPage // We have the user tell us the first page the reading actually starts, and where it ends
         if (practicePageIndex > lastPageIndex) {
             throw new NotFoundException(`Last page of the book is ${book.endingPage}`)
@@ -117,23 +111,21 @@ export class BooksService {
         const pageNumber = practicePageIndex + book.startingPage
         const pageContent = await this.pdfService.getPageContent(pdfFile, pageNumber)
         // fetching the relevant words to practice with, and under which topic
-        const learnings = await this.topicLearningService.findAll(userId)
-        if (!learnings?.length) {
+
+        const learning = await this.topicService.autoPickTopic(userId, options.topicId)
+        if (!learning) {
             throw new NotFoundException(`Learning plan not found`)
         }
-        const sortedByRelevance = learnings.sort((a, b) => b.chunkLevel - a.chunkLevel) // Find the most recent topic, with highest level. If user is actice, this will keep changing
-        const relevantWords = sortedByRelevance[0]?.words?.map(w => w.word) ?? []
-        const howMany = 2 // We want to insert two words in the page content
-        const queryWords: (WordDocument | null)[] = await Promise.all(relevantWords.map(wId => this.wordsService.findOne(wId)))
-        const shuffled = shuffleArray(queryWords)
+        const howMany = options.wordsPerPage || 2 // We want to insert two words in the page content
+        const shuffled = shuffleArray(learning.words)
         const words = shuffled.slice(0, howMany).flatMap(w => w ? [{ word: w.word, example: w.example}] : [])
-        const topic = (await this.topicService.findOne(sortedByRelevance[0].topic))?.name ?? ""
+        const topic = learning.topic?.name ?? ""
 
         // Insert the words in the page content with the help of ai
         const augmentedPageContent = await this.aiSuggestionsService.bookPageAugmentation(book.title, topic, words, pageContent)
         
         return {
-            pageContent: { text: augmentedPageContent, words: words.map(w => w.word), options: shuffleArray(queryWords.flatMap(w => w ? [w.word] : [])) },
+            pageContent: { text: augmentedPageContent, words: words.map(w => w.word), options: shuffleArray(words.flatMap(w => w ? [w.word] : [])) },
             pageNumber: 0
         }
 

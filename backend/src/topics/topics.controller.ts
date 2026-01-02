@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
 import { TopicsService } from './topics.service';
-import { CreateTopicDto, GenerateTopicSuggestionsDto, ListAllTopicsDto, UpdateTopicDto } from './topics.dto';
+import { CreateTopicDto, GenerateTopicSuggestionsDto, ListAllTopicsDto, QueryAutoFindTopicDto, UpdateTopicDto } from './topics.dto';
 import { GetUser } from 'src/auth/get-user.decorator';
 import { AiSuggestionsService } from 'src/ai-suggestions/ai-suggestions.service';
 import { Types } from 'mongoose';
@@ -17,6 +17,11 @@ export class TopicsController {
     @Get()
     async findAll(@Query() query: ListAllTopicsDto) {
         return this.topicsService.findAll(query)
+    }
+
+    @Get('auto-pick')
+    async autoFindTopic(@Query() dto: QueryAutoFindTopicDto, @GetUser('userID') userId: Types.ObjectId ) {
+        return this.topicsService.autoPickTopic(userId, dto.topicId)
     }
 
     @Get(':id')

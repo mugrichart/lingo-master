@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, NotImplementedException } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, NotFoundException, NotImplementedException } from '@nestjs/common';
 import { CreateWordDto, WordsQueryDto } from './words.dto';
 import { TopicsService } from 'src/topics/topics.service';
 import { InjectModel } from '@nestjs/mongoose';
@@ -13,6 +13,8 @@ export class WordsService {
     constructor(
         @InjectConnection() private connection: Connection,
         @InjectModel(Word.name) private wordModel: Model<Word>,
+
+        @Inject(forwardRef(() => TopicsService))
         private topicService: TopicsService, 
     ) {}
 

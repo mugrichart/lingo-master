@@ -1,5 +1,6 @@
 import { Transform } from "class-transformer";
 import { IsArray, IsBoolean, IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { Types } from "mongoose";
 
 export class CreateTopicDto {
     @IsString() name: string;
@@ -36,4 +37,11 @@ export class UpdateTopicDto {
 export class GenerateTopicSuggestionsDto {
     @IsOptional() @IsString() parentTopic?: string;
     @IsOptional() @IsArray() @IsString({ each: true }) alreadyExistingTopics?: string[]
+}
+
+//-------------------------------------------------
+export class QueryAutoFindTopicDto {
+    @IsOptional()
+    @Transform(({ value }) => Types.ObjectId.isValid(value) ? new Types.ObjectId(value) : value)
+    topicId: Types.ObjectId
 }

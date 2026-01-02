@@ -25,7 +25,16 @@ export class QueryPracticePageDto {
     @Transform(({ value }) => Types.ObjectId.isValid(value) ? new Types.ObjectId(value) : value)
     bookId: Types.ObjectId
 
+    
     @IsOptional()
     @Type(() => Number)
     pageNumber?: number
+    
+    @IsOptional()
+    @Transform(({ value }) => Types.ObjectId.isValid(value) ? new Types.ObjectId(value) : value)
+    topicId?: Types.ObjectId
+
+    @IsOptional()
+    @Type(() => Number)
+    wordsPerPage?: number
 }
