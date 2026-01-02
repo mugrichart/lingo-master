@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { WordsController } from './words.controller';
 import { WordsService } from './words.service';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -12,7 +12,7 @@ import { AiSuggestionsModule } from 'src/ai-suggestions/ai-suggestions.module';
       name: Word.name,
       schema: WordSchema
     }]),
-    TopicsModule,
+    forwardRef(() => TopicsModule),
     AiSuggestionsModule
 ],
   controllers: [WordsController],

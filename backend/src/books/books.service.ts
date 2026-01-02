@@ -147,4 +147,8 @@ export class BooksService {
     async createUserPracticeTracking(userId: Types.ObjectId) {
         return this.userTrackingModel.create({ user: userId, score: 0})
     }
+
+    async updateUserPracticeTracking(score: number, userId: Types.ObjectId) {
+        return this.userTrackingModel.findOneAndUpdate({ user: userId}, { score }, { new: true}).exec()
+    }
 }

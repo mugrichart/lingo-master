@@ -6,6 +6,7 @@ import { Learning, Topic, TopicLearningSchema, TopicSchema } from './topics.sche
 import { AiSuggestionsModule } from 'src/ai-suggestions/ai-suggestions.module';
 import { TopicLearningPlanController } from './learning.controller';
 import { TopicLearningPlanService } from './learning.service';
+import { WordsModule } from 'src/words/words.module';
 
 @Module({
   imports: [
@@ -13,7 +14,8 @@ import { TopicLearningPlanService } from './learning.service';
       { name: Topic.name, schema: TopicSchema },
       { name: Learning.name, schema: TopicLearningSchema }
     ]),
-    AiSuggestionsModule
+    AiSuggestionsModule,
+    WordsModule
   ],
   controllers: [TopicLearningPlanController, TopicsController],
   providers: [TopicsService, TopicLearningPlanService],

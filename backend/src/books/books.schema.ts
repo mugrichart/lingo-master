@@ -68,3 +68,5 @@ export const BookPracticeSchema = SchemaFactory.createForClass(BookPractice)
 export const BookPracticePageSchema = SchemaFactory.createForClass(BookPracticePage)
 export const BookPracticePageContentSchema = SchemaFactory.createForClass(BookPracticePageContent)
 export const BookPracticeTrackingSchema = SchemaFactory.createForClass(BookPracticeTracking)
+
+BookPracticeSchema.index({ user: 1, bookId: 1}, { unique: true})

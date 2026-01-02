@@ -67,8 +67,8 @@ export class BooksController {
     }
 
     @Put('/practice/tracking')
-    async updateUserPracticeTracking() {
-        throw new NotImplementedException()
+    async updateUserPracticeTracking(@Body('score') score: number, @GetUser('userID') userId: Types.ObjectId) {
+        return this.booksService.updateUserPracticeTracking(score, userId)
     }
 
 }
