@@ -125,7 +125,7 @@ export class BooksService {
         const augmentedPageContent = await this.aiSuggestionsService.bookPageAugmentation(book.title, topic, words, pageContent)
         
         return {
-            pageContent: { text: augmentedPageContent, words: words.map(w => w.word), options: shuffleArray(words.flatMap(w => w ? [w.word] : [])) },
+            pageContent: { text: augmentedPageContent, words: words.map(w => w.word), options: shuffleArray(learning.words.slice(0, 10).flatMap(w => w ? [w.word] : [])) },
             pageNumber: 0
         }
 
