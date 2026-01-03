@@ -7,7 +7,12 @@ import { createPracticeTracking, fetchPracticeBooks, fetchPracticeTracking } fro
 import BookCard from "./BookCard"
 
 
-const page = async () => {
+const page = async ({
+  searchParams
+}:{
+  searchParams: Promise<{ topicId: string}>
+}) => {
+  const {topicId} = await searchParams
   const books = await fetchPracticeBooks()
   let tracking = await fetchPracticeTracking()
   if (!tracking) {//create tracking
@@ -17,6 +22,10 @@ const page = async () => {
       //TODO: Fix this ASA you can
       return <div>Error creating tracking data</div>
     }
+  }
+
+  const getQuery = (score: number, topicId: string, bookId: string) => {
+    return new URLSearchParams({ topicId, score: score?.toString(), bookId }).toString()
   }
   
   return (
@@ -42,7 +51,7 @@ const page = async () => {
       <ContentView>
         {
           books.map(book => (
-            <Link key={book._id} href={`/practice-with-books/practice?bookId=${book._id}&score=${tracking.score}`}>
+            <Link key={book._id} href={`/practice-with-books/practice?${getQuery(tracking.score, topicId, book._id)}`}>
               <BookCard book={book} />
             </Link>
           ))

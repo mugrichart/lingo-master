@@ -8,7 +8,7 @@ import { Trash, Edit, Share, Book, FolderOpen, Move3d, MoveHorizontal } from "lu
 
 import ContentView from './ContentView'
 
-import { Topic } from "@/lib/definitions"
+import { Topic, Word } from "@/lib/definitions"
 import Link from "next/link"
 
 import {
@@ -45,7 +45,7 @@ export const TopicCard = ({ topic }: { topic: Topic }) => {
   )
 }
 
-export const TopicList = ({ topics, topicId }: { topics: Topic[], topicId?: string}) => {
+export const TopicList = ({ topics, topicId, words }: { topics: Topic[], topicId?: string, words: Word[]}) => {
   const pathname = usePathname()
 
   return (
@@ -59,6 +59,13 @@ export const TopicList = ({ topics, topicId }: { topics: Topic[], topicId?: stri
           <InputGroupAddon align="inline-end">12 results</InputGroupAddon>
         </InputGroup>
         <div className="flex gap-2">
+          {words.length > 0 &&
+            <Link href={`/practice-with-books?topicId=${topicId}`}>
+              <Button>
+                Practice with a book
+              </Button>
+            </Link>
+          }
           <Link href={topicId ? `/topics/create-topic?parentTopic=${topicId}` : `/topics/create-topic`}>
             <Button>
               <Plus />

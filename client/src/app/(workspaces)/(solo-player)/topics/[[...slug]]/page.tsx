@@ -35,7 +35,7 @@ const page = async ({
         )
       }
       <TabsContent value="topics">
-        <TopicList topics={topics || []} topicId={topicId}/>
+        <TopicList topics={topics || []} topicId={topicId} words={words}/>
       </TabsContent>
       {
         topicId && 
