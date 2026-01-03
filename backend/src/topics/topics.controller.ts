@@ -1,9 +1,9 @@
-import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Query } from '@nestjs/common';
 import { TopicsService } from './topics.service';
 import { CreateTopicDto, GenerateTopicSuggestionsDto, ListAllTopicsDto, QueryAutoFindTopicDto, UpdateTopicDto } from './topics.dto';
 import { GetUser } from 'src/auth/get-user.decorator';
 import { AiSuggestionsService } from 'src/ai-suggestions/ai-suggestions.service';
-import { Types } from 'mongoose';
+import { DeleteResult, Types } from 'mongoose';
 
 @Controller('topics')
 export class TopicsController {
@@ -29,9 +29,14 @@ export class TopicsController {
         return this.topicsService.findOne(id)
     }
 
-    @Put(':id')
+    @Patch(':id')
     async update(@Param('id') id: Types.ObjectId, @Body() updateTopicDto: UpdateTopicDto) {
         return this.topicsService.update(id, updateTopicDto)
+    }
+
+    @Delete(':id')
+    async deleteTopic(@Param('id') id: string): Promise<DeleteResult> {
+        return this.topicsService.deleteOne(new Types.ObjectId(id))
     }
     
     //--------------------------------------------------

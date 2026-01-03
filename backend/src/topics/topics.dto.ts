@@ -5,7 +5,9 @@ import { Types } from "mongoose";
 export class CreateTopicDto {
     @IsString() name: string;
     @IsString() language: string;
+
     @IsOptional() @IsString() parent?: string;
+    
     @IsOptional()
     @Transform(({ value }) => value == true || value === 'true')
     @IsBoolean()
@@ -31,6 +33,10 @@ export class ListAllTopicsDto {
 export class UpdateTopicDto {
     @IsOptional() @IsString() name?: string;
     @IsOptional() @IsString() language?: string;
+    
+    @IsOptional()
+    @Transform(({ value }) => Types.ObjectId.isValid(value) ? new Types.ObjectId(value) : value)
+    parent?: Types.ObjectId
 }
 
 // ------------------------------------------------

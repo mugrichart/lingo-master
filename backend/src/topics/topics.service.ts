@@ -1,6 +1,6 @@
 import { forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { ClientSession, Model, Types } from 'mongoose';
+import { ClientSession, DeleteResult, Model, Types } from 'mongoose';
 import { Topic, TopicDocument } from './topics.schema';
 import { CreateTopicDto, ListAllTopicsDto, UpdateTopicDto } from './topics.dto';
 import { TopicLearningPlanService } from './learning.service';
@@ -41,6 +41,10 @@ export class TopicsService {
         return this.topicModel.findById(id).exec()
     }
 
+    async deleteOne(id: Types.ObjectId): Promise<DeleteResult> {
+        return this.topicModel.deleteOne(id)
+    }
+
     /**
      * Picks the most relevant topic for the user
      * @param userId The ID of the learner
@@ -72,7 +76,6 @@ export class TopicsService {
     }
 
     async update(id: Types.ObjectId, updateDto: UpdateTopicDto) {
-        console.log(updateDto)
         return this.topicModel.findByIdAndUpdate(id, updateDto, { new: true}).exec()
     }
 
