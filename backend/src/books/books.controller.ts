@@ -23,19 +23,19 @@ export class BooksController {
     async uploadBook(
         @Body() metadata: UploadMetadataDto,
         @UploadedFiles() files: { bookFile: Express.Multer.File[], bookCover: Express.Multer.File[]},
-        @GetUser('userID') userId: Types.ObjectId
+        @GetUser('userId') userId: Types.ObjectId
     ) {
         return this.booksService.upload(metadata, files, userId)
     }
 
     //---------------------------------------------------------------------
     @Get('/practice/plan')
-    async getBookPracticePlan(@Query() dto: QueryPracticePageDto, @GetUser('userID') userId: Types.ObjectId) {
+    async getBookPracticePlan(@Query() dto: QueryPracticePageDto, @GetUser('userId') userId: Types.ObjectId) {
         return this.booksService.getBookPracticePlan(dto.bookId, userId)
     }
 
     @Post('/practice/plan')
-    async createBookPracticePlan(@Body() dto: QueryPracticePageDto, @GetUser('userID') userId: Types.ObjectId) {
+    async createBookPracticePlan(@Body() dto: QueryPracticePageDto, @GetUser('userId') userId: Types.ObjectId) {
         return this.booksService.createBookPracticePlan(dto.bookId, userId)
     }
 
@@ -45,12 +45,12 @@ export class BooksController {
     }
     //---------------------------------------------------------------------
     @Get('/practice/page')
-    async getBookPracticePage(@Query() dto: QueryPracticePageDto, @GetUser('userID') userId: Types.ObjectId) {
+    async getBookPracticePage(@Query() dto: QueryPracticePageDto, @GetUser('userId') userId: Types.ObjectId) {
         return this.booksService.getBookPracticePage(dto, userId)
     }
 
     @Post('/practice/page')
-    async createBookPracticePage(@Body() dto: QueryPracticePageDto, @GetUser('userID') userId: Types.ObjectId) {
+    async createBookPracticePage(@Body() dto: QueryPracticePageDto, @GetUser('userId') userId: Types.ObjectId) {
         return this.booksService.createBookPracticePage(
             dto.bookId, userId, 
             { practicePageIdx: dto.pageNumber, topicId: dto.topicId, wordsPerPage: dto.wordsPerPage }
@@ -60,17 +60,17 @@ export class BooksController {
 
     //--------------------------------------------------------------------
     @Get('/practice/tracking')
-    async getUserPracticeTracking(@GetUser('userID') userId: Types.ObjectId) {
+    async getUserPracticeTracking(@GetUser('userId') userId: Types.ObjectId) {
         return this.booksService.getUserPracticeTracking(userId)
     }
 
     @Post('/practice/tracking')
-    async createUserPracticeTracking(@GetUser('userID') userId: Types.ObjectId) {
+    async createUserPracticeTracking(@GetUser('userId') userId: Types.ObjectId) {
         return this.booksService.createUserPracticeTracking(userId)
     }
 
     @Put('/practice/tracking')
-    async updateUserPracticeTracking(@Body('score') score: number, @GetUser('userID') userId: Types.ObjectId) {
+    async updateUserPracticeTracking(@Body('score') score: number, @GetUser('userId') userId: Types.ObjectId) {
         return this.booksService.updateUserPracticeTracking(score, userId)
     }
 

@@ -27,15 +27,15 @@ import { Wand2 } from "lucide-react"
 function CreateWordForm ({
     wordSuggestion,
     developWithAI,
-    topicID,
+    topicId,
     resetForm
 }:{
     wordSuggestion: WordSuggestion | null,
     developWithAI: () => void
-    topicID: string,
+    topicId: string,
     resetForm: () => void
 }) {
-    const createWordWithTopicID = createWord.bind(null, topicID);
+    const createWordWithTopicID = createWord.bind(null, topicId);
 
     // access action state to know when the server action is pending
     const [errorMessage, formAction, isPending] = useActionState(createWordWithTopicID, undefined)

@@ -92,11 +92,11 @@ export async function fetchTopicSuggestions(topic: Topic | null): Promise<{ topi
 // =================== Words realted ============================
 
 
-export async function fetchWords(topicID?: string, search?: string): Promise<Word[]> {
+export async function fetchWords(topicId?: string, search?: string): Promise<Word[]> {
     const headers = await getHeaders()
 
     try {
-        return apiRequest(`/words?topic=${topicID}&search=${search}`, 
+        return apiRequest(`/words?topic=${topicId}&search=${search}`, 
             z.array(WordSchema),
             {
             method: 'GET',

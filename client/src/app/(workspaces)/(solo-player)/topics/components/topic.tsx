@@ -45,7 +45,7 @@ export const TopicCard = ({ topic }: { topic: Topic }) => {
   )
 }
 
-export const TopicList = ({ topics, topicID }: { topics: Topic[], topicID?: string}) => {
+export const TopicList = ({ topics, topicId }: { topics: Topic[], topicId?: string}) => {
   const pathname = usePathname()
 
   return (
@@ -59,10 +59,10 @@ export const TopicList = ({ topics, topicID }: { topics: Topic[], topicID?: stri
           <InputGroupAddon align="inline-end">12 results</InputGroupAddon>
         </InputGroup>
         <div className="flex gap-2">
-          <Link href={topicID ? `/topics/create-topic?parentTopic=${topicID}` : `/topics/create-topic`}>
+          <Link href={topicId ? `/topics/create-topic?parentTopic=${topicId}` : `/topics/create-topic`}>
             <Button>
               <Plus />
-              New {topicID ? "subtopic" : "topic"}
+              New {topicId ? "subtopic" : "topic"}
             </Button>
           </Link>
         </div>
@@ -83,7 +83,7 @@ export const TopicList = ({ topics, topicID }: { topics: Topic[], topicID?: stri
                       </Link>
                   </ContextMenuItem>
                   <ContextMenuItem>
-                      <Link href={`/topics/edit-topic?topicID=${topic._id}`} className="flex items-center gap-2">
+                      <Link href={`/topics/edit-topic?topicId=${topic._id}`} className="flex items-center gap-2">
                         <Edit /> Edit Topic
                       </Link>
                   </ContextMenuItem>

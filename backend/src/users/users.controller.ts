@@ -7,7 +7,7 @@ export class UsersController {
     constructor(private usersService: UsersService){}
 
     @Get('/profile')
-    getProfile(@GetUser('userID') id: string) {
+    getProfile(@GetUser('userId') id: string) {
         return this.usersService.findById(id)
     }
 }

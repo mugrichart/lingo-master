@@ -7,13 +7,13 @@ const page = async ({
   searchParams
 }: { searchParams: Promise<{ topic: string}>}) => {
 
-  const topicIDResolved = (await searchParams).topic;
+  const topicIdResolved = (await searchParams).topic;
  
-  const topic = await fetchTopicByID(topicIDResolved)
+  const topic = await fetchTopicByID(topicIdResolved)
 
-  const words = await fetchWords(topicIDResolved)
+  const words = await fetchWords(topicIdResolved)
 
-  const { conversations } = await fetchConversationSuggestions(topicIDResolved)
+  const { conversations } = await fetchConversationSuggestions(topicIdResolved)
 
   return (
     <CreateConvoClient words={words} topic={topic} suggestions={conversations} expandConversationSuggestion={expandConversationSuggestion}/>

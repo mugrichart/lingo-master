@@ -16,8 +16,8 @@ export class TopicsService {
         private wordsService: WordsService
     ) {}
 
-    async create(createDto: CreateTopicDto, userID: Types.ObjectId) {
-        return this.topicModel.create({...createDto, creator: userID})
+    async create(createDto: CreateTopicDto, userId: Types.ObjectId) {
+        return this.topicModel.create({...createDto, creator: userId})
     }
 
     async findAll(query: ListAllTopicsDto): Promise<TopicDocument[]> {

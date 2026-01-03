@@ -39,9 +39,9 @@ export class WordsService {
         const session = await this.connection.startSession()
         session.startTransaction()
         try {
-             const topic = await this.topicService.findOne(createWordDto.topicID)
+             const topic = await this.topicService.findOne(createWordDto.topicId)
             if (!topic) {
-                throw new NotFoundException(`Topic with id ${createWordDto.topicID} not found`)
+                throw new NotFoundException(`Topic with id ${createWordDto.topicId} not found`)
             }
             const [word] = await this.wordModel.create(
                 [ {...createWordDto, language: topic.language } ],

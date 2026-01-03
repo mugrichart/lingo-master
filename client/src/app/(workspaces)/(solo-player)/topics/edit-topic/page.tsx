@@ -4,11 +4,11 @@ import EditTopicClient from "./EditTopicClient";
 
 const page = async ({ 
   searchParams
-}: { searchParams: Promise<{ topicID: string}>}) => {
+}: { searchParams: Promise<{ topicId: string}>}) => {
 
-  const topicIDResolved = (await searchParams).topicID;
+  const topicIdResolved = (await searchParams).topicId;
  
-  const { topic } = await fetchTopicByID(topicIDResolved)
+  const { topic } = await fetchTopicByID(topicIdResolved)
 
   return (
     <EditTopicClient topic={topic} />

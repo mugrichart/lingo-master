@@ -17,16 +17,16 @@ function CreateConvoForm ({
     words,
     convoSuggestion,
     developWithAI,
-    topicID,
+    topicId,
     resetForm
 }:{
     words: Word[],
     convoSuggestion: Partial<ExpandedSuggestion> | null,
     developWithAI: () => void
-    topicID: string,
+    topicId: string,
     resetForm: () => void
 }) {
-    const createConversationWithTopicID = createConversation.bind(null, topicID);
+    const createConversationWithTopicID = createConversation.bind(null, topicId);
     
     // access action state to know when the server action is pending
     const [errorMessage, formAction, isPending] = useActionState(createConversationWithTopicID, undefined)

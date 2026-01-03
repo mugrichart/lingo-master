@@ -10,7 +10,7 @@ export class TopicsController {
     constructor(private topicsService: TopicsService, private aiSuggestionsService: AiSuggestionsService) {}
 
     @Post()
-    async createTopic(@Body() createTopicDto: CreateTopicDto, @GetUser('userID') id: Types.ObjectId) {
+    async createTopic(@Body() createTopicDto: CreateTopicDto, @GetUser('userId') id: Types.ObjectId) {
         return this.topicsService.create(createTopicDto, id)
     }
 
@@ -20,7 +20,7 @@ export class TopicsController {
     }
 
     @Get('auto-pick')
-    async autoFindTopic(@Query() dto: QueryAutoFindTopicDto, @GetUser('userID') userId: Types.ObjectId ) {
+    async autoFindTopic(@Query() dto: QueryAutoFindTopicDto, @GetUser('userId') userId: Types.ObjectId ) {
         return this.topicsService.autoPickTopic(userId, dto.topicId)
     }
 

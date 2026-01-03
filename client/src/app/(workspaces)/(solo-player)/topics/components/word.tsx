@@ -38,7 +38,7 @@ export const WordCard = ({ word }: { word: Word}) => {
   )
 }
 
-export const WordList = ({ words, topicID }: { words: Word[], topicID: string}) => {
+export const WordList = ({ words, topicId }: { words: Word[], topicId: string}) => {
   return (
     <div className='w-full h-220'>
       <div className='w-full flex justify-between py-4'>
@@ -50,7 +50,7 @@ export const WordList = ({ words, topicID }: { words: Word[], topicID: string}) 
           <InputGroupAddon align="inline-end">12 results</InputGroupAddon>
         </InputGroup>
         <div>
-          <Link href={`/topics/create-word?topic=${topicID}`}>
+          <Link href={`/topics/create-word?topic=${topicId}`}>
             <Button>
               <Plus />
               New word

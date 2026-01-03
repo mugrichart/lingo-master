@@ -32,7 +32,7 @@ const CreateWordClient =  ({
             </CardHeader>
 
             <CardContent className="flex flex-col gap-4 w-full">
-                 <CreateWordForm topicID={topic._id} wordSuggestion={selectedSuggestion} resetForm={() => setSelectedSuggestion(null)} developWithAI={expandWithAI}/>
+                 <CreateWordForm topicId={topic._id} wordSuggestion={selectedSuggestion} resetForm={() => setSelectedSuggestion(null)} developWithAI={expandWithAI}/>
             </CardContent>
         </Card>
         <SuggestionsPanel page="words" initialSuggestions={suggestions} chooseSuggestion={setSelectedSuggestion}/>

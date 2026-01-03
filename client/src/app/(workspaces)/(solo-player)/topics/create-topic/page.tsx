@@ -8,9 +8,9 @@ const page = async ({
   searchParams
 }: { searchParams: Promise<{ parentTopic: string}>}) => {
 
-  const topicIDResolved = (await searchParams).parentTopic;
+  const topicIdResolved = (await searchParams).parentTopic;
  
-  const topic = topicIDResolved ? await fetchTopicByID(topicIDResolved) : null
+  const topic = topicIdResolved ? await fetchTopicByID(topicIdResolved) : null
 
   const { topics } = await fetchTopicSuggestions(topic) 
 

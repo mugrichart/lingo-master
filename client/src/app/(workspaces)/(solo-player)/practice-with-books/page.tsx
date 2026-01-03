@@ -42,7 +42,7 @@ const page = async () => {
       <ContentView>
         {
           books.map(book => (
-            <Link key={book._id} href={`/practice-with-books/practice?bookID=${book._id}&score=${tracking.score}`}>
+            <Link key={book._id} href={`/practice-with-books/practice?bookId=${book._id}&score=${tracking.score}`}>
               <BookCard book={book} />
             </Link>
           ))

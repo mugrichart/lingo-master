@@ -29,7 +29,7 @@ import {
 
 import { Conversation } from "@/lib/definitions"
 
-export const ConvoCard = ({ words, convo, topicID }: { words: Word[], convo: Conversation, topicID?: string  }) => {
+export const ConvoCard = ({ words, convo, topicId }: { words: Word[], convo: Conversation, topicId?: string  }) => {
   console.log(convo.lines.map( line => line.usedWords))
   return (
     <Card className="p-3 aspect-square justify-between items-end w-130 h-fit">
@@ -61,7 +61,7 @@ export const ConvoCard = ({ words, convo, topicID }: { words: Word[], convo: Con
 
         </CardContent>
         <CardFooter className="h-[10%]">
-          <Link href={`/topics/practice-convo?topic=${topicID}&conversation=${convo._id}`}>
+          <Link href={`/topics/practice-convo?topic=${topicId}&conversation=${convo._id}`}>
             <Button><BookIcon />Practice</Button>
           </Link>
         </CardFooter>       
@@ -69,7 +69,7 @@ export const ConvoCard = ({ words, convo, topicID }: { words: Word[], convo: Con
   )
 }
 
-export const ConvosList = ({ words, topicID, conversations }: { words: Word[], topicID?: string, conversations: Conversation[]}) => {
+export const ConvosList = ({ words, topicId, conversations }: { words: Word[], topicId?: string, conversations: Conversation[]}) => {
 
   return (
     <div className='w-full h-220'>
@@ -82,7 +82,7 @@ export const ConvosList = ({ words, topicID, conversations }: { words: Word[], t
                 <InputGroupAddon align="inline-end">12 results</InputGroupAddon>
             </InputGroup>
             <div className="flex gap-2">
-               <Link href={ `/topics/create-convo?topic=${topicID}` }>
+               <Link href={ `/topics/create-convo?topic=${topicId}` }>
                     <Button>
                         <Plus />
                         New conversation
@@ -93,7 +93,7 @@ export const ConvosList = ({ words, topicID, conversations }: { words: Word[], t
       <ContentView>
         {
           conversations.map(convo => (
-              <ConvoCard convo={convo} words={words} topicID={topicID}/>
+              <ConvoCard convo={convo} words={words} topicId={topicId}/>
           ))
         }
       </ContentView>

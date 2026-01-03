@@ -14,7 +14,7 @@ export class WordsQueryDto {
 export class CreateWordDto {
     @IsNotEmpty()
     @Transform(({ value }) => Types.ObjectId.isValid(value) ? new Types.ObjectId(value) : value)
-    topicID: Types.ObjectId;
+    topicId: Types.ObjectId;
 
     @IsString() 
     type: string;

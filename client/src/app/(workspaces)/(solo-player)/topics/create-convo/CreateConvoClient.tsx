@@ -42,7 +42,7 @@ const CreateConvoClient =  ({
                 <CardDescription>Under the <em>{topic?.name}</em> topic</CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-4 w-full">
-                 <CreateConvoForm words={words} topicID={topic._id} convoSuggestion={ expandedSuggestion } resetForm={() => setExpandedSuggestion(null)} developWithAI={expandWithAI}/>
+                 <CreateConvoForm words={words} topicId={topic._id} convoSuggestion={ expandedSuggestion } resetForm={() => setExpandedSuggestion(null)} developWithAI={expandWithAI}/>
             </CardContent>
         </Card>
         <SuggestionsPanel words={words} page="convos" initialSuggestions={suggestions} chooseSuggestion={setSelectedSuggestion}/>

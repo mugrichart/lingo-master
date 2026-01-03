@@ -16,17 +16,17 @@ const page = async ({
 }
 ) => {
   const topicChain = (await params).slug
-  const topicID = topicChain?.[topicChain.length - 1]
+  const topicId = topicChain?.[topicChain.length - 1]
 
   const tab = (await searchParams).tab || "topics"
 
-  const topics = await fetchTopics({ parent : topicID || null })
-  const words = topicID ? await fetchWords(topicID) : []
-  const conversations = topicID ? await fetchConversations(topicID) : []
+  const topics = await fetchTopics({ parent : topicId || null })
+  const words = topicId ? await fetchWords(topicId) : []
+  const conversations = topicId ? await fetchConversations(topicId) : []
 
   return (
     <Tabs defaultValue={tab} className="w-full h-222 pl-4">
-      {topicID && (
+      {topicId && (
         <TabsList>
           <TabsTrigger value="topics">Topics</TabsTrigger>
           <TabsTrigger value="words">Words({words?.length || 0})</TabsTrigger>
@@ -35,16 +35,16 @@ const page = async ({
         )
       }
       <TabsContent value="topics">
-        <TopicList topics={topics || []} topicID={topicID}/>
+        <TopicList topics={topics || []} topicId={topicId}/>
       </TabsContent>
       {
-        topicID && 
+        topicId && 
         <TabsContent value="words">
-          <WordList words={words} topicID={topicID}/>
+          <WordList words={words} topicId={topicId}/>
         </TabsContent>
       }
       <TabsContent value="conversations">
-        <ConvosList words={words} topicID={topicID} conversations={conversations as Conversation[]}/>
+        <ConvosList words={words} topicId={topicId} conversations={conversations as Conversation[]}/>
       </TabsContent>
   </Tabs>
   )

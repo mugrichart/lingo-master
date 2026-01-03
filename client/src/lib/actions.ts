@@ -75,7 +75,7 @@ export async function createTopic(parentTopicID: string | null, prevState: any, 
         return "An error occurred."; // This becomes your errorMessage
     }
 }
-export async function editTopic(topicID: string, prevState: any, formData: FormData) {
+export async function editTopic(topicId: string, prevState: any, formData: FormData) {
     const update = TopicSchema.pick({ name: true, language: true}).parse({
         name: formData.get("name"),
         language: formData.get("language")
@@ -84,7 +84,7 @@ export async function editTopic(topicID: string, prevState: any, formData: FormD
     try {
         const sessionToken = (await cookies()).get('sessionToken')?.value;
 
-        const response = await fetch(`${env.NEXT_PUBLIC_API_BASE_URL}/topics/${topicID}`, {
+        const response = await fetch(`${env.NEXT_PUBLIC_API_BASE_URL}/topics/${topicId}`, {
             method: 'PATCH',
             headers: {
                 'content-type': 'application/json',
@@ -104,12 +104,12 @@ export async function editTopic(topicID: string, prevState: any, formData: FormD
     }
 
     revalidatePath('/topics');
-    redirect(`/topics/${topicID}`);
+    redirect(`/topics/${topicId}`);
 }
 
 
 
-export async function createWord(topicID: string, prevState: any, formData: FormData) {
+export async function createWord(topicId: string, prevState: any, formData: FormData) {
     
     const validated = WordSchema
                         .pick({ word: true, type: true, "language style": true, meaning: true, example: true, synonym: true, antonym: true})
@@ -132,7 +132,7 @@ export async function createWord(topicID: string, prevState: any, formData: Form
             WordSchema, {
             method: 'POST',
             headers,
-            body: JSON.stringify({ ...validated, 'blanked example': blanked, topicID: topicID })
+            body: JSON.stringify({ ...validated, 'blanked example': blanked, topicId: topicId })
         })
     } catch (error) {
         console.error(error)
