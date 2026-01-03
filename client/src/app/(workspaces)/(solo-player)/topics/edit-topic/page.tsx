@@ -8,7 +8,7 @@ const page = async ({
 
   const topicIdResolved = (await searchParams).topicId;
  
-  const { topic } = await fetchTopicByID(topicIdResolved)
+  const topic = await fetchTopicByID(topicIdResolved)
 
   return (
     <EditTopicClient topic={topic} />

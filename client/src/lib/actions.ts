@@ -76,28 +76,22 @@ export async function createTopic(parentTopicID: string | null, prevState: any, 
     }
 }
 export async function editTopic(topicId: string, prevState: any, formData: FormData) {
+    const headers = await getHeaders()
     const update = TopicSchema.pick({ name: true, language: true}).parse({
-        name: formData.get("name"),
-        language: formData.get("language")
+        name: formData.get("name")?.toString(),
+        language: formData.get("language")?.toString()
     });
 
     try {
-        const sessionToken = (await cookies()).get('sessionToken')?.value;
+        await apiRequest(`/topics/${topicId}`, 
+                TopicSchema,
+                {
+                    method: 'PATCH',
+                    headers,
+                    body: JSON.stringify(update)
+                }
+        );
 
-        const response = await fetch(`${env.NEXT_PUBLIC_API_BASE_URL}/topics/${topicId}`, {
-            method: 'PATCH',
-            headers: {
-                'content-type': 'application/json',
-                'Authorization': `Bearer ${sessionToken}`
-            },
-            body: JSON.stringify(update)
-        });
-
-        if (!response.ok) {
-            return "Failed to update topic."; // This becomes your errorMessage
-        }
-
-        
     } catch (error) {
         console.error(error);
         return "An error occurred."; // This becomes your errorMessage
