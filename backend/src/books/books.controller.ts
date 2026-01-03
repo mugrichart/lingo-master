@@ -1,9 +1,9 @@
-import { Body, Controller, Get, NotAcceptableException, NotImplementedException, Post, Put, Query, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, NotAcceptableException, NotImplementedException, Param, Post, Put, Query, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { QueryPracticePageDto, UploadMetadataDto } from './books.dto';
 import { FileFieldsInterceptor } from "@nestjs/platform-express"
 import { BooksService } from './books.service';
 import { GetUser } from 'src/auth/get-user.decorator';
-import { Types } from 'mongoose';
+import { DeleteResult, Types } from 'mongoose';
 
 
 @Controller('books')
@@ -26,6 +26,11 @@ export class BooksController {
         @GetUser('userId') userId: Types.ObjectId
     ) {
         return this.booksService.upload(metadata, files, userId)
+    }
+
+    @Delete(':id')
+    async deleteBook(@Param('id') bookId: string): Promise<DeleteResult> {
+        return this.booksService.delete(new Types.ObjectId(bookId))
     }
 
     //---------------------------------------------------------------------

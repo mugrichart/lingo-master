@@ -28,7 +28,7 @@ export class BookPractice {
     @Prop({ type: mongoose.SchemaTypes.ObjectId, ref: 'User'})
     user: Types.ObjectId
     
-    @Prop({ default: 0}) cursorAt: number
+    @Prop({ default: 0}) currentPage: number
     
     @Prop({ type: [{type: mongoose.SchemaTypes.ObjectId, ref: 'BookPracticePage'}], default: [] })
     pages: Types.ObjectId[]

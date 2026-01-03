@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { QueryPracticePageDto, UploadMetadataDto } from './books.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Book, BookPractice, BookPracticePage, BookPracticeTracking } from './books.schema';
-import { Model, Types } from 'mongoose';
+import { DeleteResult, Model, Types } from 'mongoose';
 import { ConfigService } from '@nestjs/config';
 import { FileStorageService } from 'src/file-storage/file-storage.service';
 import { PdfService } from './pdf.service';
@@ -27,6 +27,11 @@ export class BooksService {
 
     async findAll() {
         return this.bookModel.find().exec()
+    }
+
+    async delete(bookId: Types.ObjectId): Promise<DeleteResult> {
+        await this.practiceModel.deleteOne({ bookId }).exec()
+        return this.bookModel.deleteOne(bookId).exec()
     }
 
     async findOne(id: Types.ObjectId) {
@@ -70,7 +75,7 @@ export class BooksService {
             return practicePlan
         }
 
-        return this.practiceModel.create({ bookId, user: userId, cursorAt: 0, pages: []})
+        return this.practiceModel.create({ bookId, user: userId, currentPage: 0, pages: []})
     }
 
     async getBookPracticePage(dto: QueryPracticePageDto, userId: Types.ObjectId) {
@@ -79,7 +84,7 @@ export class BooksService {
             if (!practice) {
                 throw new NotFoundException(`Practice plan for book with id ${dto.bookId} not found`)
             }
-            const pageNumber = dto.pageNumber ?? practice.cursorAt
+            const pageNumber = dto.pageNumber ?? practice.currentPage
     
             const pageId = practice.pages[pageNumber]
     
@@ -101,7 +106,7 @@ export class BooksService {
             throw new NotFoundException(`Practice plan for book with id ${bookId} not found`)
         }
 
-        const practicePageIndex = options.practicePageIdx ?? practicePlan.pages.length // 0-indexed in the practice plan -> next page
+        const practicePageIndex = options.practicePageIdx ?? practicePlan.currentPage ?? practicePlan.pages.length // 0-indexed in the practice plan -> next page
         const lastPageIndex = book.endingPage - book.startingPage // We have the user tell us the first page the reading actually starts, and where it ends
         if (practicePageIndex > lastPageIndex) {
             throw new NotFoundException(`Last page of the book is ${book.endingPage}`)
@@ -124,9 +129,12 @@ export class BooksService {
         // Insert the words in the page content with the help of ai
         const augmentedPageContent = await this.aiSuggestionsService.bookPageAugmentation(book.title, topic, words, pageContent)
         
+        // Update current page
+        await this.practiceModel.findByIdAndUpdate(practicePlan._id, { currentPage: practicePageIndex + 1 })
+
         return {
             pageContent: { text: augmentedPageContent, words: words.map(w => w.word), options: shuffleArray(learning.words.slice(0, 10).flatMap(w => w ? [w.word] : [])) },
-            pageNumber: 0
+            pageNumber: practicePageIndex
         }
 
     }
