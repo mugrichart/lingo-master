@@ -63,7 +63,7 @@ const PracticeClient = (
                             }
                             
                             return <p key={idx} className={
-                                    displayedText[0] === displayedText[0]?.toUpperCase() ? 'mt-5' : 'mt-1'
+                                    displayedText[0] === displayedText[0]?.toUpperCase() ? 'mt-5' : 'mt-.5'
                                 }>{displayedText}</p>
                         })}
                     </CardContent>
