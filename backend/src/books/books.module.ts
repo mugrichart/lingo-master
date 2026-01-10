@@ -7,6 +7,7 @@ import { FileStorageModule } from 'src/file-storage/file-storage.module';
 import { PdfService } from './pdf.service';
 import { TopicsModule } from 'src/topics/topics.module';
 import { AiSuggestionsModule } from 'src/ai-suggestions/ai-suggestions.module';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { AiSuggestionsModule } from 'src/ai-suggestions/ai-suggestions.module';
       {name: BookPracticePage.name, schema: BookPracticePageSchema},
       {name: BookPracticeTracking.name, schema: BookPracticeTrackingSchema},
     ]),
+    CacheModule.register(),
     FileStorageModule, TopicsModule, AiSuggestionsModule
   ],
   controllers: [BooksController],

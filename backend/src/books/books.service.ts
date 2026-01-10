@@ -1,7 +1,7 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { QueryPracticePageDto, UploadMetadataDto } from './books.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { Book, BookPractice, BookPracticePage, BookPracticeTracking } from './books.schema';
+import { Book, BookPractice, BookPracticeDocument, BookPracticePage, BookPracticeTracking } from './books.schema';
 import { DeleteResult, Model, Types } from 'mongoose';
 import { ConfigService } from '@nestjs/config';
 import { FileStorageService } from 'src/file-storage/file-storage.service';
@@ -10,6 +10,9 @@ import { PDFDocumentProxy } from 'pdfjs-dist';
 import { shuffleArray } from 'src/lib/shuffle';
 import { TopicsService } from 'src/topics/topics.service';
 import { AiSuggestionsService } from 'src/ai-suggestions/ai-suggestions.service';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from '@nestjs/cache-manager';
+import { WordDocument } from 'src/words/words.schema';
 
 @Injectable()
 export class BooksService {
@@ -18,6 +21,9 @@ export class BooksService {
         @InjectModel(BookPractice.name) private practiceModel: Model<BookPractice>,
         @InjectModel(BookPracticePage.name) private pageModel: Model<BookPracticePage>,
         @InjectModel(BookPracticeTracking.name) private userTrackingModel: Model<BookPracticeTracking>,
+
+        @Inject(CACHE_MANAGER) private cacheManager: Cache,
+
         private configService: ConfigService,
         private fileStorageService: FileStorageService,
         private pdfService: PdfService,
@@ -35,7 +41,14 @@ export class BooksService {
     }
 
     async findOne(id: Types.ObjectId) {
-        return this.bookModel.findById(id).exec()
+        const value = await this.cacheManager.get(`book-${id}`)
+        if (value) {
+            return value
+        } else {
+            const book = await this.bookModel.findById(id).exec()
+            this.cacheManager.set(`book-${id}`, book)
+            return book
+        }
     }
 
     async upload(metadata: UploadMetadataDto, files: { bookFile: Express.Multer.File[], bookCover: Express.Multer.File[]}, userId: Types.ObjectId) {
@@ -62,8 +75,13 @@ export class BooksService {
 
     // ---------------------------------------------------------------------
 
-    async getBookPracticePlan(bookId: Types.ObjectId, userId: Types.ObjectId) {
-        return this.practiceModel.findOne({ bookId, user: userId}).exec()
+    async getBookPracticePlan(bookId: Types.ObjectId, userId: Types.ObjectId): Promise<BookPracticeDocument> {
+        const key = `book-${bookId}-user-${userId}`
+        let plan = await this.cacheManager.get(key)
+        if (plan) return plan as BookPracticeDocument;
+        plan = await this.practiceModel.findOne({ bookId, user: userId}).exec()
+        if (plan) await this.cacheManager.set(key, plan)
+        return plan as BookPracticeDocument
     }
 
     async createBookPracticePlan(bookId: Types.ObjectId, userId: Types.ObjectId) {
@@ -98,7 +116,13 @@ export class BooksService {
     }
 
     async createBookPracticePage(bookId: Types.ObjectId, userId: Types.ObjectId, options: {practicePageIdx?: number, topicId?: Types.ObjectId, wordsPerPage?: number} = {}) {
-        const[book, practicePlan] = await Promise.all([ this.bookModel.findOne(bookId), this.getBookPracticePlan(bookId, userId) ])
+        console.time("Measuring time after implementing caching")
+        const[book, practicePlan, learning] = await Promise.all([ 
+            this.bookModel.findOne(bookId), 
+            this.getBookPracticePlan(bookId, userId), 
+            this.topicService.autoPickTopic(userId, options.topicId) 
+        ])
+
         if (!book) {
             throw new NotFoundException(`Book with id ${bookId} not found`)
         }
@@ -114,29 +138,49 @@ export class BooksService {
 
         const pdfFile: PDFDocumentProxy = await this.pdfService.getPdf(book.pdfUrl)
         const pageNumber = practicePageIndex + book.startingPage
-        const pageContent = await this.pdfService.getPageContent(pdfFile, pageNumber)
-        // fetching the relevant words to practice with, and under which topic
 
-        const learning = await this.topicService.autoPickTopic(userId, options.topicId)
         if (!learning) {
             throw new NotFoundException(`Learning plan not found`)
         }
         const howMany = options.wordsPerPage || 2 // We want to insert two words in the page content
-        const shuffled = shuffleArray(learning.words)
-        const words = shuffled.slice(0, howMany).flatMap(w => w ? [{ word: w.word, example: w.example}] : [])
-        const topic = learning.topic?.name ?? ""
 
-        // Insert the words in the page content with the help of ai
-        const augmentedPageContent = await this.aiSuggestionsService.bookPageAugmentation(book.title, topic, words, pageContent)
+        // Create the next one in the background and cache for the next fetch
+        const [augmentedPageContent, words] = await this.handleAugmentation(book.title, learning.topic?.name, learning.words, pdfFile, pageNumber, howMany)
         
-        // Update current page
-        await this.practiceModel.findByIdAndUpdate(practicePlan._id, { currentPage: practicePageIndex + 1 })
+        // Create the next one in the background and cache for the next fetch
+        this.handleAugmentation(book.title, learning.topic?.name, learning.words, pdfFile, pageNumber + 1, howMany)
+        
+        // Update current page: async
+        this.practiceModel.findByIdAndUpdate(practicePlan._id, { currentPage: practicePageIndex + 1 })
+        
+        console.timeEnd("Measuring time after implementing caching")
 
         return {
             pageContent: { text: augmentedPageContent, words: words.map(w => w.word), options: shuffleArray(learning.words.slice(0, 10).flatMap(w => w ? [w.word] : [])) },
             pageNumber: practicePageIndex
         }
 
+    }
+
+    private async handleAugmentation(title: string, topicH: string | undefined, wordsH: (WordDocument | null)[], pdfFile: PDFDocumentProxy, pageNumber: number, howMany=2) {
+        const key = `title=${title}-page=${pageNumber}`
+        const value = await this.cacheManager.get(key)
+        if (value) return value as [string, {word: string, example: string}[]]
+        else {
+            const shuffled = shuffleArray(wordsH)
+            const words = shuffled.slice(0, howMany).flatMap(w => w ? [{ word: w.word, example: w.example}] : [])
+            const topic = topicH ?? ""
+    
+            const pageContent = await this.pdfService.getPageContent(pdfFile, pageNumber)
+    
+            // Insert the words in the page content with the help of ai
+            const augmentedPageContent = await this.aiSuggestionsService.bookPageAugmentation(title, topic, words, pageContent)
+            
+            await this.cacheManager.set(key, [augmentedPageContent, words])
+            
+            return [augmentedPageContent, words] as [string, {word: string, example: string}[]]
+        }
+        
     }
 
     //----------------------------------------------------------------------

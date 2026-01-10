@@ -5,6 +5,8 @@ import { Topic, TopicDocument } from './topics.schema';
 import { CreateTopicDto, ListAllTopicsDto, UpdateTopicDto } from './topics.dto';
 import { TopicLearningPlanService } from './learning.service';
 import { WordsService } from 'src/words/words.service';
+import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
+import { WordDocument } from 'src/words/words.schema';
 
 @Injectable()
 export class TopicsService {
@@ -13,7 +15,9 @@ export class TopicsService {
         private topicLearningService: TopicLearningPlanService,
 
         @Inject(forwardRef(() => WordsService))
-        private wordsService: WordsService
+        private wordsService: WordsService,
+
+        @Inject(CACHE_MANAGER) private cacheManager: Cache
     ) {}
 
     async create(createDto: CreateTopicDto, userId: Types.ObjectId) {
@@ -51,28 +55,34 @@ export class TopicsService {
      * @param topicId The ID of an optional topic in case the learner picks the topic
      */
     async autoPickTopic(userId: Types.ObjectId, topicId?: Types.ObjectId) {
-        if (topicId) {
-            const topic = await this.findOne(topicId)
-            if (!topic) {
-                throw new NotFoundException('Topic not found')
+        const key = `user=${userId}-topic=${topicId}`
+        const value = await this.cacheManager.get(key)
+        if (value) return value as { topic: TopicDocument, words: [WordDocument]}
+        else {
+            if (topicId) {
+                const topic = await this.findOne(topicId)
+                if (!topic) {
+                    throw new NotFoundException('Topic not found')
+                }
+                const words = await Promise.all(topic.words.map(wId => this.wordsService.findOne(wId)))
+                return { topic, words }
             }
-            const words = await Promise.all(topic.words.map(wId => this.wordsService.findOne(wId)))
+            const learnings = await this.topicLearningService.findAll(userId)
+            if (!learnings?.length) {
+                throw new NotFoundException('Learning plan not found')
+            }
+            const sortedByRelevance = learnings.sort((a, b) => b.chunkLevel - a.chunkLevel)
+            const mostRelevantTopic = sortedByRelevance[0].topic
+            const wordIds = sortedByRelevance[0].words.map(w => w.word)
+    
+            const [topic, ...words] = await Promise.all([
+                this.findOne(mostRelevantTopic), 
+                ...wordIds.map(wId => this.wordsService.findOne(wId))
+            ])
+            await this.cacheManager.set(key, { topic, words })
             return { topic, words }
         }
-        const learnings = await this.topicLearningService.findAll(userId)
-        if (!learnings?.length) {
-            throw new NotFoundException('Learning plan not found')
-        }
-        const sortedByRelevance = learnings.sort((a, b) => b.chunkLevel - a.chunkLevel)
-        const mostRelevantTopic = sortedByRelevance[0].topic
-        const wordIds = sortedByRelevance[0].words.map(w => w.word)
 
-        const [topic, ...words] = await Promise.all([
-            this.findOne(mostRelevantTopic), 
-            ...wordIds.map(wId => this.wordsService.findOne(wId))
-        ])
-
-        return { topic, words }
     }
 
     async update(id: Types.ObjectId, updateDto: UpdateTopicDto) {

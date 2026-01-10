@@ -1,18 +1,30 @@
-import { Injectable } from '@nestjs/common';
+import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Inject, Injectable } from '@nestjs/common';
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
 // For Node environments, you must point to the worker
-import { TextContent, TextItem } from 'pdfjs-dist/types/src/display/api';
+import { PDFDocumentProxy, TextContent, TextItem } from 'pdfjs-dist/types/src/display/api';
 
 @Injectable()
 export class PdfService {
+  constructor(
+    @Inject(CACHE_MANAGER) private cacheManager: Cache
+  ){}
   
   async getPdf(url: string) {
-    const res = await fetch(url);
-    const buffer = new Uint8Array(await res.arrayBuffer());
-
-    // In Node.js, pdfjs needs the workerSrc set or it might fail
-    const loadingTask = pdfjsLib.getDocument({ data: buffer });
-    return await loadingTask.promise;
+    const key = `pdfUrl-${url}`
+    let pdf = await this.cacheManager.get(key)
+    if (pdf) {
+      return pdf as PDFDocumentProxy
+    } else {
+      const res = await fetch(url);
+      const buffer = new Uint8Array(await res.arrayBuffer());
+  
+      // In Node.js, pdfjs needs the workerSrc set or it might fail
+      const loadingTask = pdfjsLib.getDocument({ data: buffer });
+      pdf = await loadingTask.promise;
+      await this.cacheManager.set(key, pdf, 600000)
+      return pdf as PDFDocumentProxy
+    }
   }
 
   async getPageContent(pdf: pdfjsLib.PDFDocumentProxy, pageNumber: number = 0): Promise<string> {

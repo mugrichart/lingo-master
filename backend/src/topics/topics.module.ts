@@ -7,6 +7,7 @@ import { AiSuggestionsModule } from 'src/ai-suggestions/ai-suggestions.module';
 import { TopicLearningPlanController } from './learning.controller';
 import { TopicLearningPlanService } from './learning.service';
 import { WordsModule } from 'src/words/words.module';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
   imports: [
@@ -15,7 +16,8 @@ import { WordsModule } from 'src/words/words.module';
       { name: Learning.name, schema: TopicLearningSchema }
     ]),
     AiSuggestionsModule,
-    WordsModule
+    WordsModule,
+    CacheModule.register()
   ],
   controllers: [TopicLearningPlanController, TopicsController],
   providers: [TopicsService, TopicLearningPlanService],
