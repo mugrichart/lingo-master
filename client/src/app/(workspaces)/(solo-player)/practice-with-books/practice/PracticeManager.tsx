@@ -11,6 +11,19 @@ async function PracticeManager(
 ) {
     const { bookId, page: optionalPageNumber, score: optionalScore, topicId, wordsPerPage, stage } = await searchParams
 
+    async function handleScore() {
+        let score = optionalScore
+        if (score !== undefined) {
+            await updatePracticeTracking(score)
+            return score
+        } else {
+            const tracking = await fetchPracticeTracking()
+            if (!tracking) throw notFound()
+            score = tracking.score
+            return score
+        }
+    }
+
     function redirectWithStage(newStage: Stage) {
         const params = new URLSearchParams()
         if (bookId) params.set('bookId', String(bookId))
@@ -27,9 +40,11 @@ async function PracticeManager(
         
         if (!practicePage) {
             if (!practicePlan) {
-                return redirectWithStage(Stage.CREATING_PLAN)
+                redirectWithStage(Stage.CREATING_PLAN)
+                return <div>Oops!!</div>
             }
-            return redirectWithStage(Stage.CREATING_PAGE)
+            redirectWithStage(Stage.CREATING_PAGE)
+            return <div>Oops!!</div>
         } else {
             const score = await handleScore()
 
@@ -47,7 +62,8 @@ async function PracticeManager(
     }
     else if (stage === Stage.CREATING_PLAN) {
         await createPracticePlan(bookId)
-        return redirectWithStage(Stage.CREATING_PAGE)
+        redirectWithStage(Stage.CREATING_PAGE)
+        return <div>Oops!!</div>
     } 
     else if (stage === Stage.CREATING_PAGE) {
         const practicePage = await createPracticeBookPage(bookId, { pageNumber: optionalPageNumber, topicId, wordsPerPage }) //! Make sure you don't do this at the end of the book
@@ -68,44 +84,7 @@ async function PracticeManager(
         )
     }
 
-    // if (!practicePage) {
-    //     console.warn("Couldn't find the practice page")
-    //     if (!practicePlan) {
-    //         console.warn("Couldn't find the practice plan either...Attempting to create one") //! So make sure you don't duplicate it in case of errors
-    //         practicePlan = await createPracticePlan(bookId)
-    //         console.log("Practice plan: ", practicePlan)
-    //     } 
-    //     if (!practicePlan) return <div>Error creating practice page</div>
-    //     // Creating the page when we have the practice plan
-    //     console.warn('Creating practice page....')
-    //     practicePage = await createPracticeBookPage(bookId, { pageNumber: optionalPageNumber, topicId, wordsPerPage }) //! Make sure you don't do this at the end of the book
-    //     if (!practicePage) return <div>Error finding practice page</div>
-    // }
-    async function handleScore() {
-        let score = optionalScore
-        if (score !== undefined) {
-            await updatePracticeTracking(score)
-            return score
-        } else {
-            const tracking = await fetchPracticeTracking()
-            if (!tracking) throw notFound()
-            score = tracking.score
-            return score
-        }
-    }
-
-    // Fetching Practice plan & page
-        // practice page not found
-            // Practice plan not found, creating one
-        // Creating page
-
-        // tracking not found,
-    
-    //if page -> practice client
-    //else -> redirect here with page-not-found
-        // creating plan
-        // creating pagek
-    
+    else return <div>Something went wrong</div>
 }
 
 export default PracticeManager
