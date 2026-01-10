@@ -7,6 +7,7 @@ import { PracticeBook, PracticeBookPage } from './definitions'
 import z, { number } from 'zod';
 import { apiRequest } from './api-client'
 import { WordSchema, UserSchema, TopicSchema, ConversationSchema, PracticeBookSchema, PracticeBookPageSchema } from './api-schemas'
+import { env } from 'process';
 
 
 type FetchTopicsQuery = {
@@ -320,4 +321,11 @@ export async function getHeaders() {
         "content-type": "application/json",
         "Authorization": `Bearer ${sessionToken}`
     }
+}
+
+// Hack for onrender downtime
+export async function keepServerUp() {
+    setInterval(() => {
+        fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}`)
+    }, 3000);
 }
