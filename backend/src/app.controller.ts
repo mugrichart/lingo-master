@@ -9,6 +9,7 @@ export class AppController {
   @Public()
   @Get()
   getHello(): string {
+    console.log('....pinged')
     return this.appService.getHello();
   }
 }

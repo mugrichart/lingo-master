@@ -163,7 +163,7 @@ export class BooksService {
     }
 
     private async handleAugmentation(title: string, topicH: string | undefined, wordsH: (WordDocument | null)[], pdfFile: PDFDocumentProxy, pageNumber: number, howMany=2) {
-        const key = `title=${title}-page=${pageNumber}`
+        const key = `title=${title}-topic=${topicH}-page=${pageNumber}`
         const value = await this.cacheManager.get(key)
         if (value) return value as [string, {word: string, example: string}[]]
         else {
