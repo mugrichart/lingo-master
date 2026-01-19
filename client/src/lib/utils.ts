@@ -16,7 +16,7 @@ interface MatchResult {
 export class SentenceExpressionMatchProcessor {
   private readonly THRESHOLD: number = 0.7; // 70/100
   private readonly PERFECT_SCORE: number = 0.9; // 90/100
-  private readonly DASH_COUNT: number = 5;
+  private readonly DASH_COUNT: number = 10;
   
   public sentence: string;
   private readonly expressions: string[];
