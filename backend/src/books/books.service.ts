@@ -145,10 +145,10 @@ export class BooksService {
         const howMany = options.wordsPerPage || 2 // We want to insert two words in the page content
 
         // Create the next one in the background and cache for the next fetch
-        const [augmentedPageContent, words] = await this.handleAugmentation(book.title, learning.topic?.name, learning.words, pdfFile, pageNumber, howMany)
+        const [augmentedPageContent, words] = await this.handleAugmentation(book.title, learning.topic?.name, learning.words, pdfFile, pageNumber, howMany, true)
         
         // Create the next one in the background and cache for the next fetch
-        this.handleAugmentation(book.title, learning.topic?.name, learning.words, pdfFile, pageNumber + 1, howMany)
+        this.handleAugmentation(book.title, learning.topic?.name, learning.words, pdfFile, pageNumber + 1, howMany, false)
         
         // Update current page: async
         this.practiceModel.findByIdAndUpdate(practicePlan._id, { currentPage: practicePageIndex + 1 })
@@ -162,7 +162,7 @@ export class BooksService {
 
     }
 
-    private async handleAugmentation(title: string, topicH: string | undefined, wordsH: (WordDocument | null)[], pdfFile: PDFDocumentProxy, pageNumber: number, howMany=2) {
+    private async handleAugmentation(title: string, topicH: string | undefined, wordsH: (WordDocument | null)[], pdfFile: PDFDocumentProxy, pageNumber: number, howMany=2, prefersFastResponse=false) {
         const key = `title=${title}-topic=${topicH}-page=${pageNumber}`
         const value = await this.cacheManager.get(key)
         if (value) return value as [string, {word: string, example: string}[]]
@@ -172,11 +172,16 @@ export class BooksService {
             const topic = topicH ?? ""
     
             const pageContent = await this.pdfService.getPageContent(pdfFile, pageNumber)
+
+            // In case it's the first page, we don't want the user waiting for the ai process. It should return the normal page, and then process the next page in the background
+            if (prefersFastResponse) {
+                return [pageContent, []] as [string, {word: string, example: string}[]]
+            }
     
             // Insert the words in the page content with the help of ai
             const augmentedPageContent = await this.aiSuggestionsService.bookPageAugmentation(title, topic, words, pageContent)
             
-            await this.cacheManager.set(key, [augmentedPageContent, words])
+            await this.cacheManager.set(key, [augmentedPageContent, words], 5*60*1000)
             
             return [augmentedPageContent, words] as [string, {word: string, example: string}[]]
         }
