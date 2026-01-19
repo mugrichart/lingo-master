@@ -75,13 +75,16 @@ export class BooksService {
 
     // ---------------------------------------------------------------------
 
-    async getBookPracticePlan(bookId: Types.ObjectId, userId: Types.ObjectId): Promise<BookPracticeDocument> {
-        const key = `book-${bookId}-user-${userId}`
-        let plan = await this.cacheManager.get(key)
-        if (plan) return plan as BookPracticeDocument;
-        plan = await this.practiceModel.findOne({ bookId, user: userId}).exec()
-        if (plan) await this.cacheManager.set(key, plan)
-        return plan as BookPracticeDocument
+    async getBookPracticePlan(bookId: Types.ObjectId, userId: Types.ObjectId): Promise<BookPracticeDocument | null> {
+        // const key = `plan-book=${bookId}-user=${userId}`
+        // let plan = await this.cacheManager.get(key)
+        // if (plan) return plan as BookPracticeDocument;
+        // plan = await this.practiceModel.findOne({ bookId, user: userId}).exec()
+        // if (plan) await this.cacheManager.set(key, plan)
+        // return plan as BookPracticeDocument
+
+        // no caching. This changes on every page fetch
+        return this.practiceModel.findOne({ bookId, user: userId}).exec()
     }
 
     async createBookPracticePlan(bookId: Types.ObjectId, userId: Types.ObjectId) {
@@ -122,7 +125,6 @@ export class BooksService {
             this.getBookPracticePlan(bookId, userId), 
             this.topicService.autoPickTopic(userId, options.topicId) 
         ])
-
         if (!book) {
             throw new NotFoundException(`Book with id ${bookId} not found`)
         }
@@ -151,7 +153,7 @@ export class BooksService {
         this.handleAugmentation(book.title, learning.topic?.name, learning.words, pdfFile, pageNumber + 1, howMany, false)
         
         // Update current page: async
-        this.practiceModel.findByIdAndUpdate(practicePlan._id, { currentPage: practicePageIndex + 1 })
+        this.practiceModel.findByIdAndUpdate(practicePlan._id, { currentPage: practicePageIndex + 1 }).exec()
         
         console.timeEnd("Measuring time after implementing caching")
 
