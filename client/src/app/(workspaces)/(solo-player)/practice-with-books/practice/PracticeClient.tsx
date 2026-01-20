@@ -54,8 +54,8 @@ const PracticeClient = (
                     </ScrollArea>
                     <CardFooter className="flex justify-center">
                         <div className="flex gap-5 items-center">
-                            <Link className="bg-secondary p-1 pl-3 rounded-l-md" href={`practice?bookId=${bookId}&page=${currentPage}&score=${score}`}><RefreshCcw /></Link>
-                            <Link className="bg-secondary p-1 pl-3 rounded-l-md" href={`practice?bookId=${bookId}&page=${currentPage - 1}&score=${score}`}><ArrowLeft /></Link>
+                            <Link className="bg-secondary p-1 pr-3 rounded-r-md" href={`practice?bookId=${bookId}&page=${currentPage}&score=${score}&topicId=${topicId}&wordsPerPage=${wordsPerPage || 2}`}><RefreshCcw /></Link>
+                            <Link className="bg-secondary p-1 pr-3 rounded-r-md" href={`practice?bookId=${bookId}&page=${currentPage - 1}&score=${score}&topicId=${topicId}&wordsPerPage=${wordsPerPage || 2}`}><ArrowLeft /></Link>
                             <input onChange={e => setCurrentPage(Number(e.target.value))} value={currentPage} className="w-10" />
                             {currentPidx >= allPs.length &&
                                 <Link className="bg-secondary p-1 pr-3 rounded-r-md" href={`practice?bookId=${bookId}&page=${currentPage + 1}&score=${score}&topicId=${topicId}&wordsPerPage=${wordsPerPage || 2}`}><ArrowRight /></Link>
