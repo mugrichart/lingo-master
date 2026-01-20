@@ -9,10 +9,12 @@ export function usePractice(
     const [currentPidx, setCurrentPidx] = useState(0)
     const [solvedWords, setSolvedWords] = useState<string[]>([])
     const [score, setScore] = useState(initialScore)
-    
+
     const [currentStreak, setCurrentStreak] = useState(0)
 
     const allPs = useMemo(() => page.text.split("\n"), [page.text])
+
+    const [attemps, setAttempts] = useState(3)
 
     // Helper to find the next paragraph that actually has blanks
     const findNextParagraphWithBlanks = useCallback((startIndex: number) => {
@@ -36,8 +38,9 @@ export function usePractice(
         if (currentPidx >= allPs.length) return
 
         const fullP = allPs[currentPidx]
+        console.log(fullP)
         const nextSolvedWords = [...solvedWords, word]
-        
+
         // We pass ALL target words, but filter which ones are "solved" (visible)
         const lookupWords = page.words.filter(w => !nextSolvedWords.includes(w))
         const { blanked, usedExpressions } = handleBlanksGen(fullP, lookupWords, false)
@@ -53,10 +56,20 @@ export function usePractice(
             if (blanked !== prevBlanked) {
                 animate(currentStreak + 1)
                 setSolvedWords(nextSolvedWords)
-            } else animate(0)
+            } else {
+                console.log(attemps)
+                // fill the paragraph after 3 attemps, in order not to get stuck if they can't guess the word
+                if (attemps - 1 < 1) {
+                    setSolvedWords([...solvedWords, page.words.filter(w => !solvedWords.includes(w))[0]])
+                    setAttempts(3)
+                } else {
+                    animate(-1)
+                    setAttempts(attemps - 1)
+                }
+            }
         }
     }
-    
+
     function animate(level: number) {
         if (currentPidx >= allPs.length) return;
         setScore(score + level)
@@ -65,14 +78,14 @@ export function usePractice(
 
         // 1. Create the "FX" Star
         const fxStar = document.createElement('div');
-        fxStar.textContent = {0: "💣", 1: "⭐", 2: "🔥", 3: "💎"}[level] ?? "💎"
+        fxStar.textContent = { 1: "⭐", 2: "🔥", 3: "💎" }[level] ?? level > 3 ? "💎" : "💣"
         fxStar.style.position = "fixed";
         fxStar.style.zIndex = "999";
         fxStar.style.left = "50%";
         fxStar.style.top = "50%";
         fxStar.style.fontSize = "24px";
         fxStar.style.pointerEvents = "none";
-        
+
         // 2. Start the "Pop & Vibrate"
         fxStar.style.animation = "game-pop 0.6s forwards";
         document.body.appendChild(fxStar);
@@ -80,7 +93,7 @@ export function usePractice(
         // 3. After the vibration (600ms), fly to target
         setTimeout(() => {
             const rect = target.getBoundingClientRect();
-            
+
             fxStar.style.transition = "all 0.6s cubic-bezier(0.6, -0.28, 0.735, 0.045)"; // "Slingshot" feel
             fxStar.style.left = `${rect.left + rect.width / 2}px`;
             fxStar.style.top = `${rect.top + rect.height / 2}px`;
@@ -94,7 +107,7 @@ export function usePractice(
                 target.style.transform = "scale(1.5)";
                 setTimeout(() => target.style.transform = "scale(1)", 200);
             }, 600);
-        }, 800); 
+        }, 800);
     }
 
     return { allPs, currentStreak, score, currentPidx, solvedWords, handleWordChoice }
