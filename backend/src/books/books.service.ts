@@ -146,11 +146,14 @@ export class BooksService {
         }
         const howMany = options.wordsPerPage || 2 // We want to insert two words in the page content
 
+        // limiting word set
+        const wordSet = learning.words.slice(0, 10)
+
         // Create the next one in the background and cache for the next fetch
-        const [augmentedPageContent, words] = await this.handleAugmentation(book.title, learning.topic?.name, learning.words, pdfFile, pageNumber, howMany, true)
+        const [augmentedPageContent, words] = await this.handleAugmentation(book.title, learning.topic?.name, wordSet, pdfFile, pageNumber, howMany, true)
         
         // Create the next one in the background and cache for the next fetch
-        this.handleAugmentation(book.title, learning.topic?.name, learning.words, pdfFile, pageNumber + 1, howMany, false)
+        this.handleAugmentation(book.title, learning.topic?.name, wordSet, pdfFile, pageNumber + 1, howMany, false)
         
         // Update current page: async
         this.practiceModel.findByIdAndUpdate(practicePlan._id, { currentPage: practicePageIndex + 1 }).exec()
@@ -158,7 +161,7 @@ export class BooksService {
         console.timeEnd("Measuring time after implementing caching")
 
         return {
-            pageContent: { text: augmentedPageContent, words: words.map(w => w.word), options: shuffleArray(learning.words.slice(0, 10).flatMap(w => w ? [w.word] : [])) },
+            pageContent: { text: augmentedPageContent, words: words.map(w => w.word), options: shuffleArray(wordSet.flatMap(w => w ? [w.word] : [])) },
             pageNumber: practicePageIndex
         }
 
