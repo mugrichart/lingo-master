@@ -87,7 +87,7 @@ const page = async ({
         />
   
         {/* Your Content Container */}
-        <div className="absolute inset-0 w-full h-screen flex justify-center px-10"  id="book">
+        <div className="absolute inset-0 w-full h-screen flex justify-center lg:px-10 px-5"  id="book">
             <Suspense fallback={<FallBack />}>
                 <PracticeManager searchParams={searchParams}/>
             </Suspense>

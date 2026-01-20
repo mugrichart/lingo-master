@@ -30,8 +30,8 @@ const PracticeClient = (
                 </span>
                 <span className="ml-10">{score}🪙</span>
             </div>
-            <div className="p-3 flex h-[95%] w-full gap-5 justify-center flex-wrap">
-                <Card className="w-[95dvw] lg:w-[800px] lg:shrink-0 h-full bg-card/50 backdrop-blur-2xl pl-10 ">
+            <div className="flex lg:h-[93%] h-[75%] w-full gap-5 justify-center flex-wrap">
+                <Card className="w-[95dvw] lg:w-[800px] lg:shrink-0 h-full bg-card/50 backdrop-blur-2xl pl-5 ">
                     <ScrollArea className="flex-1 overflow-hidden">
                         <CardContent className="text-xl font-serif leading-8 text">
                             {allPs.map((pg, idx) => {
@@ -64,10 +64,10 @@ const PracticeClient = (
                     </CardFooter>
                 </Card>
 
-                <Card className="w-100 h-fit bg-card/50 backdrop-blur-md">
-                    <CardHeader>
+                <Card className="lg:w-100 w-full h-fit bg-card/50 backdrop-blur-md">
+                    {/* <CardHeader>
                         <CardTitle>Key words:</CardTitle>
-                    </CardHeader>
+                    </CardHeader> */}
                     <CardContent>
                         <div className="flex flex-wrap gap-2 mt-2">
                             {page.options.map((w, i) => (
