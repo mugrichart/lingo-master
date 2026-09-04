@@ -45,6 +45,16 @@ export class TopicsService {
         return this.topicModel.findById(id).exec()
     }
 
+    /** Aggregated (recursive) mastery for a topic card; null when the branch has no testable/tested content. */
+    async getAggregatedMastery(userId: Types.ObjectId, topicId: Types.ObjectId): Promise<number | null> {
+        return this.topicLearningService.getAggregatedMastery(userId, topicId)
+    }
+
+    /** Invalidates cached aggregated mastery for a topic and its ancestors. */
+    async invalidateMasteryCacheFor(userId: Types.ObjectId, topicId: Types.ObjectId | null | undefined): Promise<void> {
+        return this.topicLearningService.invalidateMasteryCache(userId, topicId)
+    }
+
     async deleteOne(id: Types.ObjectId): Promise<DeleteResult> {
         return this.topicModel.deleteOne(id)
     }

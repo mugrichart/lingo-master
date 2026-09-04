@@ -24,6 +24,12 @@ export class TopicsController {
         return this.topicsService.autoPickTopic(userId, dto.topicId)
     }
 
+    @Get(':id/mastery')
+    async getMastery(@Param('id') id: Types.ObjectId, @GetUser('userId') userId: Types.ObjectId) {
+        const mastery = await this.topicsService.getAggregatedMastery(userId, id)
+        return { mastery }
+    }
+
     @Get(':id')
     async findOne(@Param('id') id: Types.ObjectId) {
         return this.topicsService.findOne(id)
@@ -35,8 +41,10 @@ export class TopicsController {
     }
 
     @Delete(':id')
-    async deleteTopic(@Param('id') id: string): Promise<DeleteResult> {
-        return this.topicsService.deleteOne(new Types.ObjectId(id))
+    async deleteTopic(@Param('id') id: string, @GetUser('userId') userId: Types.ObjectId): Promise<DeleteResult> {
+        const topicId = new Types.ObjectId(id)
+        await this.topicsService.invalidateMasteryCacheFor(userId, topicId)
+        return this.topicsService.deleteOne(topicId)
     }
     
     //--------------------------------------------------

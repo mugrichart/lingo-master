@@ -3,7 +3,8 @@ import {TopicList} from "../components/topic"
 import {WordList} from "../components/word"
 
 // import { fetchConvos, fetchWords } from "@/lib/data"
-import { fetchConversations, fetchTopicMastery, fetchTopics, fetchWords } from "@/lib/data"
+import { fetchConversations, fetchTopics, fetchWords } from "@/lib/data"
+import { fetchTopicMasteryBadge } from "@/lib/mastery"
 import { ConvosList } from "../components/convos"
 import { Conversation } from "@/lib/definitions"
 
@@ -23,7 +24,14 @@ const page = async ({
   const topics = await fetchTopics({ parent : topicId || null })
   const words = topicId ? await fetchWords(topicId) : []
   const conversations = topicId ? await fetchConversations(topicId) : []
-  const mastery = topicId ? await fetchTopicMastery(topicId) : null
+  const mastery = topicId ? await fetchTopicMasteryBadge(topicId) : null
+
+  // resolve each visible topic's aggregated mastery in parallel (backend-cached per node)
+  const masteryById: Record<string, number | null> = Object.fromEntries(
+    await Promise.all(
+      (topics || []).map(async t => [t._id, await fetchTopicMasteryBadge(t._id)] as const)
+    )
+  )
 
   return (
     <Tabs defaultValue={tab} className="w-full h-222 pl-4">
@@ -36,7 +44,7 @@ const page = async ({
         )
       }
       <TabsContent value="topics">
-        <TopicList topics={topics || []} topicId={topicId} words={words}/>
+        <TopicList topics={topics || []} topicId={topicId} words={words} masteryById={masteryById}/>
       </TabsContent>
       {
         topicId && 

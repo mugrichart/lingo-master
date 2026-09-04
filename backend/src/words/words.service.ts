@@ -1,6 +1,7 @@
 import { forwardRef, Inject, Injectable, NotFoundException, NotImplementedException } from '@nestjs/common';
 import { CreateWordDto, WordsQueryDto } from './words.dto';
 import { TopicsService } from 'src/topics/topics.service';
+import { TopicLearningPlanService } from 'src/topics/learning.service';
 import { InjectModel } from '@nestjs/mongoose';
 import { Word, WordDocument } from './words.schema';
 import { Model, Types } from 'mongoose';
@@ -15,7 +16,10 @@ export class WordsService {
         @InjectModel(Word.name) private wordModel: Model<Word>,
 
         @Inject(forwardRef(() => TopicsService))
-        private topicService: TopicsService, 
+        private topicService: TopicsService,
+
+        @Inject(forwardRef(() => TopicLearningPlanService))
+        private topicLearningService: TopicLearningPlanService,
     ) {}
 
     async findAll(query: WordsQueryDto): Promise<(WordDocument | null)[]> {
@@ -50,6 +54,10 @@ export class WordsService {
 
             await this.topicService.addNewWord( topic._id, word._id, session)
             await session.commitTransaction()
+
+            // the topic now has (new) words: any cached mastery aggregates up the tree are stale
+            await this.topicLearningService.invalidateMasteryCache(topic.creator, topic._id)
+
             return word
         } catch (error) {
             console.error(error.message)

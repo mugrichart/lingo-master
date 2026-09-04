@@ -16,11 +16,11 @@ import { CacheModule } from '@nestjs/cache-manager';
       { name: Learning.name, schema: TopicLearningSchema }
     ]),
     AiSuggestionsModule,
-    WordsModule,
+    forwardRef(() => WordsModule),
     CacheModule.register()
   ],
   controllers: [TopicLearningPlanController, TopicsController],
   providers: [TopicsService, TopicLearningPlanService],
-  exports: [TopicsService]
+  exports: [TopicsService, TopicLearningPlanService]
 })
 export class TopicsModule {}

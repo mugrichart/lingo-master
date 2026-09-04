@@ -26,8 +26,7 @@ import {
   ContextMenuTrigger,
 } from "@/components/ui/context-menu"
 
-
-export const TopicCard = ({ topic }: { topic: Topic }) => {
+export const TopicCard = ({ topic, mastery }: { topic: Topic, mastery: number | null }) => {
   return (
     <Card className="p-3 aspect-square justify-between w-70">
         <div className="w-full flex justify-between">
@@ -38,14 +37,14 @@ export const TopicCard = ({ topic }: { topic: Topic }) => {
             { topic.name }
         </CardContent>
         <div className="w-full flex justify-between">
-            <label>Mastery: 100%</label>
+            <label>Mastery: {mastery === null ? 'Not tested' : `${mastery}%`}</label>
             <label>{ topic.words.length }</label>
         </div>
     </Card>
   )
 }
 
-export const TopicList = ({ topics, topicId, words }: { topics: Topic[], topicId?: string, words: Word[]}) => {
+export const TopicList = ({ topics, topicId, words, masteryById }: { topics: Topic[], topicId?: string, words: Word[], masteryById?: Record<string, number | null> }) => {
   const pathname = usePathname()
 
   return (
@@ -75,51 +74,49 @@ export const TopicList = ({ topics, topicId, words }: { topics: Topic[], topicId
         </div>
       </div>
       <ContentView>
-        {
-          topics.map(topic => (
-            <ContextMenu key={topic._id}>
-              <ContextMenuTrigger>
-                  <Link href={`${pathname}/${topic._id}`}>
-                    <TopicCard topic={topic} />
-                  </Link>
-              </ContextMenuTrigger>
-              <ContextMenuContent className="">
-                  <ContextMenuItem>
-                      <Link href={`${pathname}/${topic._id}`} className="flex items-center gap-2">
-                        <FolderOpen /> Open Topic
-                      </Link>
-                  </ContextMenuItem>
-                  <ContextMenuItem>
-                      <Link href={`/topics/edit-topic?topicId=${topic._id}`} className="flex items-center gap-2">
-                        <Edit /> Edit Topic
-                      </Link>
-                  </ContextMenuItem>
-                  <ContextMenuItem>
-                      <Share /> Share Topic
-                  </ContextMenuItem>
-                  <ContextMenuItem>
-                      <MoveHorizontal /> Move Topic
-                  </ContextMenuItem>
-                  <ContextMenuItem>
-                      <Plus /> New word
-                  </ContextMenuItem>
-                  <ContextMenuItem>
-                      <Link href={`/topics/learn?topic=${topic._id}`} className="flex items-center gap-2">
-                        <Book /> Learn Topic
-                      </Link>
-                  </ContextMenuItem>
-                  <ContextMenuItem>
-                      <Link href={`/topics/test?topic=${topic._id}`} className="flex items-center gap-2">
-                        <ClipboardCheck /> Take Test
-                      </Link>
-                  </ContextMenuItem>
-                  <ContextMenuItem variant="destructive">
-                      <Trash />Delete Topic
-                  </ContextMenuItem>
-              </ContextMenuContent>
+        {topics.map(topic => (
+          <ContextMenu key={topic._id}>
+            <ContextMenuTrigger>
+                <Link href={`${pathname}/${topic._id}`}>
+                  <TopicCard topic={topic} mastery={masteryById?.[topic._id] ?? null} />
+                </Link>
+            </ContextMenuTrigger>
+            <ContextMenuContent className="">
+                <ContextMenuItem>
+                    <Link href={`${pathname}/${topic._id}`} className="flex items-center gap-2">
+                      <FolderOpen /> Open Topic
+                    </Link>
+                </ContextMenuItem>
+                <ContextMenuItem>
+                    <Link href={`/topics/edit-topic?topicId=${topic._id}`} className="flex items-center gap-2">
+                      <Edit /> Edit Topic
+                    </Link>
+                </ContextMenuItem>
+                <ContextMenuItem>
+                    <Share /> Share Topic
+                </ContextMenuItem>
+                <ContextMenuItem>
+                    <MoveHorizontal /> Move Topic
+                </ContextMenuItem>
+                <ContextMenuItem>
+                    <Plus /> New word
+                </ContextMenuItem>
+                <ContextMenuItem>
+                    <Link href={`/topics/learn?topic=${topic._id}`} className="flex items-center gap-2">
+                      <Book /> Learn Topic
+                    </Link>
+                </ContextMenuItem>
+                <ContextMenuItem>
+                    <Link href={`/topics/test?topic=${topic._id}`} className="flex items-center gap-2">
+                      <ClipboardCheck /> Take Test
+                    </Link>
+                </ContextMenuItem>
+                <ContextMenuItem variant="destructive">
+                    <Trash />Delete Topic
+                </ContextMenuItem>
+            </ContextMenuContent>
           </ContextMenu>
-          ))
-        }
+        ))}
       </ContentView>
     </div>
   )

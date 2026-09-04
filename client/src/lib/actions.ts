@@ -4,7 +4,7 @@ import { env } from "@/env"
 
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { revalidatePath } from 'next/cache'
+import { revalidatePath, revalidateTag } from 'next/cache'
 import { fetchWords } from './data'
 import { handleBlanksGen } from './utils'
 import { AuthFormSchema, ConversationSchema, LearningScoreSchema, PracticeBookSchema, TopicSchema, WordSchema } from './api-schemas'
@@ -16,7 +16,7 @@ import { LearningScoreResult, WordAttemptRecord } from './definitions'
 export async function scoreLearningAttempt(topicId: string, records: WordAttemptRecord[], persistMastery = false): Promise<LearningScoreResult> {
     const headers = await getHeaders()
     try {
-        return await apiRequest(`/topics/learning/score`,
+        const result = await apiRequest(`/topics/learning/score`,
             LearningScoreSchema,
             {
                 method: 'POST',
@@ -24,6 +24,9 @@ export async function scoreLearningAttempt(topicId: string, records: WordAttempt
                 body: JSON.stringify({ topic: topicId, records, persistMastery })
             }
         )
+        // topic mastery changed: any cached topic-card mastery is now stale
+        if (persistMastery) revalidateTag('topic-mastery', 'max')
+        return result
     } catch (error) {
         console.error(error)
         throw new Error('Error scoring learning attempt')
