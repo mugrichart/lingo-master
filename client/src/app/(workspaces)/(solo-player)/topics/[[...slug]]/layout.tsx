@@ -6,6 +6,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
+import { Fragment } from "react"
 import { Separator } from "@/components/ui/separator"
 
 import {
@@ -44,23 +45,23 @@ const topicsLayout = async (
                 </BreadcrumbItem>
                 {
                     breadcrumbs.map((bc, i) => (
-                        <BreadcrumbItem key={bc.slug}>
+                        <Fragment key={bc.slug}>
                             <BreadcrumbSeparator className="hidden md:block" />
-                            { (i === breadcrumbs.length - 1) ? (
-                                <BreadcrumbPage>{bc.name}</BreadcrumbPage>
-                                ) : (
-                                    <BreadcrumbLink
-                                        href={`
-                                            /topics/${breadcrumbs
-                                                .slice(0, i+1)
-                                                .map(bc => bc.slug)
-                                                .join('/')}
-                                        `}
-                                    >{bc.name}</BreadcrumbLink>
-                                )
+                            <BreadcrumbItem>
+                                { (i === breadcrumbs.length - 1) ? (
+                                    <BreadcrumbPage>{bc.name}</BreadcrumbPage>
+                                    ) : (
+                                        <BreadcrumbLink
+                                            href={`/topics/${breadcrumbs
+                                                    .slice(0, i+1)
+                                                    .map(bc => bc.slug)
+                                                    .join('/')}`}
+                                        >{bc.name}</BreadcrumbLink>
+                                    )
 
-                            }
-                        </BreadcrumbItem>
+                                }
+                            </BreadcrumbItem>
+                        </Fragment>
                     ))
                 }
               </BreadcrumbList>
