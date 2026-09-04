@@ -3,7 +3,7 @@ import {TopicList} from "../components/topic"
 import {WordList} from "../components/word"
 
 // import { fetchConvos, fetchWords } from "@/lib/data"
-import { fetchConversations, fetchTopics, fetchWords } from "@/lib/data"
+import { fetchConversations, fetchTopicMastery, fetchTopics, fetchWords } from "@/lib/data"
 import { ConvosList } from "../components/convos"
 import { Conversation } from "@/lib/definitions"
 
@@ -23,6 +23,7 @@ const page = async ({
   const topics = await fetchTopics({ parent : topicId || null })
   const words = topicId ? await fetchWords(topicId) : []
   const conversations = topicId ? await fetchConversations(topicId) : []
+  const mastery = topicId ? await fetchTopicMastery(topicId) : null
 
   return (
     <Tabs defaultValue={tab} className="w-full h-222 pl-4">
@@ -40,7 +41,7 @@ const page = async ({
       {
         topicId && 
         <TabsContent value="words">
-          <WordList words={words} topicId={topicId}/>
+          <WordList words={words} topicId={topicId} mastery={mastery}/>
         </TabsContent>
       }
       <TabsContent value="conversations">

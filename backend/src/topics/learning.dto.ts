@@ -39,4 +39,9 @@ export class ScoreLearningAttemptDto {
     @ValidateNested({ each: true })
     @Type(() => WordAttemptRecordDto)
     records: WordAttemptRecordDto[]
+
+    /** When true, the resulting overallScore is stored as the user's topic mastery (topic-wide tests only). */
+    @IsOptional()
+    @IsBoolean()
+    persistMastery?: boolean
 }

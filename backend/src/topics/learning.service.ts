@@ -23,8 +23,20 @@ export class TopicLearningPlanService {
         return this.learningModel.findById(id)
     }
 
+    async findMastery(user: Types.ObjectId, topic: Types.ObjectId) {
+        return this.learningModel.findOne({ user, topic }).exec()
+    }
+
     async scoreAttempt(userId: Types.ObjectId, dto: ScoreLearningAttemptDto) {
-        return this.aiSuggestionsService.scoreMastery(dto.records)
+        const result = await this.aiSuggestionsService.scoreMastery(dto.records)
+        if (dto.persistMastery) {
+            await this.learningModel.findOneAndUpdate(
+                { user: userId, topic: dto.topic },
+                { $set: { topicLevel: result.overallScore } },
+                { upsert: true, new: true }
+            ).exec()
+        }
+        return result
     }
 
 }

@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation"
 
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Trash, Edit, Share, Book, FolderOpen, Move3d, MoveHorizontal } from "lucide-react"
+import { Trash, Edit, Share, Book, FolderOpen, ClipboardCheck, MoveHorizontal } from "lucide-react"
 
 import ContentView from './ContentView'
 
@@ -106,6 +106,11 @@ export const TopicList = ({ topics, topicId, words }: { topics: Topic[], topicId
                   <ContextMenuItem>
                       <Link href={`/topics/learn?topic=${topic._id}`} className="flex items-center gap-2">
                         <Book /> Learn Topic
+                      </Link>
+                  </ContextMenuItem>
+                  <ContextMenuItem>
+                      <Link href={`/topics/test?topic=${topic._id}`} className="flex items-center gap-2">
+                        <ClipboardCheck /> Take Test
                       </Link>
                   </ContextMenuItem>
                   <ContextMenuItem variant="destructive">

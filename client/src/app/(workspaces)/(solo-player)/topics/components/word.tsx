@@ -8,7 +8,7 @@ import {
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group"
-import { GraduationCap, Plus, Search } from 'lucide-react'
+import { ClipboardCheck, GraduationCap, Plus, Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 
@@ -38,7 +38,7 @@ export const WordCard = ({ word }: { word: Word}) => {
   )
 }
 
-export const WordList = ({ words, topicId }: { words: Word[], topicId: string}) => {
+export const WordList = ({ words, topicId, mastery }: { words: Word[], topicId: string, mastery: number | null }) => {
   return (
     <div className='w-full h-220'>
       <div className='w-full flex justify-between py-4'>
@@ -49,14 +49,25 @@ export const WordList = ({ words, topicId }: { words: Word[], topicId: string}) 
           </InputGroupAddon>
           <InputGroupAddon align="inline-end">12 results</InputGroupAddon>
         </InputGroup>
-        <div className="flex gap-2">
+        <div className="flex gap-2 items-center">
           {words.length > 0 &&
-            <Link href={`/topics/learn?topic=${topicId}`}>
-              <Button>
-                <GraduationCap />
-                Learn
-              </Button>
-            </Link>
+            <>
+              {mastery !== null &&
+                <span className="text-sm text-muted-foreground whitespace-nowrap">Mastery: {mastery}%</span>
+              }
+              <Link href={`/topics/test?topic=${topicId}`}>
+                <Button>
+                  <ClipboardCheck />
+                  Take Test
+                </Button>
+              </Link>
+              <Link href={`/topics/learn?topic=${topicId}`}>
+                <Button>
+                  <GraduationCap />
+                  Learn
+                </Button>
+              </Link>
+            </>
           }
           <Link href={`/topics/create-word?topic=${topicId}`}>
             <Button>

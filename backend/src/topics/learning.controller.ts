@@ -18,6 +18,11 @@ export class TopicLearningPlanController {
         return this.learningService.scoreAttempt(userId, dto)
     }
 
+    @Get('mastery/:topic')
+    async findMastery(@GetUser('userId') userId: Types.ObjectId, @Param('topic') topic: Types.ObjectId) {
+        return this.learningService.findMastery(userId, topic)
+    }
+
     @Get(':id')
     async findOne(@Param('id') id: Types.ObjectId) {
         return this.learningService.findOne(id)

@@ -90,6 +90,21 @@ export async function fetchTopicSuggestions(topic: Topic | null): Promise<{ topi
     }
 }
 
+/** Latest topic test mastery (0-100) for the current user, or null when no test has been taken yet. */
+export async function fetchTopicMastery(topicId: string): Promise<number | null> {
+    const headers = await getHeaders()
+    try {
+        const learning = await apiRequest(`/topics/learning/mastery/${topicId}`,
+            z.object({ topicLevel: z.number() }).nullable(),
+            { method: 'GET', headers }
+        )
+        return learning?.topicLevel ?? null
+    } catch (error) {
+        console.error(error)
+        return null
+    }
+}
+
 // =================== Words realted ============================
 
 

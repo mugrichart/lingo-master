@@ -13,7 +13,7 @@ import { getHeaders } from './data'
 import { LearningScoreResult, WordAttemptRecord } from './definitions'
 
 
-export async function scoreLearningAttempt(topicId: string, records: WordAttemptRecord[]): Promise<LearningScoreResult> {
+export async function scoreLearningAttempt(topicId: string, records: WordAttemptRecord[], persistMastery = false): Promise<LearningScoreResult> {
     const headers = await getHeaders()
     try {
         return await apiRequest(`/topics/learning/score`,
@@ -21,7 +21,7 @@ export async function scoreLearningAttempt(topicId: string, records: WordAttempt
             {
                 method: 'POST',
                 headers,
-                body: JSON.stringify({ topic: topicId, records })
+                body: JSON.stringify({ topic: topicId, records, persistMastery })
             }
         )
     } catch (error) {
