@@ -7,6 +7,10 @@ import { ChatCompletionSystemMessageParam, ChatCompletionUserMessageParam } from
 import { ExpandWordSuggestionDto, GenerateWordSuggestionsDto } from 'src/words/words.dto';
 import { WordDocument } from 'src/words/words.schema';
 import { ConversationDocument } from 'src/conversations/conversations.schema';
+import { WordAttemptRecordDto } from 'src/topics/learning.dto';
+
+export type WordMasteryResult = { word: string, definitionScore: number, sentenceScore: number, feedback: string }
+export type MasteryScoreResult = { results: WordMasteryResult[], overallScore: number, overallPassed: boolean, feedback: string }
 
 type OPENAI_MODELS = 'gpt-4o' | 'gpt-4o-mini' | 'gpt-3.5-turbo' | 'o4-mini'
 
@@ -52,6 +56,12 @@ export class AiSuggestionsService {
         const { userPrompt, systemPrompt} = this.promptsProvider.bookPageAugmentationPromptGenerator(title, topic, words, pageContent)
         const suggestionsString = await this.openaiHandle("o4-mini", systemPrompt, userPrompt)
         return suggestionsString
+    }
+
+    async scoreMastery(records: WordAttemptRecordDto[]): Promise<MasteryScoreResult> {
+        const { userPrompt, systemPrompt } = this.promptsProvider.masteryScoringPromptGenerator(records)
+        const scoringString = await this.openaiHandle("gpt-4o-mini", systemPrompt, userPrompt, true)
+        return JSON.parse(scoringString)
     }
 
     private async openaiHandle(model: OPENAI_MODELS, systemPrompt: string, userPrompt: string, request_structured_output: boolean = false) {

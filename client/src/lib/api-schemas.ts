@@ -68,3 +68,15 @@ export const AuthFormSchema = z.object({
     email: z.email(),
     password: z.string()
 })
+
+export const LearningScoreSchema = z.object({
+    results: z.array(z.object({
+        word: z.string(),
+        definitionScore: z.number(),
+        sentenceScore: z.number(),
+        feedback: z.string()
+    })),
+    overallScore: z.number(),
+    overallPassed: z.boolean(),
+    feedback: z.string()
+})

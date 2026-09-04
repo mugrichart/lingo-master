@@ -104,7 +104,9 @@ export const TopicList = ({ topics, topicId, words }: { topics: Topic[], topicId
                       <Plus /> New word
                   </ContextMenuItem>
                   <ContextMenuItem>
-                      <Book /> Learn Topic
+                      <Link href={`/topics/learn?topic=${topic._id}`} className="flex items-center gap-2">
+                        <Book /> Learn Topic
+                      </Link>
                   </ContextMenuItem>
                   <ContextMenuItem variant="destructive">
                       <Trash />Delete Topic

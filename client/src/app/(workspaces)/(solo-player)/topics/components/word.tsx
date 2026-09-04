@@ -8,7 +8,7 @@ import {
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group"
-import { Plus, Search } from 'lucide-react'
+import { GraduationCap, Plus, Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 
@@ -49,7 +49,15 @@ export const WordList = ({ words, topicId }: { words: Word[], topicId: string}) 
           </InputGroupAddon>
           <InputGroupAddon align="inline-end">12 results</InputGroupAddon>
         </InputGroup>
-        <div>
+        <div className="flex gap-2">
+          {words.length > 0 &&
+            <Link href={`/topics/learn?topic=${topicId}`}>
+              <Button>
+                <GraduationCap />
+                Learn
+              </Button>
+            </Link>
+          }
           <Link href={`/topics/create-word?topic=${topicId}`}>
             <Button>
               <Plus />

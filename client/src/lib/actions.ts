@@ -7,9 +7,28 @@ import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 import { fetchWords } from './data'
 import { handleBlanksGen } from './utils'
-import { AuthFormSchema, ConversationSchema, PracticeBookSchema, TopicSchema, WordSchema } from './api-schemas'
+import { AuthFormSchema, ConversationSchema, LearningScoreSchema, PracticeBookSchema, TopicSchema, WordSchema } from './api-schemas'
 import { apiRequest } from './api-client'
 import { getHeaders } from './data'
+import { LearningScoreResult, WordAttemptRecord } from './definitions'
+
+
+export async function scoreLearningAttempt(topicId: string, records: WordAttemptRecord[]): Promise<LearningScoreResult> {
+    const headers = await getHeaders()
+    try {
+        return await apiRequest(`/topics/learning/score`,
+            LearningScoreSchema,
+            {
+                method: 'POST',
+                headers,
+                body: JSON.stringify({ topic: topicId, records })
+            }
+        )
+    } catch (error) {
+        console.error(error)
+        throw new Error('Error scoring learning attempt')
+    }
+}
 
 
 export async function login(formData: FormData) {

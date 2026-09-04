@@ -70,3 +70,25 @@ export type ExpandedSuggestion = Omit<Conversation, '_id' | 'isAiGenerated' | 'l
                 text: string;
             }[];
         }
+
+export type WordAttemptRecord = {
+    word: string,
+    meaning: string,
+    userDefinition: string,
+    example: string,
+    userSentence: string,
+}
+
+export type WordMasteryResult = {
+    word: string,
+    definitionScore: number,
+    sentenceScore: number,
+    feedback: string,
+}
+
+export type LearningScoreResult = {
+    results: WordMasteryResult[],
+    overallScore: number,
+    overallPassed: boolean,
+    feedback: string,
+}

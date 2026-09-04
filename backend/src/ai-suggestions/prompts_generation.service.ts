@@ -74,8 +74,24 @@ export class PromptsProvider {
         return { userPrompt, systemPrompt }
     }
 
+    masteryScoringPromptGenerator(records: { word: string, meaning: string, userDefinition: string, example: string, userSentence: string }[]): PromptGenReturnType {
+        const systemPrompt = this.SYSTEM_PROMPTS['masteryScoring']
+        const userPrompt = `
+        Score the student's mastery for each of these ${records.length} word/expression records:
+        ${records.map((r, i) => `
+        Record ${i + 1}:
+            word: ${r.word}
+            expected meaning: ${r.meaning}
+            student's definition: ${r.userDefinition}
+            example sentence: ${r.example}
+            student's sentence: ${r.userSentence}
+        `).join('\n')}
+        `
+        return { userPrompt, systemPrompt }
+    }
+
     private load_system_prompts(): 
-        Record<'topicSuggestions' | 'wordSuggestions' | 'wordSuggestionExpansion' | 'conversationSuggestions' | 'conversationSuggestionExpansion' | 'bookPageAugmentation', string> 
+        Record<'topicSuggestions' | 'wordSuggestions' | 'wordSuggestionExpansion' | 'conversationSuggestions' | 'conversationSuggestionExpansion' | 'bookPageAugmentation' | 'masteryScoring', string> 
     {
         const filePath = path.join(process.cwd(), './src/ai-suggestions/system_prompts.json')
         const systemPromptsFile = fs.readFileSync(filePath, 'utf-8')
