@@ -3,7 +3,7 @@ import {TopicList} from "../components/topic"
 import {WordList} from "../components/word"
 
 // import { fetchConvos, fetchWords } from "@/lib/data"
-import { fetchConversations, fetchTopics, fetchWords } from "@/lib/data"
+import { fetchConversations, fetchTopics, fetchWords, fetchTopicMastery } from "@/lib/data"
 import { fetchTopicMasteryBadge } from "@/lib/mastery"
 import { ConvosList } from "../components/convos"
 import { Conversation } from "@/lib/definitions"
@@ -24,7 +24,9 @@ const page = async ({
   const topics = await fetchTopics({ parent : topicId || null })
   const words = topicId ? await fetchWords(topicId) : []
   const conversations = topicId ? await fetchConversations(topicId) : []
-  const mastery = topicId ? await fetchTopicMasteryBadge(topicId) : null
+  const { mastery, learned } = topicId
+    ? await fetchTopicMastery(topicId)
+    : { mastery: null, learned: false }
 
   // resolve each visible topic's aggregated mastery in parallel (backend-cached per node)
   const masteryById: Record<string, number | null> = Object.fromEntries(
@@ -49,7 +51,7 @@ const page = async ({
       {
         topicId && 
         <TabsContent value="words">
-          <WordList words={words} topicId={topicId} mastery={mastery}/>
+          <WordList words={words} topicId={topicId} mastery={mastery} learned={learned}/>
         </TabsContent>
       }
       <TabsContent value="conversations">

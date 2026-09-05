@@ -38,7 +38,7 @@ export const WordCard = ({ word }: { word: Word}) => {
   )
 }
 
-export const WordList = ({ words, topicId, mastery }: { words: Word[], topicId: string, mastery: number | null }) => {
+export const WordList = ({ words, topicId, mastery, learned }: { words: Word[], topicId: string, mastery: number | null, learned: boolean }) => {
   return (
     <div className='w-full h-220'>
       <div className='w-full flex justify-between py-4'>
@@ -55,16 +55,18 @@ export const WordList = ({ words, topicId, mastery }: { words: Word[], topicId: 
               {mastery !== null &&
                 <span className="text-sm text-muted-foreground whitespace-nowrap">Mastery: {mastery}%</span>
               }
-              <Link href={`/topics/test?topic=${topicId}`}>
-                <Button>
-                  <ClipboardCheck />
-                  Take Test
-                </Button>
-              </Link>
+              {learned &&
+                <Link href={`/topics/test?topic=${topicId}`}>
+                  <Button>
+                    <ClipboardCheck />
+                    {mastery !== null ? 'Retake Test' : 'Take Test'}
+                  </Button>
+                </Link>
+              }
               <Link href={`/topics/learn?topic=${topicId}`}>
-                <Button>
+                <Button variant={learned ? 'outline' : 'default'}>
                   <GraduationCap />
-                  Learn
+                  {learned ? 'Revise' : 'Learn'}
                 </Button>
               </Link>
             </>

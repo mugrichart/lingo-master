@@ -90,18 +90,52 @@ export async function fetchTopicSuggestions(topic: Topic | null): Promise<{ topi
     }
 }
 
-/** Latest topic test mastery (0-100) for the current user, or null when no test has been taken yet. */
-export async function fetchTopicMastery(topicId: string): Promise<number | null> {
+/** Latest topic test mastery (0-100) + whether the learn loop was completed, for the current user. */
+export async function fetchTopicMastery(topicId: string): Promise<{ mastery: number | null, learned: boolean }> {
     const headers = await getHeaders()
     try {
         const learning = await apiRequest(`/topics/learning/mastery/${topicId}`,
-            z.object({ topicLevel: z.number() }).nullable(),
+            z.object({ topicLevel: z.number().nullable(), learnedAt: z.string().nullable() }).nullable(),
             { method: 'GET', headers }
         )
-        return learning?.topicLevel ?? null
+        return { mastery: learning?.topicLevel ?? null, learned: Boolean(learning?.learnedAt) }
     } catch (error) {
         console.error(error)
-        return null
+        return { mastery: null, learned: false }
+    }
+}
+
+export type MyLearningTopic = {
+    _id: string,
+    topicLevel: number,
+    learnedAt: string,
+    topic: Topic
+}
+
+/** Topics the current user has completed the learn loop for (newest first). */
+export async function fetchMyLearning(): Promise<MyLearningTopic[]> {
+    const headers = await getHeaders()
+    try {
+        const list = await apiRequest(`/topics/learning/my-learning`,
+            z.array(z.object({
+                _id: z.string(),
+                topicLevel: z.number().nullable().default(0),
+                learnedAt: z.string().nullable(),
+                topic: TopicSchema.nullable()
+            })),
+            { method: 'GET', headers }
+        )
+        return list
+            .filter((l): l is typeof l & { topic: Topic } => Boolean(l.topic))
+            .map(l => ({
+                _id: l._id,
+                topicLevel: l.topicLevel ?? 0,
+                learnedAt: l.learnedAt ?? '',
+                topic: l.topic
+            }))
+    } catch (error) {
+        console.error(error)
+        return []
     }
 }
 

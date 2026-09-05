@@ -30,6 +30,23 @@ export class TopicLearningPlanService {
         return this.learningModel.findOne({ user, topic }).exec()
     }
 
+    /** Mark a topic's learn loop as completed for this user. */
+    async markLearned(userId: Types.ObjectId, topicId: Types.ObjectId) {
+        return this.learningModel.findOneAndUpdate(
+            { user: userId, topic: topicId },
+            { $set: { learnedAt: new Date() } },
+            { upsert: true, new: true }
+        ).exec()
+    }
+
+    /** All topics the user has completed the learn loop for. */
+    async findMyLearning(userId: Types.ObjectId) {
+        return this.learningModel
+            .find({ user: userId, learnedAt: { $ne: null } })
+            .populate('topic')
+            .exec()
+    }
+
     async scoreAttempt(userId: Types.ObjectId, dto: ScoreLearningAttemptDto) {
         const result = await this.aiSuggestionsService.scoreMastery(dto.records)
         if (dto.persistMastery) {
@@ -46,8 +63,10 @@ export class TopicLearningPlanService {
 
     /**
      * Recursive, cached mastery for a topic: average of the topic's own recorded
-     * mastery (only when it has words) and the aggregated mastery of each subtopic.
-     * null means "nothing testable/tested anywhere in this branch".
+     * mastery (when it has words) and the aggregated mastery of each subtopic.
+     * A branch that has words but has never been tested counts as 0, so a strong
+     * result in one subtopic can't be inflated by untested siblings.
+     * null means "nothing testable anywhere in this branch" (no words at all).
      */
     async getAggregatedMastery(userId: Types.ObjectId, topicId: Types.ObjectId): Promise<number | null> {
         const cacheKey = this.masteryCacheKey(userId, topicId)
@@ -63,7 +82,9 @@ export class TopicLearningPlanService {
         if (!topic) return null
 
         const ownLearning = await this.learningModel.findOne({ user: userId, topic: topicId }).exec()
-        const ownScore = (topic.words?.length ?? 0) > 0 ? (ownLearning?.topicLevel ?? null) : null
+        const hasWords = (topic.words?.length ?? 0) > 0
+        // untested-but-has-words contributes 0; no words at all contributes nothing
+        const ownScore = hasWords ? (ownLearning?.topicLevel ?? 0) : null
 
         const subtopics = await this.topicModel.find({ parent: topicId }).exec()
         const subScores = await Promise.all(

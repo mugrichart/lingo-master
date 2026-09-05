@@ -18,9 +18,20 @@ export class TopicLearningPlanController {
         return this.learningService.scoreAttempt(userId, dto)
     }
 
+    @Post('learned/:topic')
+    async markLearned(@GetUser('userId') userId: Types.ObjectId, @Param('topic') topic: Types.ObjectId) {
+        return this.learningService.markLearned(userId, topic)
+    }
+
+    @Get('my-learning')
+    async findMyLearning(@GetUser('userId') userId: Types.ObjectId) {
+        return this.learningService.findMyLearning(userId)
+    }
+
     @Get('mastery/:topic')
     async findMastery(@GetUser('userId') userId: Types.ObjectId, @Param('topic') topic: Types.ObjectId) {
-        return this.learningService.findMastery(userId, topic)
+        const learning = await this.learningService.findMastery(userId, topic)
+        return { topicLevel: learning?.topicLevel ?? null, learnedAt: learning?.learnedAt ?? null }
     }
 
     @Get(':id')

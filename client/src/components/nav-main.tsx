@@ -46,7 +46,7 @@ const items = [
         },
         {
           title: "My Learning",
-          url: "#",
+          url: "/my-learning",
         },
         {
           title: "Stories",

@@ -54,6 +54,10 @@ export class Learning {
     @Prop({ default: 0}) chunkLevel: number
     @Prop({ default: 0}) topicLevel: number
 
+    /** Set when the user completes the guided learn loop for this topic. */
+    @Prop({ type: Date, default: null })
+    learnedAt: Date | null
+
 }
 
 

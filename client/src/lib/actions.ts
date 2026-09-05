@@ -33,6 +33,20 @@ export async function scoreLearningAttempt(topicId: string, records: WordAttempt
     }
 }
 
+/** Flags a topic's guided learn loop as completed for the current user. */
+export async function markTopicLearned(topicId: string): Promise<void> {
+    const headers = await getHeaders()
+    try {
+        await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/topics/learning/learned/${topicId}`, {
+            method: 'POST',
+            headers
+        })
+    } catch (error) {
+        // non-fatal: completion UX should not break if the flag write fails
+        console.error('Error marking topic learned', error)
+    }
+}
+
 
 export async function login(formData: FormData) {
     const { email, password } = AuthFormSchema.omit({ username: true }).parse({

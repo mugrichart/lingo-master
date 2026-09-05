@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { ArrowRight, Eye, EyeOff, GraduationCap, Loader2, PartyPopper, RotateCcw } from 'lucide-react'
 import { LearningScoreResult, Topic, Word, WordAttemptRecord } from '@/lib/definitions'
-import { scoreLearningAttempt } from '@/lib/actions'
+import { scoreLearningAttempt, markTopicLearned } from '@/lib/actions'
 import { SpeechTextarea } from '@/components/speech-textarea'
 
 type TestSpec = {
@@ -73,6 +73,9 @@ export default function LearnClient({ topic, words }: { topic: Topic, words: Wor
     return tests
   }
 
+  // Mark the topic as learned once the user completes the whole loop.
+  const markLearned = useCallback(() => { void markTopicLearned(topic._id) }, [topic._id])
+
   const advanceAfterPassedTest = () => {
     const remaining = pendingTests.slice(1)
     setPendingTests(remaining)
@@ -86,6 +89,7 @@ export default function LearnClient({ topic, words }: { topic: Topic, words: Wor
         setWordIndex(wordIndex + 1)
         setStage({ kind: 'learn-definition' })
       } else {
+        markLearned()
         setStage({ kind: 'done' })
       }
     }
@@ -160,6 +164,7 @@ export default function LearnClient({ topic, words }: { topic: Topic, words: Wor
           setWordIndex(wordIndex + 1)
           setStage({ kind: 'learn-definition' })
         } else {
+          markLearned()
           setStage({ kind: 'done' })
         }
         break
@@ -169,7 +174,7 @@ export default function LearnClient({ topic, words }: { topic: Topic, words: Wor
         break
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stage, canProceed, input, wordIndex, words, currentTest, testIndex, testPhase, records, pendingTests])
+  }, [stage, canProceed, input, wordIndex, words, currentTest, testIndex, testPhase, records, pendingTests, markLearned])
 
   // Enter proceeds everywhere (Shift+Enter inserts a newline in textareas)
   useEffect(() => {
