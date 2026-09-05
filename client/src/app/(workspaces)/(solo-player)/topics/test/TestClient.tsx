@@ -240,7 +240,7 @@ export default function TestClient({ topic, words }: { topic: Topic, words: Word
           <CardFooter className="justify-between">
             <Button variant="outline" onClick={reset}><RotateCcw /> Retake test</Button>
             <Link href={`/topics/${topic._id}?tab=words`}>
-              <Button>Back to topic</Button>
+              <Button>Proceed <ArrowRight /></Button>
             </Link>
           </CardFooter>
         </Card>

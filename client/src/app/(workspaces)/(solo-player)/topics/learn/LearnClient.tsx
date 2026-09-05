@@ -81,7 +81,7 @@ export default function LearnClient({ topic, words }: { topic: Topic, words: Wor
   // Mark the topic as learned once the user completes the whole loop.
   const markLearned = useCallback(() => { void markTopicLearned(topic._id) }, [topic._id])
 
-  const advanceAfterPassedTest = () => {
+  const advanceAfterTest = () => {
     const remaining = pendingTests.slice(1)
     setPendingTests(remaining)
     resetTestState()
@@ -105,8 +105,7 @@ export default function LearnClient({ topic, words }: { topic: Topic, words: Wor
     try {
       const result = await scoreLearningAttempt(topic._id, finalRecords)
       setScoreResult(result)
-      if (result.overallPassed) advanceAfterPassedTest()
-      else setStage({ kind: 'test-result' })
+      setStage({ kind: 'test-result' })
     } catch {
       setError('We could not score your answers. Please try again.')
       setStage({ kind: 'test-result' })
@@ -344,7 +343,7 @@ export default function LearnClient({ topic, words }: { topic: Topic, words: Wor
             )}
           </CardContent>
           <CardFooter className="justify-between">
-            <span className="text-xs text-muted-foreground">You must score 100% to continue</span>
+            <span className="text-xs text-muted-foreground">Review your answers before continuing</span>
             <Button onClick={proceed} disabled={!canProceed}>Proceed <ArrowRight /></Button>
           </CardFooter>
         </Card>
@@ -360,18 +359,18 @@ export default function LearnClient({ topic, words }: { topic: Topic, words: Wor
         </Card>
       )}
 
-      {/* ---- Test failed ---- */}
+      {/* ---- Test results ---- */}
       {stage.kind === 'test-result' && (
         <Card>
           <CardHeader>
             <CardTitle>
-              {error ? 'Something went wrong' : `Not quite there — ${scoreResult?.overallScore ?? 0}% (100% required)`}
+              {error ? 'Something went wrong' : `Results — ${scoreResult?.overallScore ?? 0}%`}
             </CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col gap-3">
             {error && <p className="text-destructive">{error}</p>}
             {scoreResult?.feedback && <p>{scoreResult.feedback}</p>}
-            {scoreResult?.results?.filter(r => r.feedback || r.definitionScore < 100 || r.sentenceScore < 100).map(r => {
+            {scoreResult?.results?.map(r => {
               const wordObj = words.find(w => w.word.toLowerCase() === r.word.toLowerCase())
               const isExpanded = Boolean(expandedWords[r.word])
               return (
@@ -426,8 +425,11 @@ export default function LearnClient({ topic, words }: { topic: Topic, words: Wor
               )
             })}
           </CardContent>
-          <CardFooter className="justify-end">
-            <Button onClick={retryTest}><RotateCcw /> Retry this test</Button>
+          <CardFooter className="justify-between">
+            <Button variant="outline" onClick={retryTest}><RotateCcw /> Retry this test</Button>
+            {scoreResult && (
+              <Button onClick={advanceAfterTest}>Proceed <ArrowRight /></Button>
+            )}
           </CardFooter>
         </Card>
       )}
@@ -439,8 +441,8 @@ export default function LearnClient({ topic, words }: { topic: Topic, words: Wor
             <PartyPopper size={56} className="text-primary" />
             <h2 className="text-3xl font-bold">Congratulations! 🎉</h2>
             <p className="text-lg text-muted-foreground max-w-md">
-              You mastered all {words.length} word{words.length > 1 ? 's' : ''} in
-              <span className="font-semibold text-foreground"> {topic.name}</span> — every definition and every sentence scored 100%.
+              You completed the learning loop for all {words.length} word{words.length > 1 ? 's' : ''} in
+              <span className="font-semibold text-foreground"> {topic.name}</span>.
             </p>
             <div className="flex gap-3 mt-2">
               <Link href={`/topics/${topic._id}?tab=words`}>
