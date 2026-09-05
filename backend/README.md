@@ -1,3 +1,11 @@
+# lingo-master backend
+
+NestJS + MongoDB (Mongoose) + OpenAI + AWS S3 API. Run with `pnpm start:dev`.
+
+> **Contributing / AI agents:** see the root [AGENTS.md](../AGENTS.md) — especially the Mongoose ref/`@Prop` typing rules, the global `ValidationPipe`, and the `AiSuggestionsService` prompt conventions. Config comes from `.env` (see `src/config/configuration.ts`).
+
+---
+
 <p align="center">
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
 </p>
