@@ -11,8 +11,9 @@ export const ChatHeader = ({ chat }: { chat: Chat }) => {
   const isPlot = chat.kind === 'plot'
   const title = isPlot ? chat.title : chat.actor.name
   const avatar = isPlot ? chat.avatar : chat.actor.avatar
+  const activeStory = isPlot ? chat.stories?.find(s => s._id === chat.activeStoryId) : null
   const sub = isPlot
-    ? `${chat.topic} · ${chat.members.map(m => m.name.split(' ')[0]).join(', ')}`
+    ? activeStory ? `Active story: ${activeStory.title}` : `${chat.stories?.length ?? 0} stories · Type /start-story`
     : chat.actor.online ? 'Online' : chat.actor.description
 
   return (

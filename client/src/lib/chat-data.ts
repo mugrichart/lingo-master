@@ -52,44 +52,7 @@ const mins = (m: number) => new Date(now - m * 60_000).toISOString()
 const msg = (id: string, chatId: string, senderId: string, text: string, minutesAgo: number, status?: ChatMessage['status']): ChatMessage =>
   ({ id, chatId, senderId, text, timestamp: mins(minutesAgo), status })
 
-export const mockChats: Chat[] = [
-  {
-    kind: 'plot',
-    id: 'plot-quantum',
-    title: 'Quantum Physics',
-    topic: 'Quantum Physics',
-    description: 'A group where stories about quantum research, experiments and scientific breakthroughs play out. Multiple plots run here, all orbiting quantum physics — so you keep practising the same technical vocabulary in fresh scenarios.',
-    plots: ['The Schroedinger Heist', 'The Entangled Alibi', 'Decoherence at Dawn'],
-    avatar: img('quantum-plot'),
-    members: [actors.dr_lin, actors.marcus, actors.kenji],
-    unreadCount: 2,
-    messages: [
-      msg('q1', 'plot-quantum', 'dr_lin', 'The coherence window is closing. If we do not isolate the qubit array, the superposition will decohere.', 34),
-      msg('q2', 'plot-quantum', 'marcus', 'Explain it to me like I am on the review board. What exactly did they steal?', 32),
-      msg('q3', 'plot-quantum', 'dr_lin', 'A photonic entangler. Without it, our whole encryption scheme is theoretical.', 30),
-      msg('q4', 'plot-quantum', 'kenji', 'So we pivot. We track the thermal signature instead of the device itself.', 27),
-      msg('q5', 'plot-quantum', 'dr_lin', 'Precisely. And we need to articulate the risk in plain terms for the investors.', 25),
-    ]
-  },
-  {
-    kind: 'plot',
-    id: 'plot-food',
-    title: 'Food & Hospitality',
-    topic: 'Food & Hospitality',
-    description: 'Stories set in kitchens, restaurants and dining rooms. Several plots run in this group — openings, disasters, critics and celebrations — all rich with food and hospitality expressions.',
-    plots: ['Opening Night at the Trattoria', 'The Health Inspector', 'A Michelin Surprise'],
-    avatar: img('food-plot'),
-    members: [actors.sofia, actors.amara, actors.kenji],
-    unreadCount: 0,
-    messages: [
-      msg('f1', 'plot-food', 'sofia', 'The supplier delivered basil instead of oregano. We improvise, yes?', 130),
-      msg('f2', 'plot-food', 'amara', 'This is exactly like the night market in Bangkok. You adapt or you close.', 125),
-      msg('f3', 'plot-food', 'me', 'What is the fallback for the sauce then?', 120, 'read'),
-      msg('f4', 'plot-food', 'sofia', 'We pivot to a basil pesto. Kenji, you handle the front-of-house announcements.', 118),
-      msg('f5', 'plot-food', 'kenji', 'On it. I will comp the first round of drinks and manage expectations.', 115),
-    ]
-  }
-]
+export const mockChats: Chat[] = []
 
 
 export const currentUserAvatar = img('current-user')

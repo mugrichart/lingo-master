@@ -2,13 +2,9 @@
 import { useMemo, useState, KeyboardEvent, useRef } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Mic, Paperclip, Send, Smile, BookPlus, Loader2 } from 'lucide-react'
+import { Mic, Paperclip, Send, Smile, BookPlus, Sparkles, Loader2 } from 'lucide-react'
 import { MyLearningTopic } from '@/lib/definitions';
 import { useClickOutside } from '@/hooks/useClickOutside';
-
-const COMMANDS = [
-  { name: '/add-expertise', description: 'Teach this contact one of your learned topics' }
-]
 
 export const ChatInput = ({
   onSend,
@@ -16,28 +12,46 @@ export const ChatInput = ({
   sending,
   learnedTopics,
   showCommands,
+  isGroupChat,
 }: {
   onSend: (text: string) => void,
-  onCommand?: (command: string, topicId: string) => void,
+  onCommand?: (command: string, param?: string) => void,
   sending?: boolean,
   learnedTopics?: MyLearningTopic[],
   showCommands?: boolean,
+  isGroupChat?: boolean,
 }) => {
   const pickerRef = useRef<HTMLDivElement>(null);
   useClickOutside(pickerRef, () => setTopicPickerFor(null));
   const [value, setValue] = useState('')
   const [topicPickerFor, setTopicPickerFor] = useState<string | null>(null)
 
+  const availableCommands = useMemo(() => {
+    const list = []
+    if (isGroupChat) {
+      list.push({ name: '/start-story', description: 'Scaffold a new interactive story scenario in this topic', icon: Sparkles })
+    } else {
+      list.push({ name: '/add-expertise', description: 'Teach this contact one of your learned topics', icon: BookPlus })
+    }
+    return list
+  }, [isGroupChat])
+
   const isCommand = value.startsWith('/')
   const matched = useMemo(
-    () => COMMANDS.filter(c => c.name.startsWith(value.split(' ')[0])),
-    [value]
+    () => availableCommands.filter(c => c.name.startsWith(value.split(' ')[0])),
+    [value, availableCommands]
   )
-  const showCommandList = Boolean(showCommands && isCommand && matched.length && !topicPickerFor)
+  const showCommandList = Boolean(isCommand && matched.length && !topicPickerFor)
 
   const send = () => {
     const text = value.trim()
-    if (!text || text.startsWith('/')) return
+    if (!text) return
+    if (text === '/start-story' && isGroupChat) {
+      onCommand?.('/start-story')
+      setValue('')
+      return
+    }
+    if (text.startsWith('/')) return
     onSend(text)
     setValue('')
   }
@@ -48,7 +62,13 @@ export const ChatInput = ({
   }
 
   const pickCommand = (cmd: string) => {
-    if (cmd === '/add-expertise') { setTopicPickerFor(cmd); setValue('') }
+    if (cmd === '/add-expertise') {
+      setTopicPickerFor(cmd)
+      setValue('')
+    } else if (cmd === '/start-story') {
+      onCommand?.('/start-story')
+      setValue('')
+    }
   }
 
   const pickTopic = (topicId: string) => {
@@ -60,16 +80,19 @@ export const ChatInput = ({
     <div className="relative border-t bg-card/60">
       {showCommandList && (
         <div className="absolute bottom-full left-0 mb-1 w-full max-w-md rounded-lg border bg-popover p-1 shadow-lg">
-          {matched.map(c => (
-            <button key={c.name} onClick={() => pickCommand(c.name)}
-              className="flex w-full items-start gap-2 rounded-md px-3 py-2 text-left hover:bg-accent">
-              <BookPlus className="mt-0.5 size-4 text-muted-foreground" />
-              <span>
-                <span className="block font-mono text-sm font-medium">{c.name}</span>
-                <span className="block text-xs text-muted-foreground">{c.description}</span>
-              </span>
-            </button>
-          ))}
+          {matched.map(c => {
+            const Icon = c.icon
+            return (
+              <button key={c.name} onClick={() => pickCommand(c.name)}
+                className="flex w-full items-start gap-2 rounded-md px-3 py-2 text-left hover:bg-accent">
+                <Icon className="mt-0.5 size-4 text-emerald-500" />
+                <span>
+                  <span className="block font-mono text-sm font-medium">{c.name}</span>
+                  <span className="block text-xs text-muted-foreground">{c.description}</span>
+                </span>
+              </button>
+            )
+          })}
         </div>
       )}
 

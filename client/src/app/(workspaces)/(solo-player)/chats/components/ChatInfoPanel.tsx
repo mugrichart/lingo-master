@@ -10,7 +10,17 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 const initials = (name: string) =>
   name.split(' ').map(p => p[0]).join('').slice(0, 2).toUpperCase()
 
-export const ChatInfoPanel = ({ chat, onClose, onDelete }: { chat: Chat, onClose: () => void, onDelete?: () => void }) => {
+export const ChatInfoPanel = ({
+  chat,
+  onClose,
+  onDelete,
+  onSelectStory
+}: {
+  chat: Chat,
+  onClose: () => void,
+  onDelete?: () => void,
+  onSelectStory?: (storyId: string) => void
+}) => {
   const isPlot = chat.kind === 'plot'
   const title = isPlot ? chat.title : chat.actor.name
   const avatar = isPlot ? chat.avatar : chat.actor.avatar
@@ -48,36 +58,52 @@ export const ChatInfoPanel = ({ chat, onClose, onDelete }: { chat: Chat, onClose
           <>
             <Separator />
             <div className="px-4 py-4">
-              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                Stories in this group
-              </p>
-              <div className="flex flex-col gap-2">
-                {chat.plots.map(plot => (
-                  <div key={plot} className="flex items-center gap-2 text-sm">
-                    <span className="size-1.5 rounded-full bg-emerald-500" />
-                    {plot}
-                  </div>
-                ))}
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  Stories in this group ({chat.stories?.length ?? 0})
+                </p>
               </div>
-            </div>
-            <Separator />
-            <div className="px-4 py-4">
-              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                {chat.members.length} members
-              </p>
-              <div className="flex flex-col gap-3">
-                {chat.members.map(m => (
-                  <div key={m.id} className="flex items-center gap-3">
-                    <Avatar className="size-10">
-                      <AvatarImage src={m.avatar} alt={m.name} />
-                      <AvatarFallback>{initials(m.name)}</AvatarFallback>
-                    </Avatar>
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-medium">{m.name}</p>
-                      <p className="truncate text-xs text-muted-foreground">{m.description}</p>
-                    </div>
-                  </div>
-                ))}
+              <div className="flex flex-col gap-2">
+                {(chat.stories ?? []).length === 0 ? (
+                  <p className="text-xs text-muted-foreground italic">
+                    No stories yet. Type <span className="font-mono font-semibold text-foreground">/start-story</span> in the chat box to begin!
+                  </p>
+                ) : (
+                  chat.stories.map(story => {
+                    const isActive = story._id === chat.activeStoryId
+                    const hitsCount = story.targetWords.filter(w => w.hit).length
+                    const totalWords = story.targetWords.length
+                    return (
+                      <button
+                        key={story._id}
+                        onClick={() => onSelectStory?.(story._id)}
+                        className={`flex flex-col gap-1 text-left rounded-lg p-2.5 transition-colors border ${
+                          isActive
+                            ? 'bg-accent border-emerald-500/50 shadow-sm'
+                            : 'bg-card/50 hover:bg-accent/50 border-border'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between gap-1">
+                          <span className="font-medium text-sm line-clamp-1">{story.title}</span>
+                          <span
+                            className={`size-2 shrink-0 rounded-full ${
+                              story.status === 'completed'
+                                ? 'bg-emerald-500'
+                                : isActive
+                                ? 'bg-sky-500 animate-pulse'
+                                : 'bg-muted-foreground'
+                            }`}
+                          />
+                        </div>
+                        <p className="text-xs text-muted-foreground line-clamp-1">{story.setting}</p>
+                        <div className="flex items-center justify-between text-[11px] text-muted-foreground mt-1">
+                          <span>{totalWords > 0 ? `${hitsCount}/${totalWords} words hit` : ''}</span>
+                          <span className="capitalize">{story.status === 'completed' ? 'Completed' : 'In progress'}</span>
+                        </div>
+                      </button>
+                    )
+                  })
+                )}
               </div>
             </div>
           </>

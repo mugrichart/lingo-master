@@ -119,3 +119,52 @@ export type MyLearningTopic = {
     learnedAt: string,
     topic: Topic
 }
+
+export type StoryActor = {
+    id: string
+    name: string
+    role: string
+    description?: string
+    avatar?: string
+    isUser?: boolean
+}
+
+export type StoryTargetWord = {
+    word: string
+    meaning?: string
+    example?: string
+    semanticField: string[]
+    biasStage: number
+    hit: boolean
+}
+
+export type Story = {
+    _id: string
+    creator: string
+    topic: string
+    title: string
+    setting: string
+    plotSetup: string
+    cast: StoryActor[]
+    targetWords: StoryTargetWord[]
+    currentWordIndex: number
+    status: 'in_progress' | 'completed'
+    createdAt?: string
+}
+
+export type StoryMessage = {
+    _id: string
+    story: string
+    senderId: string
+    senderName: string
+    text: string
+    kind: 'user' | 'actor' | 'narration' | 'system'
+    createdAt?: string
+}
+
+export type SendStoryMessageResponse = {
+    hit: boolean
+    feedback?: string
+    messages: StoryMessage[]
+    story: Story
+}

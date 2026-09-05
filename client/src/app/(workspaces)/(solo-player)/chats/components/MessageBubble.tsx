@@ -31,10 +31,44 @@ const nameColor = (seed: string) => {
 }
 
 export const MessageBubble = ({ message, chat }: { message: ChatMessage, chat: Chat }) => {
+  const isNarration = message.kind === 'narration' || message.senderId === 'narrator'
+  const isSystem = message.kind === 'system'
+
+  if (isNarration) {
+    return (
+      <div className="my-2 flex w-full justify-center px-4">
+        <div className="max-w-xl rounded-xl border border-border/70 bg-card/70 px-4 py-3 text-center shadow-sm backdrop-blur-sm">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/80 mb-1">
+            ✦ Narration
+          </p>
+          <p className="text-sm italic leading-relaxed text-foreground/90 font-serif">
+            {message.text}
+          </p>
+          <span className="mt-1 block text-[10px] text-muted-foreground/60">{time(message.timestamp)}</span>
+        </div>
+      </div>
+    )
+  }
+
+  if (isSystem) {
+    return (
+      <div className="my-1.5 flex w-full justify-center px-4">
+        <div className="rounded-full bg-muted/80 px-3 py-1 text-xs text-muted-foreground shadow-sm">
+          {message.text}
+        </div>
+      </div>
+    )
+  }
+
   const own = message.senderId === 'me'
+  const activeStory = chat.kind === 'plot' ? chat.stories?.find(s => s._id === chat.activeStoryId) : null
+  const storyActor = activeStory?.cast.find(c => c.id === message.senderId)
+
   const sender =
     chat.kind === 'plot'
-      ? chat.members.find(m => m.id === message.senderId)
+      ? storyActor
+        ? { id: storyActor.id, name: storyActor.name, avatar: storyActor.avatar || `https://picsum.photos/seed/${storyActor.name}/200/200` }
+        : { id: message.senderId, name: message.senderName || 'Companion', avatar: `https://picsum.photos/seed/${message.senderName || 'actor'}/200/200` }
       : chat.kind === 'direct'
         ? chat.actor
         : undefined

@@ -100,3 +100,52 @@ export const CharacterMessageSchema = z.object({
     text: z.string(),
     createdAt: z.string().optional()
 })
+
+export const StoryActorSchema = z.object({
+    id: z.string(),
+    name: z.string(),
+    role: z.string(),
+    description: z.string().optional().default(''),
+    avatar: z.string().optional().default(''),
+    isUser: z.boolean().optional().default(false),
+})
+
+export const StoryTargetWordSchema = z.object({
+    word: z.string(),
+    meaning: z.string().optional().default(''),
+    example: z.string().optional().default(''),
+    semanticField: z.array(z.string()).default([]),
+    biasStage: z.number().default(0),
+    hit: z.boolean().default(false),
+})
+
+export const StorySchema = z.object({
+    _id: z.string(),
+    creator: z.string(),
+    topic: z.string(),
+    title: z.string(),
+    setting: z.string(),
+    plotSetup: z.string(),
+    cast: z.array(StoryActorSchema).default([]),
+    targetWords: z.array(StoryTargetWordSchema).default([]),
+    currentWordIndex: z.number().default(0),
+    status: z.enum(['in_progress', 'completed']),
+    createdAt: z.string().optional(),
+})
+
+export const StoryMessageSchema = z.object({
+    _id: z.string(),
+    story: z.string(),
+    senderId: z.string(),
+    senderName: z.string(),
+    text: z.string(),
+    kind: z.enum(['user', 'actor', 'narration', 'system']),
+    createdAt: z.string().optional(),
+})
+
+export const SendStoryMessageResponseSchema = z.object({
+    hit: z.boolean(),
+    feedback: z.string().optional().default(''),
+    messages: z.array(StoryMessageSchema),
+    story: StorySchema,
+})

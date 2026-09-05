@@ -114,6 +114,41 @@ export class AiSuggestionsService {
         }
     }
 
+    async generateStoryScaffold(topic: string, words: { word: string, meaning?: string, example?: string }[]): Promise<{
+        title: string,
+        setting: string,
+        plotSetup: string,
+        userRole: { name: string, role: string, description: string },
+        cast: { id: string, name: string, role: string, description: string }[],
+        targetWords: { word: string, meaning: string, example: string, semanticField: string[] }[],
+        openingNarration: string,
+        openingActorId: string,
+        openingActorLine: string
+    }> {
+        const { userPrompt, systemPrompt } = this.promptsProvider.storyScaffoldPromptGenerator(topic, words)
+        const scaffoldString = await this.openaiHandle("gpt-4o-mini", systemPrompt, userPrompt, true)
+        return JSON.parse(scaffoldString)
+    }
+
+    async evaluateStoryTurn(input: {
+        story: { title: string, setting: string, plotSetup: string, cast: any[] },
+        currentWord: { word: string, meaning?: string, example?: string },
+        biasWord: string,
+        history: { role: string, senderName: string, text: string }[],
+        userText: string
+    }): Promise<{
+        hit: boolean,
+        feedback: string,
+        dmNarration: string | null,
+        actorId: string,
+        actorName: string,
+        actorLine: string
+    }> {
+        const { userPrompt, systemPrompt } = this.promptsProvider.storyTurnPromptGenerator(input)
+        const turnString = await this.openaiHandle("gpt-4o-mini", systemPrompt, userPrompt, true)
+        return JSON.parse(turnString)
+    }
+
     private async openaiHandle(model: OPENAI_MODELS, systemPrompt: string, userPrompt: string, request_structured_output: boolean = false) {
         const messages: [ChatCompletionSystemMessageParam, ChatCompletionUserMessageParam] = [
             { role: "system", content: systemPrompt},

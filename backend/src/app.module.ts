@@ -12,6 +12,7 @@ import { ConversationsModule } from './conversations/conversations.module';
 import { BooksModule } from './books/books.module';
 import { FileStorageModule } from './file-storage/file-storage.module';
 import { CharactersModule } from './characters/characters.module';
+import { StoriesModule } from './stories/stories.module';
 import configuration from './config/configuration';
 
 @Module({
@@ -35,7 +36,8 @@ import configuration from './config/configuration';
     ConversationsModule,
     BooksModule,
     FileStorageModule,
-    CharactersModule
+    CharactersModule,
+    StoriesModule
   ],
   controllers: [AppController],
   providers: [AppService],

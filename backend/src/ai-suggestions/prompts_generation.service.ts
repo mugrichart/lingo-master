@@ -117,8 +117,48 @@ export class PromptsProvider {
         return { userPrompt, systemPrompt }
     }
 
+    storyScaffoldPromptGenerator(topic: string, words: { word: string, meaning?: string, example?: string }[]): PromptGenReturnType {
+        const systemPrompt = this.SYSTEM_PROMPTS['storyScaffold']
+        const userPrompt = `
+        Topic: ${topic}
+        Words & Expressions to practice in this story:
+        ${JSON.stringify(words, null, 2)}
+
+        Create an engaging interactive story scenario where the user is the Main Character (MC) and supporting characters help bias the MC towards using these target words one by one.
+        `
+        return { userPrompt, systemPrompt }
+    }
+
+    storyTurnPromptGenerator(input: {
+        story: { title: string, setting: string, plotSetup: string, cast: any[] },
+        currentWord: { word: string, meaning?: string, example?: string },
+        biasWord: string,
+        history: { role: string, senderName: string, text: string }[],
+        userText: string
+    }): PromptGenReturnType {
+        const systemPrompt = this.SYSTEM_PROMPTS['storyTurn']
+        const userPrompt = `
+        Story Context:
+        Title: ${input.story.title}
+        Setting: ${input.story.setting}
+        Plot Setup: ${input.story.plotSetup}
+        Cast: ${JSON.stringify(input.story.cast, null, 2)}
+
+        CURRENT TARGET WORD: "${input.currentWord.word}" (Meaning: ${input.currentWord.meaning || ''})
+        CURRENT BIAS WORD for supporting characters to nudge the user with: "${input.biasWord || input.currentWord.word}"
+
+        Recent Conversation History:
+        ${input.history.slice(-8).map(h => `${h.senderName} (${h.role}): ${h.text}`).join('\n')}
+
+        Latest User (MC) Message: "${input.userText}"
+
+        Evaluate if the user naturally used or attempted the target word "${input.currentWord.word}". Produce the next turn response.
+        `
+        return { userPrompt, systemPrompt }
+    }
+
     private load_system_prompts(): 
-        Record<'topicSuggestions' | 'wordSuggestions' | 'wordSuggestionExpansion' | 'conversationSuggestions' | 'conversationSuggestionExpansion' | 'bookPageAugmentation' | 'masteryScoring' | 'characterFill' | 'characterChat', string> 
+        Record<'topicSuggestions' | 'wordSuggestions' | 'wordSuggestionExpansion' | 'conversationSuggestions' | 'conversationSuggestionExpansion' | 'bookPageAugmentation' | 'masteryScoring' | 'characterFill' | 'characterChat' | 'storyScaffold' | 'storyTurn', string> 
     {
         const filePath = path.join(process.cwd(), './src/ai-suggestions/system_prompts.json')
         const systemPromptsFile = fs.readFileSync(filePath, 'utf-8')

@@ -34,7 +34,7 @@ export const ConversationPane = ({
   sending?: boolean
   learnedTopics?: MyLearningTopic[]
   isRealCharacter?: boolean
-  onCommand?: (command: string, topicId: string) => void
+  onCommand?: (command: string, param?: string) => void
 }) => {
   const bottomRef = useRef<HTMLDivElement>(null)
 
@@ -45,13 +45,49 @@ export const ConversationPane = ({
   // group consecutive-day boundaries for WhatsApp-style date separators
   let lastDay = ''
 
+  const isPlot = chat.kind === 'plot'
+  const activeStory = isPlot ? chat.stories?.find(s => s._id === chat.activeStoryId) : null
+  const currentWord = activeStory?.targetWords[activeStory.currentWordIndex]
+
   return (
     <div className="flex h-full min-w-0 flex-1 flex-col bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-accent/30 via-background to-background">
       <div onClick={onToggleInfo} className="cursor-pointer">
         <ChatHeader chat={chat} />
       </div>
-              <ScrollArea className="flex-1 overflow-y-auto">
+
+      {isPlot && activeStory && (
+        <div className="flex items-center justify-between border-b bg-card/40 px-4 py-2 text-xs">
+          <div className="flex items-center gap-2">
+            <span className="font-semibold text-emerald-500">📖 {activeStory.title}</span>
+            <span className="text-muted-foreground hidden sm:inline">·</span>
+            <span className="text-muted-foreground hidden sm:inline">{activeStory.setting}</span>
+          </div>
+          {currentWord && !currentWord.hit ? (
+            <div className="flex items-center gap-1.5 font-medium">
+              <span className="text-muted-foreground">Target word:</span>
+              <span className="rounded bg-emerald-500/10 px-1.5 py-0.5 font-mono text-emerald-500">
+                {currentWord.word}
+              </span>
+            </div>
+          ) : activeStory.status === 'completed' ? (
+            <span className="font-semibold text-emerald-500">🎉 Story Completed!</span>
+          ) : null}
+        </div>
+      )}
+
+      <ScrollArea className="flex-1 overflow-y-auto">
         <div className="mx-auto flex max-w-3xl flex-col gap-2 px-4 py-4">
+          {isPlot && (!activeStory || messages.length === 0) && (
+            <div className="my-12 flex flex-col items-center justify-center gap-3 text-center px-4">
+              <div className="grid size-16 place-items-center rounded-full bg-emerald-500/10 text-2xl text-emerald-500">
+                ✨
+              </div>
+              <h3 className="text-lg font-semibold">{chat.title} Stories</h3>
+              <p className="max-w-md text-sm text-muted-foreground">
+                No active story currently selected. Type <code className="font-mono font-bold text-foreground">/start-story</code> below to scaffold an interactive roleplay scenario with AI companions, a Dungeon Master, and vocabulary targets.
+              </p>
+            </div>
+          )}
           {messages.map(m => {
             const day = new Date(m.timestamp).toDateString()
             const showDay = day !== lastDay
@@ -77,7 +113,8 @@ export const ConversationPane = ({
         onCommand={onCommand}
         sending={sending}
         learnedTopics={learnedTopics}
-        showCommands={isRealCharacter}
+        showCommands={true}
+        isGroupChat={isPlot}
       />
     </div>
   )

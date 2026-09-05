@@ -12,7 +12,11 @@ const initials = (name: string) =>
 const display = (chat: Chat) =>
   chat.kind === 'direct'
     ? { title: chat.actor.name, subtitle: chat.actor.description, avatar: chat.actor.avatar }
-    : { title: chat.title, subtitle: `${chat.topic} · ${chat.members.length} members`, avatar: chat.avatar }
+    : {
+        title: chat.title,
+        subtitle: `${chat.stories?.length ?? 0} stories · ${chat.topic}`,
+        avatar: chat.avatar
+      }
 
 const lastMessage = (chat: Chat) => chat.messages[chat.messages.length - 1]
 
