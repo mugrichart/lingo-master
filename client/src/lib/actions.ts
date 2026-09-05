@@ -80,6 +80,15 @@ export async function addCharacterExpertise(characterId: string, topicId: string
     })
 }
 
+/** Deletes a character and all its messages. */
+export async function deleteCharacter(characterId: string): Promise<void> {
+    const headers = await getHeaders()
+    await apiRequest(`/characters/${characterId}`, z.object({ deleted: z.boolean() }), {
+        method: 'DELETE',
+        headers,
+    })
+}
+
 
 export async function login(formData: FormData) {
     const { email, password } = AuthFormSchema.omit({ username: true }).parse({

@@ -50,7 +50,7 @@ export const ConversationPane = ({
       <div onClick={onToggleInfo} className="cursor-pointer">
         <ChatHeader chat={chat} />
       </div>
-      <ScrollArea className="flex-1">
+              <ScrollArea className="flex-1 overflow-y-auto">
         <div className="mx-auto flex max-w-3xl flex-col gap-2 px-4 py-4">
           {messages.map(m => {
             const day = new Date(m.timestamp).toDateString()

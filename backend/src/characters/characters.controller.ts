@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post } from "@nestjs/common";
 import { Types } from "mongoose";
 import { CharactersService } from "./characters.service";
 import { AddExpertiseDto, ChatMessageDto, CreateCharacterDto } from "./characters.dto";
@@ -37,6 +37,11 @@ export class CharactersController {
         const reply = await this.charactersService.replyTo(character, history, dto.text)
         const saved = await this.charactersService.saveCharacterMessage(id, reply)
         return { reply, message: saved }
+    }
+
+    @Delete(':id')
+    remove(@GetUser('userId') userId: Types.ObjectId, @Param('id') id: Types.ObjectId) {
+        return this.charactersService.deleteOne(userId, id)
     }
 
     @Post(':id/expertise')

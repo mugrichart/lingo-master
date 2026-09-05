@@ -12,7 +12,11 @@ export async function apiRequest<T>(
   schema: z.ZodSchema<T>,
   options?: RequestInit
 ): Promise<T> {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}${url}`, options);
+  // /api/* paths are Next.js proxy routes — call them same-origin (relative).
+  // Everything else goes directly to the backend.
+  const backendBase = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:5000';
+  const fullUrl = url.startsWith('/api/') ? url : `${backendBase}${url}`;
+  const response = await fetch(fullUrl, { credentials: 'include', ...options });
 
   const contentType = response.headers.get('content-type');
   const isJson = contentType?.includes('application/json');

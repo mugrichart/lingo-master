@@ -72,17 +72,6 @@ export const mockChats: Chat[] = [
     ]
   },
   {
-    kind: 'direct',
-    id: 'dm-marcus',
-    actor: actors.marcus,
-    unreadCount: 1,
-    messages: [
-      msg('m1', 'dm-marcus', 'marcus', 'Your last essay hedged every claim. Pick a position and defend it.', 55),
-      msg('m2', 'dm-marcus', 'me', 'Fair. I will rewrite the thesis statement to be more assertive.', 50, 'read'),
-      msg('m3', 'dm-marcus', 'marcus', 'Good. Use "contend" or "assert" — not "I think maybe". Send it over when done.', 48),
-    ]
-  },
-  {
     kind: 'plot',
     id: 'plot-food',
     title: 'Food & Hospitality',
@@ -99,28 +88,9 @@ export const mockChats: Chat[] = [
       msg('f4', 'plot-food', 'sofia', 'We pivot to a basil pesto. Kenji, you handle the front-of-house announcements.', 118),
       msg('f5', 'plot-food', 'kenji', 'On it. I will comp the first round of drinks and manage expectations.', 115),
     ]
-  },
-  {
-    kind: 'direct',
-    id: 'dm-amara',
-    actor: actors.amara,
-    unreadCount: 0,
-    messages: [
-      msg('a1', 'dm-amara', 'amara', 'You would love the street food in Hanoi. The pho there hits different.', 400),
-      msg('a2', 'dm-amara', 'me', 'I keep hearing that. What does "hits different" really mean though?', 390, 'read'),
-      msg('a3', 'dm-amara', 'amara', 'Haha, it means it is just on another level — unforgettably good.', 388),
-    ]
-  },
-  {
-    kind: 'direct',
-    id: 'dm-dr_lin',
-    actor: actors.dr_lin,
-    unreadCount: 0,
-    messages: [
-      msg('d1', 'dm-dr_lin', 'dr_lin', 'Remember: correlation is not causation. Be precise in your lab report.', 1500),
-    ]
   }
 ]
+
 
 export const currentUserAvatar = img('current-user')
 

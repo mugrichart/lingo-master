@@ -76,6 +76,13 @@ export class CharactersService {
         return character
     }
 
+    async deleteOne(userId: Types.ObjectId, id: Types.ObjectId) {
+        const character = await this.characterModel.findOneAndDelete({ _id: id, creator: userId }).exec()
+        if (!character) throw new NotFoundException('Character not found')
+        await this.chatMessageModel.deleteMany({ character: id }).exec()
+        return { deleted: true }
+    }
+
     async findMessages(userId: Types.ObjectId, characterId: Types.ObjectId) {
         await this.findOne(userId, characterId) // ensures ownership
         return this.chatMessageModel.find({ character: characterId }).sort({ createdAt: 1 }).exec()

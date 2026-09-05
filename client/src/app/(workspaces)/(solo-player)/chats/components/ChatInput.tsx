@@ -1,9 +1,10 @@
 'use client'
-import { useMemo, useState, KeyboardEvent } from 'react'
+import { useMemo, useState, KeyboardEvent, useRef } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Mic, Paperclip, Send, Smile, BookPlus, Loader2 } from 'lucide-react'
-import { MyLearningTopic } from '@/lib/definitions'
+import { MyLearningTopic } from '@/lib/definitions';
+import { useClickOutside } from '@/hooks/useClickOutside';
 
 const COMMANDS = [
   { name: '/add-expertise', description: 'Teach this contact one of your learned topics' }
@@ -14,14 +15,16 @@ export const ChatInput = ({
   onCommand,
   sending,
   learnedTopics,
-  showCommands
+  showCommands,
 }: {
-  onSend: (text: string) => void
-  onCommand?: (command: string, topicId: string) => void
-  sending?: boolean
-  learnedTopics?: MyLearningTopic[]
-  showCommands?: boolean
+  onSend: (text: string) => void,
+  onCommand?: (command: string, topicId: string) => void,
+  sending?: boolean,
+  learnedTopics?: MyLearningTopic[],
+  showCommands?: boolean,
 }) => {
+  const pickerRef = useRef<HTMLDivElement>(null);
+  useClickOutside(pickerRef, () => setTopicPickerFor(null));
   const [value, setValue] = useState('')
   const [topicPickerFor, setTopicPickerFor] = useState<string | null>(null)
 
@@ -71,19 +74,22 @@ export const ChatInput = ({
       )}
 
       {topicPickerFor === '/add-expertise' && (
-        <div className="absolute bottom-full left-0 mb-1 w-full max-w-md rounded-lg border bg-popover p-2 shadow-lg">
-          <p className="mb-2 px-1 text-xs font-semibold text-muted-foreground">Pick a learned topic to add as expertise</p>
-          <div className="flex max-h-56 flex-col gap-1 overflow-y-auto">
-            {(learnedTopics ?? []).length === 0 && (
-              <p className="px-1 py-2 text-sm text-muted-foreground">No learned topics yet — finish a learn loop first.</p>
-            )}
-            {(learnedTopics ?? []).map(t => (
-              <button key={t.topic._id} onClick={() => pickTopic(t.topic._id)}
-                className="flex items-center justify-between rounded-md px-3 py-2 text-left text-sm hover:bg-accent">
-                <span>{t.topic.name}</span>
-                <span className="text-xs text-muted-foreground">{t.topicLevel}%</span>
-              </button>
-            ))}
+        <div className="relative" ref={pickerRef}>
+          <div className="absolute bottom-full left-0 mb-1 w-full max-w-md rounded-lg border bg-popover p-2 shadow-lg">
+            <button className="absolute top-2 right-2 text-muted-foreground hover:text-foreground" onClick={() => setTopicPickerFor(null)}>×</button>
+            <p className="mb-2 px-1 text-xs font-semibold text-muted-foreground">Pick a learned topic to add as expertise</p>
+            <div className="flex max-h-56 flex-col gap-1 overflow-y-auto">
+              {(learnedTopics ?? []).length === 0 && (
+                <p className="px-1 py-2 text-sm text-muted-foreground">No learned topics yet — finish a learn loop first.</p>
+              )}
+              {(learnedTopics ?? []).map(t => (
+                <button key={t.topic._id} onClick={() => pickTopic(t.topic._id)}
+                  className="flex items-center justify-between rounded-md px-3 py-2 text-left text-sm hover:bg-accent">
+                  <span>{t.topic.name}</span>
+                  <span className="text-xs text-muted-foreground">{t.topicLevel}%</span>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       )}

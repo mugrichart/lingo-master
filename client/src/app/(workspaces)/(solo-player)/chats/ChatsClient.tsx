@@ -7,7 +7,7 @@ import { ChatInfoPanel } from './components/ChatInfoPanel'
 import { MessageSquareText } from 'lucide-react'
 import { Character, MyLearningTopic } from '@/lib/definitions'
 import { fetchCharacterClient, fetchCharacterMessagesClient } from '@/lib/chat-client-data'
-import { sendCharacterMessage, addCharacterExpertise } from '@/lib/actions'
+import { sendCharacterMessage, addCharacterExpertise, deleteCharacter } from '@/lib/actions'
 
 const EmptyState = () => (
   <div className="hidden h-full flex-1 flex-col items-center justify-center gap-3 bg-background text-center md:flex">
@@ -27,6 +27,8 @@ export default function ChatsClient({ initialChats, learnedTopics }: { initialCh
   const [showInfo, setShowInfo] = useState(false)
   const [sending, setSending] = useState(false)
   const pollTimer = useRef<ReturnType<typeof setInterval> | null>(null)
+  // Ref to always have latest chats inside the polling interval
+  const chatsRef = useRef<Chat[]>(chats)
 
   const isRealCharacter = (chat: Chat): chat is Extract<Chat, { kind: 'direct' }> =>
     chat.kind === 'direct' && !chat.actor.id.startsWith('dm-')
@@ -62,13 +64,21 @@ export default function ChatsClient({ initialChats, learnedTopics }: { initialCh
 
   // poll pending characters until their avatar/fields are ready
   useEffect(() => {
-    const pending = chats.filter(c => c.kind === 'direct' && isRealCharacter(c) && c.actor.description === 'creating…')
-    if (!pending.length) {
+    // keep ref up‑to‑date so interval callback sees latest chats
+    chatsRef.current = chats
+    const hasPending = chatsRef.current.some(c => c.kind === 'direct' && isRealCharacter(c) && c.actor.description === 'creating…')
+    if (!hasPending) {
       if (pollTimer.current) { clearInterval(pollTimer.current); pollTimer.current = null }
       return
     }
     if (pollTimer.current) return
     pollTimer.current = setInterval(async () => {
+      const pending = chatsRef.current.filter(c => c.kind === 'direct' && isRealCharacter(c) && c.actor.description === 'creating…')
+      if (!pending.length) {
+        // no more pending, stop polling
+        if (pollTimer.current) { clearInterval(pollTimer.current); pollTimer.current = null }
+        return
+      }
       for (const c of pending) {
         const updated = await fetchCharacterClient(c.id)
         if (updated && updated.status !== 'pending') upsertCharacterChat(updated)
@@ -141,6 +151,19 @@ export default function ChatsClient({ initialChats, learnedTopics }: { initialCh
     }
   }
 
+  const handleDelete = async () => {
+    if (!active || !isRealCharacter(active)) return
+    if (!window.confirm(`Delete ${active.actor.name}? This cannot be undone.`)) return
+    try {
+      await deleteCharacter(active.id)
+      setChats(prev => prev.filter(c => c.id !== active.id))
+      setActive(null)
+      setShowInfo(false)
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
   return (
     <div className="flex h-screen w-full overflow-hidden border-t">
       <ChatListPane
@@ -161,7 +184,7 @@ export default function ChatsClient({ initialChats, learnedTopics }: { initialCh
             isRealCharacter={isRealCharacter(active)}
             onCommand={handleCommand}
           />
-          {showInfo && <ChatInfoPanel chat={active} onClose={() => setShowInfo(false)} />}
+          {showInfo && <ChatInfoPanel chat={active} onClose={() => setShowInfo(false)} onDelete={isRealCharacter(active) ? handleDelete : undefined} />}
         </>
       ) : (
         <EmptyState />

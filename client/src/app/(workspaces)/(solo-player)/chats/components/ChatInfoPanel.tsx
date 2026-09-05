@@ -1,7 +1,7 @@
 'use client'
 import { Chat } from '@/lib/chat-types'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { X, Users } from 'lucide-react'
+import { X, Users, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
@@ -10,7 +10,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 const initials = (name: string) =>
   name.split(' ').map(p => p[0]).join('').slice(0, 2).toUpperCase()
 
-export const ChatInfoPanel = ({ chat, onClose }: { chat: Chat, onClose: () => void }) => {
+export const ChatInfoPanel = ({ chat, onClose, onDelete }: { chat: Chat, onClose: () => void, onDelete?: () => void }) => {
   const isPlot = chat.kind === 'plot'
   const title = isPlot ? chat.title : chat.actor.name
   const avatar = isPlot ? chat.avatar : chat.actor.avatar
@@ -83,6 +83,18 @@ export const ChatInfoPanel = ({ chat, onClose }: { chat: Chat, onClose: () => vo
           </>
         )}
       </ScrollArea>
+      {!isPlot && onDelete && (
+        <div className="border-t px-4 py-4">
+          <Button
+            variant="destructive"
+            className="w-full gap-2"
+            onClick={onDelete}
+          >
+            <Trash2 className="size-4" />
+            Delete Contact
+          </Button>
+        </div>
+      )}
     </div>
   )
 }
