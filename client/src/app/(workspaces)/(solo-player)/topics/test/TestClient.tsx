@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { ArrowRight, ClipboardCheck, Loader2, RotateCcw } from 'lucide-react'
+import { ArrowRight, ChevronDown, ChevronUp, ClipboardCheck, Loader2, RotateCcw } from 'lucide-react'
 import { LearningScoreResult, Topic, Word, WordAttemptRecord } from '@/lib/definitions'
 import { scoreLearningAttempt } from '@/lib/actions'
 import { SpeechTextarea } from '@/components/speech-textarea'
@@ -19,6 +19,11 @@ export default function TestClient({ topic, words }: { topic: Topic, words: Word
   const [records, setRecords] = useState<WordAttemptRecord[]>([])
   const [scoreResult, setScoreResult] = useState<LearningScoreResult | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [expandedWords, setExpandedWords] = useState<Record<string, boolean>>({})
+
+  const toggleWordExpanded = (w: string) => {
+    setExpandedWords(prev => ({ ...prev, [w]: !prev[w] }))
+  }
 
   const word = words[wordIndex]
   const canProceed = input.trim().length > 0
@@ -173,17 +178,64 @@ export default function TestClient({ topic, words }: { topic: Topic, words: Word
               <p className="text-green-500 font-medium">Perfect score — full mastery of this topic! 🎉</p>
             )}
             {scoreResult?.feedback && <p>{scoreResult.feedback}</p>}
-            {scoreResult?.results?.map(r => (
-              <div key={r.word} className="rounded border p-3 flex flex-col gap-1">
-                <div className="flex items-center justify-between">
-                  <span className="font-semibold">{r.word}</span>
-                  <span className="text-sm text-muted-foreground">
-                    def {r.definitionScore}% · sentence {r.sentenceScore}%
-                  </span>
+            {scoreResult?.results?.map(r => {
+              const wordObj = words.find(w => w.word.toLowerCase() === r.word.toLowerCase())
+              const isExpanded = Boolean(expandedWords[r.word])
+              return (
+                <div
+                  key={r.word}
+                  className="rounded-lg border bg-card/60 transition-colors overflow-hidden"
+                >
+                  <button
+                    type="button"
+                    onClick={() => toggleWordExpanded(r.word)}
+                    className="w-full p-3 flex items-center justify-between text-left hover:bg-accent/50 transition-colors"
+                  >
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="font-semibold text-foreground">{r.word}</span>
+                      <span className="text-xs text-muted-foreground">
+                        def {r.definitionScore}% · sentence {r.sentenceScore}%
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1.5 shrink-0 text-muted-foreground">
+                      <span className="text-xs">{isExpanded ? 'Hide' : 'Show details'}</span>
+                      {isExpanded ? <ChevronUp className="size-4" /> : <ChevronDown className="size-4" />}
+                    </div>
+                  </button>
+
+                  <div className="px-3 pb-3 flex flex-col gap-2">
+                    {r.feedback && (
+                      <p className={`text-sm rounded p-2 ${
+                        r.definitionScore === 100 && r.sentenceScore === 100
+                          ? 'bg-muted/40 text-muted-foreground'
+                          : 'bg-destructive/10 text-destructive/90'
+                      }`}>
+                        {r.feedback}
+                      </p>
+                    )}
+
+                    {isExpanded && wordObj && (
+                      <div className="mt-1 pt-2 border-t flex flex-col gap-2 text-sm bg-muted/30 rounded p-2.5">
+                        <div>
+                          <span className="font-semibold text-xs uppercase tracking-wider text-muted-foreground block mb-0.5">
+                            Expected Definition
+                          </span>
+                          <p className="text-foreground">{wordObj.meaning}</p>
+                        </div>
+                        {wordObj.example && (
+                          <div>
+                            <span className="font-semibold text-xs uppercase tracking-wider text-muted-foreground block mb-0.5">
+                              Example Sentence
+                            </span>
+                            <p className="italic text-foreground/90">"{wordObj.example}"</p>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
-                {r.feedback && <p className="text-sm text-muted-foreground">{r.feedback}</p>}
-              </div>
-            ))}
+              )
+            })}
           </CardContent>
           <CardFooter className="justify-between">
             <Button variant="outline" onClick={reset}><RotateCcw /> Retake test</Button>
