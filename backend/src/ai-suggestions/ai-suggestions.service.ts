@@ -64,6 +64,56 @@ export class AiSuggestionsService {
         return JSON.parse(scoringString)
     }
 
+    /** Fills any missing character profile fields and returns an avatar image prompt. */
+    async fillCharacterFields(input: { name?: string, appearance?: string, description?: string }): Promise<{ name: string, description: string, bio: string, appearance: string, avatarPrompt: string }> {
+        const { userPrompt, systemPrompt } = this.promptsProvider.characterFillPromptGenerator(input)
+        const filled = await this.openaiHandle("gpt-4o-mini", systemPrompt, userPrompt, true)
+        return JSON.parse(filled)
+    }
+
+    /** Generates an avatar image and returns it as a PNG buffer. */
+    async generateAvatarImage(avatarPrompt: string): Promise<Buffer | null> {
+        try {
+            const result = await this.openaiClient.images.generate({
+                model: 'gpt-image-1',
+                prompt: avatarPrompt,
+                size: '1024x1024'
+            })
+            const b64 = result.data?.[0]?.b64_json
+            if (b64) return Buffer.from(b64, 'base64')
+            const url = result.data?.[0]?.url
+            if (url) {
+                const res = await fetch(url)
+                return Buffer.from(await res.arrayBuffer())
+            }
+            return null
+        } catch (error) {
+            console.error('avatar generation failed', error?.message)
+            return null
+        }
+    }
+
+    /** In-character chat reply, grounded in the character persona and its topic expertise. */
+    async characterChatReply(
+        character: { name: string, description: string, bio: string, expertise?: { name?: string }[] },
+        history: { role: 'user' | 'character', text: string }[],
+        userText: string
+    ): Promise<string> {
+        const { userPrompt, systemPrompt } = this.promptsProvider.characterChatPromptGenerator(character, userText)
+        const messages: any[] = [
+            { role: 'system', content: systemPrompt },
+            ...history.slice(-20).map(m => ({ role: m.role === 'user' ? 'user' : 'assistant', content: m.text })),
+            { role: 'user', content: userPrompt }
+        ]
+        try {
+            const chatCompletion = await this.openaiClient.chat.completions.create({ model: 'gpt-4o-mini', messages })
+            return chatCompletion.choices[0].message.content ?? ''
+        } catch (error) {
+            console.error('character chat reply failed', error?.message)
+            return ''
+        }
+    }
+
     private async openaiHandle(model: OPENAI_MODELS, systemPrompt: string, userPrompt: string, request_structured_output: boolean = false) {
         const messages: [ChatCompletionSystemMessageParam, ChatCompletionUserMessageParam] = [
             { role: "system", content: systemPrompt},

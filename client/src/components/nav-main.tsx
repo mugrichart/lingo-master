@@ -41,6 +41,10 @@ const items = [
           url: "/practice-with-books",
         },
         {
+          title: "Chats",
+          url: "/chats",
+        },
+        {
           title: "ForYou",
           url: "#",
         },

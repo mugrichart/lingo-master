@@ -7,10 +7,10 @@ import { redirect } from 'next/navigation'
 import { revalidatePath, revalidateTag } from 'next/cache'
 import { fetchWords } from './data'
 import { handleBlanksGen } from './utils'
-import { AuthFormSchema, ConversationSchema, LearningScoreSchema, PracticeBookSchema, TopicSchema, WordSchema } from './api-schemas'
+import { AuthFormSchema, CharacterSchema, ConversationSchema, LearningScoreSchema, PracticeBookSchema, TopicSchema, WordSchema } from './api-schemas'
 import { apiRequest } from './api-client'
 import { getHeaders } from './data'
-import { LearningScoreResult, WordAttemptRecord } from './definitions'
+import { Character, LearningScoreResult, WordAttemptRecord } from './definitions'
 
 
 export async function scoreLearningAttempt(topicId: string, records: WordAttemptRecord[], persistMastery = false): Promise<LearningScoreResult> {
@@ -45,6 +45,39 @@ export async function markTopicLearned(topicId: string): Promise<void> {
         // non-fatal: completion UX should not break if the flag write fails
         console.error('Error marking topic learned', error)
     }
+}
+
+// =================== Characters / chats ============================
+
+/** Creates a character (pending); backend fills fields + generates the avatar asynchronously. */
+export async function createCharacter(input: { name?: string, appearance?: string, description?: string }): Promise<Character> {
+    const headers = await getHeaders()
+    const character = await apiRequest(`/characters`, CharacterSchema, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(input)
+    })
+    revalidatePath('/chats')
+    return character
+}
+
+/** Sends a user message to a character and returns the character's reply. */
+export async function sendCharacterMessage(characterId: string, text: string): Promise<{ reply: string, message: any }> {
+    const headers = await getHeaders()
+    return apiRequest(`/characters/${characterId}/messages`,
+        z.object({ reply: z.string(), message: z.any() }),
+        { method: 'POST', headers, body: JSON.stringify({ text }) }
+    )
+}
+
+/** Adds a learned topic to a character's expertise. */
+export async function addCharacterExpertise(characterId: string, topicId: string): Promise<Character> {
+    const headers = await getHeaders()
+    return apiRequest(`/characters/${characterId}/expertise`, CharacterSchema, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ topic: topicId })
+    })
 }
 
 

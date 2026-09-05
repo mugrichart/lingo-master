@@ -11,6 +11,7 @@ import { AiSuggestionsModule } from './ai-suggestions/ai-suggestions.module';
 import { ConversationsModule } from './conversations/conversations.module';
 import { BooksModule } from './books/books.module';
 import { FileStorageModule } from './file-storage/file-storage.module';
+import { CharactersModule } from './characters/characters.module';
 import configuration from './config/configuration';
 
 @Module({
@@ -33,7 +34,8 @@ import configuration from './config/configuration';
     AiSuggestionsModule,
     ConversationsModule,
     BooksModule,
-    FileStorageModule
+    FileStorageModule,
+    CharactersModule
   ],
   controllers: [AppController],
   providers: [AppService],

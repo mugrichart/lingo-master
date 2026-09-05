@@ -6,7 +6,7 @@ import { PracticeBook, PracticeBookPage } from './definitions'
 
 import z, { number } from 'zod';
 import { apiRequest } from './api-client'
-import { WordSchema, UserSchema, TopicSchema, ConversationSchema, PracticeBookSchema, PracticeBookPageSchema } from './api-schemas'
+import { WordSchema, UserSchema, TopicSchema, ConversationSchema, PracticeBookSchema, PracticeBookPageSchema, CharacterSchema, CharacterMessageSchema } from './api-schemas'
 import { env } from 'process';
 
 
@@ -105,12 +105,7 @@ export async function fetchTopicMastery(topicId: string): Promise<{ mastery: num
     }
 }
 
-export type MyLearningTopic = {
-    _id: string,
-    topicLevel: number,
-    learnedAt: string,
-    topic: Topic
-}
+export type MyLearningTopic = import('./definitions').MyLearningTopic
 
 /** Topics the current user has completed the learn loop for (newest first). */
 export async function fetchMyLearning(): Promise<MyLearningTopic[]> {
@@ -133,6 +128,37 @@ export async function fetchMyLearning(): Promise<MyLearningTopic[]> {
                 learnedAt: l.learnedAt ?? '',
                 topic: l.topic
             }))
+    } catch (error) {
+        console.error(error)
+        return []
+    }
+}
+
+// =================== Characters / chats ============================
+export async function fetchCharacters(): Promise<import('./definitions').Character[]> {
+    const headers = await getHeaders()
+    try {
+        return await apiRequest(`/characters`, z.array(CharacterSchema), { method: 'GET', headers })
+    } catch (error) {
+        console.error(error)
+        return []
+    }
+}
+
+export async function fetchCharacter(id: string): Promise<import('./definitions').Character | null> {
+    const headers = await getHeaders()
+    try {
+        return await apiRequest(`/characters/${id}`, CharacterSchema, { method: 'GET', headers })
+    } catch (error) {
+        console.error(error)
+        return null
+    }
+}
+
+export async function fetchCharacterMessages(characterId: string): Promise<import('./definitions').CharacterMessage[]> {
+    const headers = await getHeaders()
+    try {
+        return await apiRequest(`/characters/${characterId}/messages`, z.array(CharacterMessageSchema), { method: 'GET', headers })
     } catch (error) {
         console.error(error)
         return []

@@ -92,3 +92,30 @@ export type LearningScoreResult = {
     overallPassed: boolean,
     feedback: string,
 }
+
+export type Character = {
+    _id: string,
+    creator: string,
+    name: string,
+    description: string,
+    bio: string,
+    appearance: string,
+    avatar: string,
+    expertise: (Topic | string)[],
+    status: 'pending' | 'ready' | 'failed',
+}
+
+export type CharacterMessage = {
+    _id: string,
+    character: string,
+    role: 'user' | 'character',
+    text: string,
+    createdAt?: string,
+}
+
+export type MyLearningTopic = {
+    _id: string,
+    topicLevel: number,
+    learnedAt: string,
+    topic: Topic
+}

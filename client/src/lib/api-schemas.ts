@@ -80,3 +80,23 @@ export const LearningScoreSchema = z.object({
     overallPassed: z.boolean(),
     feedback: z.string()
 })
+
+export const CharacterSchema = z.object({
+    _id: z.string(),
+    creator: z.string(),
+    name: z.string(),
+    description: z.string(),
+    bio: z.string(),
+    appearance: z.string(),
+    avatar: z.string(),
+    expertise: z.array(z.any()).default([]),
+    status: z.enum(['pending', 'ready', 'failed'])
+})
+
+export const CharacterMessageSchema = z.object({
+    _id: z.string(),
+    character: z.string(),
+    role: z.enum(['user', 'character']),
+    text: z.string(),
+    createdAt: z.string().optional()
+})

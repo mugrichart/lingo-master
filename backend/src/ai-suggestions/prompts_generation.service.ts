@@ -90,8 +90,35 @@ export class PromptsProvider {
         return { userPrompt, systemPrompt }
     }
 
+    characterFillPromptGenerator(input: { name?: string, appearance?: string, description?: string }): PromptGenReturnType {
+        const systemPrompt = this.SYSTEM_PROMPTS['characterFill']
+        const userPrompt = `
+        Fill in the missing fields for this character and produce the avatarPrompt.
+        Provided by the user (empty means you must invent it):
+            name: ${input.name || '(none)'}
+            appearance: ${input.appearance || '(none)'}
+            extra description: ${input.description || '(none)'}
+        `
+        return { userPrompt, systemPrompt }
+    }
+
+    characterChatPromptGenerator(character: { name: string, description: string, bio: string, expertise?: { name?: string }[] }, userText: string): PromptGenReturnType {
+        const expertise = (character.expertise ?? []).map(e => e?.name).filter(Boolean).join(', ')
+        const systemPrompt = this.SYSTEM_PROMPTS['characterChat']
+        const userPrompt = `
+        You are roleplaying as this character in a chat with a language learner.
+            Name: ${character.name}
+            Persona: ${character.description}
+            Bio: ${character.bio}
+            ${expertise ? `Expert in: ${expertise}. Weave this vocabulary in naturally.` : ''}
+        Stay fully in character, keep replies conversational and concise (1-3 sentences), and reply to the user's latest message.
+        User's latest message: ${userText}
+        `
+        return { userPrompt, systemPrompt }
+    }
+
     private load_system_prompts(): 
-        Record<'topicSuggestions' | 'wordSuggestions' | 'wordSuggestionExpansion' | 'conversationSuggestions' | 'conversationSuggestionExpansion' | 'bookPageAugmentation' | 'masteryScoring', string> 
+        Record<'topicSuggestions' | 'wordSuggestions' | 'wordSuggestionExpansion' | 'conversationSuggestions' | 'conversationSuggestionExpansion' | 'bookPageAugmentation' | 'masteryScoring' | 'characterFill' | 'characterChat', string> 
     {
         const filePath = path.join(process.cwd(), './src/ai-suggestions/system_prompts.json')
         const systemPromptsFile = fs.readFileSync(filePath, 'utf-8')
