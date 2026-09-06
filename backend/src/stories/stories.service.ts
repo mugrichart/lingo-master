@@ -93,8 +93,12 @@ export class StoriesService {
             });
         }
 
+        // Never let the opening line reveal a target word before the user has a chance to use it.
+        const openingLineLeaksTarget = Boolean(scaffold.openingActorLine && targetWords.some(target =>
+            scaffold.openingActorLine.toLowerCase().includes(target.word.toLowerCase())));
+
         // Insert opening Actor spoken line
-        if (scaffold.openingActorLine) {
+        if (scaffold.openingActorLine && !openingLineLeaksTarget) {
             const openingActor = cast.find(c => c.id === scaffold.openingActorId) || cast.find(c => !c.isUser) || cast[1];
             await this.storyMessageModel.create({
                 story: story._id,
@@ -238,6 +242,7 @@ export class StoriesService {
         return {
             hit: turnResult.hit,
             feedback: turnResult.feedback,
+            biasWord: biasWord || null,
             messages: createdMessages,
             story,
         };

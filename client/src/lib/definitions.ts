@@ -165,6 +165,7 @@ export type StoryMessage = {
 export type SendStoryMessageResponse = {
     hit: boolean
     feedback?: string
+    biasWord?: string | null
     messages: StoryMessage[]
     story: Story
 }

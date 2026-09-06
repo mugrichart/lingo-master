@@ -35,6 +35,7 @@ export default function ChatsClient({ initialChats, learnedTopics }: { initialCh
   const [sending, setSending] = useState(false)
   const [storyStarting, setStoryStarting] = useState(false)
   const [targetReward, setTargetReward] = useState<{ storyId: string, word: string } | null>(null)
+  const [latestHint, setLatestHint] = useState<{ storyId: string, word: string } | null>(null)
   const pollTimer = useRef<ReturnType<typeof setInterval> | null>(null)
   const chatsRef = useRef<Chat[]>(chats)
 
@@ -48,6 +49,7 @@ export default function ChatsClient({ initialChats, learnedTopics }: { initialCh
     setShowInfo(false)
     setStoryStarting(false)
     setTargetReward(null)
+    setLatestHint(null)
     setChats(prev => prev.map(c => c.id === chat.id ? { ...c, unreadCount: 0 } : c))
 
     if (chat.kind === 'direct' && isRealCharacter(chat)) {
@@ -98,6 +100,7 @@ export default function ChatsClient({ initialChats, learnedTopics }: { initialCh
   const selectStoryInGroup = useCallback(async (storyId: string) => {
     if (!active || active.kind !== 'plot') return
     setTargetReward(null)
+    setLatestHint(null)
     const msgs = await fetchStoryMessagesClient(storyId)
     const storyMsgs: ChatMessage[] = msgs.map(m => ({
       id: m._id,
@@ -206,6 +209,7 @@ export default function ChatsClient({ initialChats, learnedTopics }: { initialCh
             setTargetReward({ storyId: activeStoryId, word: targetWordBeforeTurn })
             window.setTimeout(() => setTargetReward(null), 2500)
           }
+          setLatestHint(res.biasWord ? { storyId: activeStoryId, word: res.biasWord } : null)
           // Convert returned messages (narration / actor reply)
           const newStoryMessages: ChatMessage[] = res.messages.filter(m => m.kind !== 'user').map(m => ({
             id: m._id,
@@ -263,7 +267,22 @@ export default function ChatsClient({ initialChats, learnedTopics }: { initialCh
     } else if (command === '/start-story' && isTopicGroup(active)) {
       setSending(true)
       setStoryStarting(true)
+      setTargetReward(null)
+      setLatestHint(null)
       try {
+        const activeStoryId = active.activeStoryId
+        const storyWithoutCurrent = activeStoryId
+          ? active.stories.filter(s => s._id !== activeStoryId)
+          : active.stories
+        const clearedPlot: PlotChat = {
+          ...active,
+          stories: storyWithoutCurrent,
+          activeStoryId: undefined,
+          messages: [],
+        }
+        setChats(prev => prev.map(c => c.id === active.id ? clearedPlot : c))
+        setActive(clearedPlot)
+
         const newStory = await startStoryClient(active.topicId)
         if (newStory) {
           const msgs = await fetchStoryMessagesClient(newStory._id)
@@ -278,8 +297,8 @@ export default function ChatsClient({ initialChats, learnedTopics }: { initialCh
           }))
 
           const updatedPlot: PlotChat = {
-            ...active,
-            stories: [newStory, ...(active.stories || []).filter(s => s._id !== newStory._id)],
+            ...clearedPlot,
+            stories: [newStory, ...storyWithoutCurrent.filter(s => s._id !== newStory._id)],
             activeStoryId: newStory._id,
             messages: storyMsgs,
           }
@@ -328,6 +347,7 @@ export default function ChatsClient({ initialChats, learnedTopics }: { initialCh
             sending={sending}
             storyStarting={storyStarting}
             targetReward={targetReward}
+            latestHint={latestHint}
             learnedTopics={learnedTopics}
             isRealCharacter={isRealCharacter(active)}
             onCommand={handleCommand}

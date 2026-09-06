@@ -146,6 +146,7 @@ export const StoryMessageSchema = z.object({
 export const SendStoryMessageResponseSchema = z.object({
     hit: z.boolean(),
     feedback: z.string().optional().default(''),
+    biasWord: z.string().nullable().optional().default(null),
     messages: z.array(StoryMessageSchema),
     story: StorySchema,
 })
