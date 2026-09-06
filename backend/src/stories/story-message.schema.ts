@@ -17,8 +17,8 @@ export class StoryMessage {
     @Prop({ required: true })
     text: string;
 
-    @Prop({ enum: ['user', 'actor', 'narration', 'system'], default: 'actor' })
-    kind: 'user' | 'actor' | 'narration' | 'system';
+    @Prop({ enum: ['user', 'actor', 'narration', 'story-starter', 'system'], default: 'actor' })
+    kind: 'user' | 'actor' | 'narration' | 'story-starter' | 'system';
 }
 
 export const StoryMessageSchema = SchemaFactory.createForClass(StoryMessage);

@@ -33,6 +33,8 @@ export default function ChatsClient({ initialChats, learnedTopics }: { initialCh
   const [active, setActive] = useState<Chat | null>(null)
   const [showInfo, setShowInfo] = useState(false)
   const [sending, setSending] = useState(false)
+  const [storyStarting, setStoryStarting] = useState(false)
+  const [targetReward, setTargetReward] = useState<{ storyId: string, word: string } | null>(null)
   const pollTimer = useRef<ReturnType<typeof setInterval> | null>(null)
   const chatsRef = useRef<Chat[]>(chats)
 
@@ -44,6 +46,8 @@ export default function ChatsClient({ initialChats, learnedTopics }: { initialCh
   const selectChat = useCallback(async (chat: Chat) => {
     setActive(chat)
     setShowInfo(false)
+    setStoryStarting(false)
+    setTargetReward(null)
     setChats(prev => prev.map(c => c.id === chat.id ? { ...c, unreadCount: 0 } : c))
 
     if (chat.kind === 'direct' && isRealCharacter(chat)) {
@@ -93,6 +97,7 @@ export default function ChatsClient({ initialChats, learnedTopics }: { initialCh
 
   const selectStoryInGroup = useCallback(async (storyId: string) => {
     if (!active || active.kind !== 'plot') return
+    setTargetReward(null)
     const msgs = await fetchStoryMessagesClient(storyId)
     const storyMsgs: ChatMessage[] = msgs.map(m => ({
       id: m._id,
@@ -190,11 +195,17 @@ export default function ChatsClient({ initialChats, learnedTopics }: { initialCh
     } else if (active.kind === 'plot') {
       const activeStoryId = active.activeStoryId
       if (!activeStoryId) return
+      const activeStoryBeforeTurn = active.stories.find(s => s._id === activeStoryId)
+      const targetWordBeforeTurn = activeStoryBeforeTurn?.targetWords[activeStoryBeforeTurn.currentWordIndex]?.word
 
       setSending(true)
       try {
         const res = await sendStoryMessageClient(activeStoryId, text)
         if (res) {
+          if (res.hit && targetWordBeforeTurn) {
+            setTargetReward({ storyId: activeStoryId, word: targetWordBeforeTurn })
+            window.setTimeout(() => setTargetReward(null), 2500)
+          }
           // Convert returned messages (narration / actor reply)
           const newStoryMessages: ChatMessage[] = res.messages.filter(m => m.kind !== 'user').map(m => ({
             id: m._id,
@@ -251,6 +262,7 @@ export default function ChatsClient({ initialChats, learnedTopics }: { initialCh
       }
     } else if (command === '/start-story' && isTopicGroup(active)) {
       setSending(true)
+      setStoryStarting(true)
       try {
         const newStory = await startStoryClient(active.topicId)
         if (newStory) {
@@ -274,11 +286,13 @@ export default function ChatsClient({ initialChats, learnedTopics }: { initialCh
 
           setChats(prev => prev.map(c => c.id === active.id ? updatedPlot : c))
           setActive(updatedPlot)
+          setTargetReward(null)
         }
       } catch (e) {
         console.error('Failed to start story', e)
       } finally {
         setSending(false)
+        setStoryStarting(false)
       }
     }
   }
@@ -312,6 +326,8 @@ export default function ChatsClient({ initialChats, learnedTopics }: { initialCh
             onSend={sendMessage}
             onToggleInfo={() => setShowInfo(s => !s)}
             sending={sending}
+            storyStarting={storyStarting}
+            targetReward={targetReward}
             learnedTopics={learnedTopics}
             isRealCharacter={isRealCharacter(active)}
             onCommand={handleCommand}

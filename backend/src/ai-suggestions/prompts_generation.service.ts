@@ -144,15 +144,15 @@ export class PromptsProvider {
         Plot Setup: ${input.story.plotSetup}
         Cast: ${JSON.stringify(input.story.cast, null, 2)}
 
-        CURRENT TARGET WORD: "${input.currentWord.word}" (Meaning: ${input.currentWord.meaning || ''})
-        CURRENT BIAS WORD for supporting characters to nudge the user with: "${input.biasWord || input.currentWord.word}"
+        PRIVATE EVALUATION TARGET (do not reveal or use in the response): "${input.currentWord.word}" (Meaning: ${input.currentWord.meaning || ''})
+        SUPPORTING-CHARACTER BIAS WORD (the only target-related word the supporting character may use): "${input.biasWord || '(none)'}"
 
         Recent Conversation History:
         ${input.history.slice(-8).map(h => `${h.senderName} (${h.role}): ${h.text}`).join('\n')}
 
         Latest User (MC) Message: "${input.userText}"
 
-        Evaluate if the user naturally used or attempted the target word "${input.currentWord.word}". Produce the next turn response.
+        Evaluate if the user naturally used or attempted the private evaluation target "${input.currentWord.word}". Produce the next turn response without revealing that target.
         `
         return { userPrompt, systemPrompt }
     }

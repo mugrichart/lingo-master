@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useRef } from 'react'
+import { Loader2 } from 'lucide-react'
 import { Chat, ChatMessage } from '@/lib/chat-types'
 import { ChatHeader } from './ChatHeader'
 import { ChatInput } from './ChatInput'
@@ -23,6 +24,8 @@ export const ConversationPane = ({
   onSend,
   onToggleInfo,
   sending,
+  storyStarting,
+  targetReward,
   learnedTopics,
   isRealCharacter,
   onCommand
@@ -32,6 +35,8 @@ export const ConversationPane = ({
   onSend: (text: string) => void
   onToggleInfo: () => void
   sending?: boolean
+  storyStarting?: boolean
+  targetReward?: { storyId: string, word: string } | null
   learnedTopics?: MyLearningTopic[]
   isRealCharacter?: boolean
   onCommand?: (command: string, param?: string) => void
@@ -47,7 +52,6 @@ export const ConversationPane = ({
 
   const isPlot = chat.kind === 'plot'
   const activeStory = isPlot ? chat.stories?.find(s => s._id === chat.activeStoryId) : null
-  const currentWord = activeStory?.targetWords[activeStory.currentWordIndex]
 
   return (
     <div className="flex h-full min-w-0 flex-1 flex-col bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-accent/30 via-background to-background">
@@ -62,11 +66,11 @@ export const ConversationPane = ({
             <span className="text-muted-foreground hidden sm:inline">·</span>
             <span className="text-muted-foreground hidden sm:inline">{activeStory.setting}</span>
           </div>
-          {currentWord && !currentWord.hit ? (
-            <div className="flex items-center gap-1.5 font-medium">
-              <span className="text-muted-foreground">Target word:</span>
+          {targetReward?.storyId === activeStory._id ? (
+            <div className="flex animate-pulse items-center gap-1.5 font-medium">
+              <span className="text-emerald-500">Target word used:</span>
               <span className="rounded bg-emerald-500/10 px-1.5 py-0.5 font-mono text-emerald-500">
-                {currentWord.word}
+                {targetReward.word}
               </span>
             </div>
           ) : activeStory.status === 'completed' ? (
@@ -77,7 +81,16 @@ export const ConversationPane = ({
 
       <ScrollArea className="flex-1 overflow-y-auto">
         <div className="mx-auto flex max-w-3xl flex-col gap-2 px-4 py-4">
-          {isPlot && (!activeStory || messages.length === 0) && (
+          {isPlot && storyStarting && (
+            <div className="my-12 flex flex-col items-center justify-center gap-3 text-center">
+              <Loader2 className="size-8 animate-spin text-emerald-500" />
+              <h3 className="text-lg font-semibold">Writing your story starter…</h3>
+              <p className="max-w-md text-sm text-muted-foreground">
+                The narrator is setting the scene, preparing your companions, and weaving in your target vocabulary.
+              </p>
+            </div>
+          )}
+          {isPlot && !storyStarting && (!activeStory || messages.length === 0) && (
             <div className="my-12 flex flex-col items-center justify-center gap-3 text-center px-4">
               <div className="grid size-16 place-items-center rounded-full bg-emerald-500/10 text-2xl text-emerald-500">
                 ✨

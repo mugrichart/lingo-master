@@ -82,14 +82,14 @@ export class StoriesService {
             status: 'in_progress',
         });
 
-        // Insert opening DM Narration
-        if (scaffold.openingNarration) {
+        // Insert the opening story starter separately from live DM narration.
+        if (scaffold.openingStoryStarter) {
             await this.storyMessageModel.create({
                 story: story._id,
                 senderId: 'narrator',
                 senderName: 'Narrator',
-                text: scaffold.openingNarration,
-                kind: 'narration',
+                text: scaffold.openingStoryStarter,
+                kind: 'story-starter',
             });
         }
 
@@ -168,7 +168,7 @@ export class StoriesService {
         const biasWord =
             currentTarget.semanticField && currentTarget.semanticField.length > 0
                 ? currentTarget.semanticField[Math.min(currentTarget.biasStage, currentTarget.semanticField.length - 1)]
-                : currentTarget.word;
+                : '';
 
         // 4. LLM evaluation & response generation
         const turnResult = await this.aiSuggestionsService.evaluateStoryTurn({
@@ -216,7 +216,10 @@ export class StoriesService {
         }
 
         // 7. Save Actor Spoken Line
-        if (turnResult.actorLine) {
+        const targetWasLeaked = Boolean(turnResult.actorLine && currentTarget.word &&
+            turnResult.actorLine.toLowerCase().includes(currentTarget.word.toLowerCase()));
+
+        if (turnResult.actorLine && !targetWasLeaked) {
             const actor = story.cast.find(c => c.id === turnResult.actorId) ||
                 story.cast.find(c => c.name.toLowerCase() === (turnResult.actorName || '').toLowerCase()) ||
                 story.cast.find(c => !c.isUser) ||

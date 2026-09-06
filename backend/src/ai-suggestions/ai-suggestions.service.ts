@@ -121,7 +121,7 @@ export class AiSuggestionsService {
         userRole: { name: string, role: string, description: string },
         cast: { id: string, name: string, role: string, description: string }[],
         targetWords: { word: string, meaning: string, example: string, semanticField: string[] }[],
-        openingNarration: string,
+        openingStoryStarter: string,
         openingActorId: string,
         openingActorLine: string
     }> {

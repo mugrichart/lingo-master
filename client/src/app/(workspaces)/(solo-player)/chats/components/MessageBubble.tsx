@@ -31,20 +31,34 @@ const nameColor = (seed: string) => {
 }
 
 export const MessageBubble = ({ message, chat }: { message: ChatMessage, chat: Chat }) => {
+  const isStoryStarter = message.kind === 'story-starter'
   const isNarration = message.kind === 'narration' || message.senderId === 'narrator'
   const isSystem = message.kind === 'system'
 
-  if (isNarration) {
+  if (isStoryStarter) {
     return (
-      <div className="my-2 flex w-full justify-center px-4">
-        <div className="max-w-xl rounded-xl border border-border/70 bg-card/70 px-4 py-3 text-center shadow-sm backdrop-blur-sm">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/80 mb-1">
-            ✦ Narration
+      <div className="my-3 flex w-full justify-center px-4">
+        <div className="max-w-2xl rounded-xl border border-border/70 bg-card/70 px-4 py-3 text-center shadow-sm backdrop-blur-sm">
+          <p className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/80">
+            ✦ Story starter
           </p>
-          <p className="text-sm italic leading-relaxed text-foreground/90 font-serif">
+          <p className="font-serif text-sm italic leading-relaxed text-foreground/90">
             {message.text}
           </p>
           <span className="mt-1 block text-[10px] text-muted-foreground/60">{time(message.timestamp)}</span>
+        </div>
+      </div>
+    )
+  }
+
+  if (isNarration) {
+    return (
+      <div className="my-3 flex w-full justify-center px-4">
+        <div className="max-w-2xl text-center">
+          <p className="font-serif text-sm italic leading-relaxed text-muted-foreground">
+            {message.text}
+          </p>
+          <span className="mt-1 block text-[10px] text-muted-foreground/50">{time(message.timestamp)}</span>
         </div>
       </div>
     )

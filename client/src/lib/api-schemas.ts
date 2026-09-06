@@ -139,7 +139,7 @@ export const StoryMessageSchema = z.object({
     senderId: z.string(),
     senderName: z.string(),
     text: z.string(),
-    kind: z.enum(['user', 'actor', 'narration', 'system']),
+    kind: z.enum(['user', 'actor', 'narration', 'story-starter', 'system']),
     createdAt: z.string().optional(),
 })
 

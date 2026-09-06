@@ -158,7 +158,7 @@ export type StoryMessage = {
     senderId: string
     senderName: string
     text: string
-    kind: 'user' | 'actor' | 'narration' | 'system'
+    kind: 'user' | 'actor' | 'narration' | 'story-starter' | 'system'
     createdAt?: string
 }
 

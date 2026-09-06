@@ -19,7 +19,7 @@ export type ChatMessage = {
   senderName?: string
   text: string
   timestamp: string // ISO
-  kind?: 'user' | 'actor' | 'narration' | 'system'
+  kind?: 'user' | 'actor' | 'narration' | 'story-starter' | 'system'
   status?: 'sent' | 'delivered' | 'read' // only meaningful for own messages
 }
 
