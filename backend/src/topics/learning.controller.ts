@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Param, Post, Query } from "@nestjs/common";
-import { QueryTopicLearningPlanDto, ScoreLearningAttemptDto } from "./learning.dto";
+import { QueryTopicLearningPlanDto, RecordCoveredWordsDto, ScoreLearningAttemptDto, UpdateLearningProgressDto } from "./learning.dto";
 import { GetUser } from "src/auth/get-user.decorator";
 import { Types } from "mongoose";
 import { TopicLearningPlanService } from "./learning.service";
@@ -20,6 +20,21 @@ export class TopicLearningPlanController {
         return this.learningService.scoreAttempt(userId, dto)
     }
 
+    @Post('covered')
+    async recordCoveredWords(@GetUser('userId') userId: Types.ObjectId, @Body() dto: RecordCoveredWordsDto) {
+        return this.learningService.recordCoveredWords(userId, dto)
+    }
+
+    @Get('resume/:topic')
+    async getResume(@GetUser('userId') userId: Types.ObjectId, @Param('topic') topic: Types.ObjectId) {
+        return this.learningService.getResume(userId, topic)
+    }
+
+    @Post('progress')
+    async updateProgress(@GetUser('userId') userId: Types.ObjectId, @Body() dto: UpdateLearningProgressDto) {
+        return this.learningService.updateProgress(userId, dto)
+    }
+
     @Post('learned/:topic')
     async markLearned(@GetUser('userId') userId: Types.ObjectId, @Param('topic') topic: Types.ObjectId) {
         return this.learningService.markLearned(userId, topic)
@@ -28,6 +43,16 @@ export class TopicLearningPlanController {
     @Get('my-learning')
     async findMyLearning(@GetUser('userId') userId: Types.ObjectId) {
         return this.learningService.findMyLearning(userId)
+    }
+
+    @Get('recent')
+    async findRecent(@GetUser('userId') userId: Types.ObjectId) {
+        return this.learningService.findRecent(userId)
+    }
+
+    @Get('current')
+    async findCurrent(@GetUser('userId') userId: Types.ObjectId) {
+        return this.learningService.findCurrent(userId)
     }
 
     @Get('mastery/:topic')

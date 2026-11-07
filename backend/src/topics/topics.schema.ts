@@ -5,6 +5,7 @@ import { Word } from "src/words/words.schema";
 
 export type TopicDocument = HydratedDocument<Topic>
 export type TopicLearningDocument = HydratedDocument<Learning>
+export type PracticeStage = 'word-practice' | 'conversation-practice' | 'complete'
 
 @Schema({ timestamps: true})
 export class Topic {
@@ -54,9 +55,13 @@ export class Learning {
     @Prop({ default: 0}) chunkLevel: number
     @Prop({ default: 0}) topicLevel: number
 
+    @Prop({ enum: ['word-practice', 'conversation-practice', 'complete'], default: 'word-practice' })
+    practiceStage: PracticeStage
+
     /** Set when the user completes the guided learn loop for this topic. */
     @Prop({ type: Date, default: null })
     learnedAt: Date | null
+
 
 }
 

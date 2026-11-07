@@ -3,6 +3,7 @@ import { InjectModel } from "@nestjs/mongoose";
 import { Learning, Topic } from "./topics.schema";
 import { Model, Types } from "mongoose";
 import { ScoreLearningAttemptDto } from "./learning.dto";
+import { RecordCoveredWordsDto, UpdateLearningProgressDto } from "./learning.dto";
 import { AiSuggestionsService } from "src/ai-suggestions/ai-suggestions.service";
 import { Cache, CACHE_MANAGER } from "@nestjs/cache-manager";
 
@@ -39,10 +40,59 @@ export class TopicLearningPlanService {
         ).exec()
     }
 
+    /** Record words covered in manual practice without invoking AI scoring. */
+    async recordCoveredWords(userId: Types.ObjectId, dto: RecordCoveredWordsDto) {
+        const words = dto.words.map(word => ({ word: new Types.ObjectId(word), level: 1 }))
+        return this.learningModel.findOneAndUpdate(
+            { user: userId, topic: new Types.ObjectId(dto.topic) },
+            { $addToSet: { words: { $each: words } } },
+            { upsert: true, new: true }
+        ).exec()
+    }
+
+    async getResume(userId: Types.ObjectId, topicId: Types.ObjectId) {
+        return this.learningModel.findOne({ user: userId, topic: topicId }).populate('topic').exec()
+    }
+
+    async updateProgress(userId: Types.ObjectId, dto: UpdateLearningProgressDto) {
+        const words = dto.words?.map(({ word, level }) => ({ word: new Types.ObjectId(word), level }))
+        const update: Record<string, unknown> = {
+            $set: { chunkIndex: dto.chunkIndex, chunkLevel: dto.chunkLevel }
+        }
+        if (dto.practiceStage) {
+            (update.$set as Record<string, unknown>).practiceStage = dto.practiceStage
+        }
+        if (words) update.$addToSet = { words: { $each: words } }
+        return this.learningModel.findOneAndUpdate(
+            { user: userId, topic: new Types.ObjectId(dto.topic) },
+            update,
+            { upsert: true, new: true }
+        ).populate('topic').exec()
+    }
+
     /** All topics the user has completed the learn loop for. */
     async findMyLearning(userId: Types.ObjectId) {
         return this.learningModel
             .find({ user: userId, learnedAt: { $ne: null } })
+            .populate('topic')
+            .exec()
+    }
+
+    /** Return the three most recently updated learning topics for this user. */
+    async findRecent(userId: Types.ObjectId) {
+        return this.learningModel
+            .find({ user: userId })
+            .sort({ updatedAt: -1 })
+            .limit(3)
+            .populate('topic')
+            .exec()
+    }
+
+    /** All learning records for the authenticated user, including resume state. */
+    async findCurrent(userId: Types.ObjectId) {
+        return this.learningModel
+            .find({ user: userId })
+            .sort({ updatedAt: -1 })
             .populate('topic')
             .exec()
     }
