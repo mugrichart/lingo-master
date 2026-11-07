@@ -1,6 +1,7 @@
 import { Transform } from "class-transformer";
 import { IsArray, IsBoolean, IsNotEmpty, IsOptional, IsString } from "class-validator";
 import { Types } from "mongoose";
+import { ApiPropertyOptional } from "@nestjs/swagger";
 
 export class CreateTopicDto {
     @IsString() name: string;
@@ -15,15 +16,23 @@ export class CreateTopicDto {
 }
 
 export class ListAllTopicsDto {
+    @ApiPropertyOptional({ example: 'science' })
     @IsOptional() @IsString() name?: string;
+    @ApiPropertyOptional({ example: 'english', default: 'english' })
     @IsOptional() @IsString() language?: string;
+    @ApiPropertyOptional({
+        example: '6805438f3e55b8ff265608d7',
+        description: 'MongoDB user ID of the creator. Do not use the username or email address.'
+    })
     @IsOptional() @IsString() creator?: string;
 
+    @ApiPropertyOptional({ example: 'PARENT_TOPIC_ID', description: 'Use null for top-level topics.' })
     @IsOptional() 
     @IsString() 
     @Transform(({ value }) => value == "null" ? null : value)
     parent?: string | null;
     
+    @ApiPropertyOptional({ example: false, default: false })
     @IsOptional()
     @Transform(({ value }) => value === true || value === 'true')
     @IsBoolean()

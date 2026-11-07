@@ -28,6 +28,7 @@
     "@nestjs/jwt": "^11.0.2",
     "@nestjs/mongoose": "^11.0.4",
     "@nestjs/platform-express": "^11.0.1",
+    "@nestjs/swagger": "^12.1.1",
     "@types/multer": "^2.0.0",
     "bcrypt": "^6.0.0",
     "cache-manager": "^7.2.8",

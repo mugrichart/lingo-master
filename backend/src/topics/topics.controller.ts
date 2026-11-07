@@ -4,7 +4,9 @@ import { CreateTopicDto, GenerateTopicSuggestionsDto, ListAllTopicsDto, QueryAut
 import { GetUser } from 'src/auth/get-user.decorator';
 import { AiSuggestionsService } from 'src/ai-suggestions/ai-suggestions.service';
 import { DeleteResult, Types } from 'mongoose';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
+@ApiBearerAuth()
 @Controller('topics')
 export class TopicsController {
     constructor(private topicsService: TopicsService, private aiSuggestionsService: AiSuggestionsService) {}

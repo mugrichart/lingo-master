@@ -3,7 +3,9 @@ import { QueryTopicLearningPlanDto, ScoreLearningAttemptDto } from "./learning.d
 import { GetUser } from "src/auth/get-user.decorator";
 import { Types } from "mongoose";
 import { TopicLearningPlanService } from "./learning.service";
+import { ApiBearerAuth } from '@nestjs/swagger';
 
+@ApiBearerAuth()
 @Controller('topics/learning')
 export class TopicLearningPlanController {
     constructor(private learningService: TopicLearningPlanService) {}

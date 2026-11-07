@@ -2,7 +2,9 @@ import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { WordsService } from './words.service';
 import { CreateWordDto, ExpandWordSuggestionDto, GenerateWordSuggestionsDto, WordsQueryDto } from './words.dto';
 import { AiSuggestionsService } from 'src/ai-suggestions/ai-suggestions.service';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
+@ApiBearerAuth()
 @Controller('words')
 export class WordsController {
     constructor(private wordsService: WordsService, private aiSuggestionsService: AiSuggestionsService) {}
