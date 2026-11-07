@@ -7,6 +7,19 @@ import { JwtService } from '@nestjs/jwt';
 export class AuthService {
     constructor(private usersService: UsersService, private jwtService: JwtService) {}
 
+    private async issueToken(userId: unknown): Promise<{token: string}> {
+        const payload = { sub: userId, userId }
+        return {
+            token: await this.jwtService.signAsync(payload)
+        }
+    }
+
+    async signUp(username: string, email: string, pass: string): Promise<{token: string}> {
+        const password = await bcrypt.hash(pass, 10)
+        const user = await this.usersService.create(username, email, password)
+        return this.issueToken(user._id)
+    }
+
     async signIn(email: string, pass: string): Promise<{token: string}> {
         const user = await this.usersService.findOne(email)
 
@@ -19,11 +32,7 @@ export class AuthService {
             throw new UnauthorizedException();
         }
 
-        const payload = { sub:  user._id, userId: user._id }
-
-        return {
-            token: await this.jwtService.signAsync(payload)
-        }
+        return this.issueToken(user._id)
     }
 
 }
